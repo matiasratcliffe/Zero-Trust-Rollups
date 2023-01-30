@@ -8,7 +8,7 @@ contract ClientImplementation is BaseClient {
 
     constructor(address brokerAddress) BaseClient(brokerAddress) {}
 
-    function clientLogic(bytes calldata inputData) public override pure returns (bytes memory) {
+    function clientLogic(bytes calldata inputData) external override pure returns (bytes memory) {
         bytes memory output = "";
         ClientInput memory input = abi.decode(inputData, (ClientInput));
         if (input.functionToRun == 1) { output = functionOne(input.data); }
@@ -37,6 +37,10 @@ contract ClientImplementation is BaseClient {
 
     function processResult(bytes calldata result) external onlyBroker override {
         //TODO hacer llamado a api, y logica interna simple para armar otro request
+    }
+
+    function processResult2(bytes calldata result) external onlyBroker {
+        
     }
 
 }

@@ -24,5 +24,4 @@ contract Transferable {
         weiBalances[msg.sender] += amount;
         return publicTransferFunds(amount, destination);
     }
-
 }
