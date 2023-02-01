@@ -6,6 +6,7 @@ import "./APIProvider.sol";
 
 contract APIConsumer {
     // TODO esto es un ejemplo de ZT rollup, o ZT Oracle
+    // TODO el turbosnitch 3000 es otro ejemplo, que ademas el post process genere el nuevo bloque a minar, y capaz haga uso de api consumer para obtener los bloques? o mejor los guardo en el cliente?
     APIProvider public provider;
     //web3.personal.sign(hash, web3.eth.defaultAccount, console.log)
     constructor(address apiProviderAddress) {

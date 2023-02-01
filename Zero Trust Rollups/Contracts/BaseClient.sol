@@ -19,7 +19,7 @@ abstract contract BaseClient is Ownable {
 
     constructor(address brokerAddress) {
         // aca linkear con Broker hardcoded
-        brokerContract = ExecutionBroker(brokerAddress); //esto me hace un circulo de referencias?? TODO check
+        brokerContract = ExecutionBroker(brokerAddress);
     }
 
     modifier onlyBroker() {
@@ -27,8 +27,9 @@ abstract contract BaseClient is Ownable {
         _;
     }
 
-    function clientLogic(bytes calldata input) public virtual pure returns (bytes memory);
-    function processResult(bytes calldata result) external onlyBroker {}  // no es virtual porque no es necesaria, la pueden dejar asi
+    function clientLogic(bytes calldata input) external virtual pure returns (bytes memory);  // TODO que el request tenga un source del codigo, asi no hace falta deployar onchain, que es caro, o capaz aca en el cliente esta la referencia al codigo? y el input es un json always
+    function checkResult(bytes calldata input, bytes calldata result) external virtual pure returns (bool);
+    function processResult(bytes calldata result) external virtual onlyBroker {}  // no es virtual porque no es necesaria, la pueden dejar asi
 
     function submitRequest(uint payment, bytes calldata inputData, uint postProcessingGas, uint requestedInsurance, uint claimDelay) external onlyOwner payable returns (uint) {
         require(payment <= msg.value + address(this).balance, "Insufficient funds");
@@ -37,7 +38,6 @@ abstract contract BaseClient is Ownable {
         return requestID;
     }
 
-    // TODO ver tema cancel request y todas las posibles interacciones
     function cancelRequest(uint requestID) external onlyOwner {
         brokerContract.cancelRequest(requestID);
     }
