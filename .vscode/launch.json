@@ -5,12 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "Brownie: Current Script",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
+            "program": "C:/Users/BuildMachine/.local/bin/brownie.exe",
             "console": "integratedTerminal",
-            "justMyCode": true
+            "args": ["run", "${file}"]
         }
     ]
 }

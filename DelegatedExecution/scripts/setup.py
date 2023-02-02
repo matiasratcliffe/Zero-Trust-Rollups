@@ -1,18 +1,28 @@
-from brownie import config
+from brownie import (
+    config,
+    network,
+    accounts,
+    ExecutionBroker,
+    ClientImplementation
+)
+## aca hacer todo lo que sea get accounts o get contracts, osea, get handles con la plataforma y comunicacion con el rpc (deploy si es necesario)
 
 
-def setupConfiguration(runningLocally):
-    pass
+def setup_contracts():
+    account = get_account(0)
+    def deployClient():
+        ClientImplementation.deploy(
+            ExecutionBroker[-1].address,
+            {"from": account}
+        )
+    def deployBroker():
+        ExecutionBroker.deploy(
+            {"from": account},
+            #publish_source=config["networks"][network.show_active()].get("verify", False)
+        )
 
-def get_account(index=None, id=None):
-    pass
-
-def get_contract(contract_name):
-    pass
-
-def main():
-    print(config['runEnvironment'])
-    print(123)
-
-if __name__ == "__main__":
-    main()
+    if (len(ExecutionBroker) == 0):
+        deployBroker()
+        deployClient()
+    elif (len(ClientImplementation) == 0):
+        deployClient()

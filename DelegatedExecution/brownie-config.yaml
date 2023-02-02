@@ -1,2 +1,4 @@
 dotenv: .env
-runEnvironment: ${runEnvironment}
+networks:
+  ganache-gui:
+    

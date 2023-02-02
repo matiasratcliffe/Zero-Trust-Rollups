@@ -34,6 +34,7 @@ abstract contract BaseClient is Ownable {
         require(payment <= msg.value + address(this).balance, "Insufficient funds");
         uint requestID = brokerContract.submitRequest{value: payment}(inputData, postProcessingGas, requestedInsurance, claimDelay);
         emit requestSubmitted(requestID);
+        // que el cliente le mande el random seed para elegir a los ejecutores TODO
         return requestID;
     }
 
