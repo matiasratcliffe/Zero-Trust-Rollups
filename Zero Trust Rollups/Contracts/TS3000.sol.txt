@@ -1,0 +1,61 @@
+// SPDX-License-Identifier: GPL-3.0
+
+pragma solidity >=0.7.0 <0.9.0;
+
+contract TS3000 {
+
+    struct KeyFragment {
+        string digest;
+        bool mined;
+        address minedBy;
+        string minedFragmentValue;
+    }
+
+    string encryptedData;
+    KeyFragment[] keyFragments;
+    uint256 totalFragments;
+    uint256 fragmentsLeft;
+    bool fullyMined = false;
+
+    constructor(string memory _encryptedData, string[] memory _keyFragmentDigests) payable {
+        encryptedData = _encryptedData;
+        totalFragments = _keyFragmentDigests.length;
+        fragmentsLeft = totalFragments;
+        for (uint256 i = 0; i < totalFragments; i++) {
+            KeyFragment memory fragment;
+            fragment.digest = _keyFragmentDigests[i];
+            fragment.mined = false;
+            fragment.minedBy = address(0);
+            fragment.minedFragmentValue = "";
+            keyFragments.push(fragment);
+        }
+    }
+
+    function mineFragment(uint256 index, string memory value) public returns (bool success) {
+        require (keyFragments[index].mined == false, "Fragment has already been mined");
+        require (keccak256(abi.encodePacked((customDigest(value)))) == keccak256(abi.encodePacked((keyFragments[index].digest))), "Value does not match");
+        keyFragments[index].minedFragmentValue = value;
+        keyFragments[index].mined = true;
+        keyFragments[index].minedBy = msg.sender;
+        payable(msg.sender).transfer(rewardPerFragment());
+        fragmentsLeft -= 1;
+        
+        if (fragmentsLeft == 0) {
+            fullyMined = true;
+        }
+
+        return true;
+    }
+
+    function customDigest(string memory data) public pure returns (string memory digest) {
+        digest = keccak256(data);
+        return digest;
+    }
+
+    function rewardPerFragment() public view returns (uint256) {
+        return address(this).balance / fragmentsLeft;
+    }
+
+}
+
+// que solo se pueda minar un fragmento a la vez. maybe cada fragmento es el hash del siguiente o algo asi?

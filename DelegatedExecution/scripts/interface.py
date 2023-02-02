@@ -1,17 +1,14 @@
-# aca hago las funciones para interactuar con los contratos ya corriendo, lo primero que corro son las cosas de setup
-#from scripts.setup import get_account, setup_contracts
-from brownie import ClientImplementation, ExecutionBroker, network, accounts
-from scripts.entities.contract.client import Client
-from scripts.entities.contract.broker import Broker
+from scripts.classes.contracts import ClientFactory
 import code;
 
 
 def main():
-    broker = Broker()
-    client = Client.create(accounts[0], broker)
-    print(f"Client address: {client.instance.address}")
-    #clientRetrieved = Client.getInstance()
-    
+    client = ClientFactory.getInstance()
+    client.sendFunds(1e+19)
+    request = client.createRequest(client.encodeInput(1, [10]))
+    print(f"RequestID: {request.id}")
+    request = client.createRequest(client.encodeInput(2, [20]))
+    print(f"RequestID: {request.id}")
     code.interact(local=dict(globals(), **locals()))
 
 if __name__ == "__main__":

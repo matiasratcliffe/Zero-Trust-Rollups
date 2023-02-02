@@ -7,7 +7,7 @@ import "./BaseClient.sol";
 
 
 struct Request {
-    bytes input;
+    BaseClient.ClientInput input;
     uint payment; // In Wei; deberia tener en cuenta el computo y el gas de las operaciones de submit y claim
     uint postProcessingGas;  // In Wei; for the post processing, if any
     uint challengeInsurance;  // amount of gas for challenges, deberia ser mayor al gas estimado, just in case
@@ -50,7 +50,7 @@ contract ExecutionBroker is Transferable {
     event challengePayment(uint requestID, bool success);
     
 
-    function submitRequest(bytes calldata inputData, uint postProcessingGas, uint requestedInsurance, uint claimDelay) public payable returns (uint) {
+    function submitRequest(BaseClient.ClientInput calldata input, uint postProcessingGas, uint requestedInsurance, uint claimDelay) public payable returns (uint) {
         // check msg.sender is an actual client - creo que no se puede, me parece que lo voy a tener que dejar asi, creo que no es una vulnerabilidad, onda, si no es del tipo, va a fallar eventualmente, y problema del boludo que lo registro mal
         require(msg.value - postProcessingGas > 0, "The post processing gas cannot takeup all of the supplied ether");  // TODO en el bot de python, ver que efectivamente el net payment, valga la pena
         BaseClient clientImplementation = BaseClient(msg.sender);
@@ -65,7 +65,7 @@ contract ExecutionBroker is Transferable {
             solidified: false
         });
         Request memory request = Request({
-            input: inputData,
+            input: input,
             payment: msg.value,
             postProcessingGas: postProcessingGas,
             challengeInsurance: requestedInsurance,
@@ -132,12 +132,12 @@ contract ExecutionBroker is Transferable {
         emit resultSubmitted(requestID, result);
     }
 
-    function submitChallenge(uint requestID) public {  // no hace falta el nuevo resultado ya que se va a recalcular regardless
+    function challengeSubmission(uint requestID) public {  // no hace falta el nuevo resultado ya que se va a recalcular regardless
         require(requests[requestID].submission.issuer != address(0x0), "There are no submissions for the challenged request");
         require(!requests[requestID].submission.solidified, "The challenged submission has already solidified");
 
 		bytes memory submittedResult = requests[requestID].submission.result;
-        bytes memory requestInput = requests[requestID].input;
+        BaseClient.ClientInput memory requestInput = requests[requestID].input;
         bytes memory trueFinalResult = requests[requestID].client.clientLogic(requestInput);
         emit challengeProcessed(requestID, trueFinalResult);
 

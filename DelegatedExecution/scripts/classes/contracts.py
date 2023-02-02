@@ -1,0 +1,148 @@
+from brownie import ExecutionBroker, ClientImplementation
+from scripts.classes.auxiliar.accountsManager import AccountsManager
+from scripts.classes.auxiliar.request import Request, Acceptance, Submission
+from brownie.exceptions import VirtualMachineError
+from eth_abi import encode_abi, decode_abi
+import re
+
+
+class BrokerFactory:
+    class Broker:
+        def __eq__(self, other):
+            return self.instance.address == other.instance.address
+
+        def getRequests(self):
+            requests = []
+            try:
+                while True:
+                    chainRequest = self.instance.requests(len(requests))
+                    client = ClientFactory.fromAddress(str(chainRequest[5]))
+                    request = Request(
+                        len(requests),
+                        client,
+                        client.encodeInput(
+                            int(chainRequest[0][0]),
+                            [decode_abi(['uint'], chainRequest[0][1])[0]]
+                        ),
+                        int(chainRequest[1]),
+                        int(chainRequest[2]),
+                        int(chainRequest[3]),
+                        int(chainRequest[4])
+                    )
+                    if (int(chainRequest[6][0], 16) != 0):
+                        request.acceptance = Acceptance(
+                            AccountsManager.getFromKey(str(chainRequest[6][0]))
+                        )
+                    if (int(chainRequest[7][0], 16) != 0):
+                        request.submission = Submission(
+                            AccountsManager.getFromKey(str(chainRequest[7][0])),
+                            int(chainRequest[7][1]),
+                            #TODO
+                            chainRequest[7][3]
+                        )
+                    request.cancelled = chainRequest[8]
+                    requests.append(request)
+            except VirtualMachineError as error:
+                return requests
+
+        def acceptRequest(self, acceptingAccount=None):
+            if acceptingAccount == None:
+                acceptingAccount = AccountsManager.getAccount()
+            pass
+
+        def cancelAcceptance(self, requestID, account=None):
+            if account == None:
+                pass
+                #self.instance.
+            pass
+
+        def submitResult(self, requestID, result):
+            pass
+
+        def challengeSubmission(self, requestID):
+            pass
+
+        def isRequestOpen(self, requestID):
+            pass
+
+        def claimPayment(self, requestID):
+            pass
+
+        def recoverPayment(self, amount, destination):
+            pass
+
+
+    def getInstance():
+        if (len(ExecutionBroker) > 0):
+            return BrokerFactory.fromAddress(ExecutionBroker[-1].address)
+        else:
+            return BrokerFactory.create(AccountsManager.getFromIndex(0))
+
+    def create(_creatorAccount):
+        ExecutionBroker.deploy(
+            {"from": _creatorAccount}
+        )
+        return BrokerFactory.fromAddress(ExecutionBroker[-1])
+
+    def fromAddress(address):
+        instance = ExecutionBroker.at(address)
+        broker = BrokerFactory.Broker()
+        broker.instance = instance
+        return broker
+
+
+class ClientFactory:
+    class Client:
+        def __eq__(self, other):
+            return self.instance.address == other.instance.address
+
+        def encodeInput(self, functionToRun, data):
+            memberRegex = "([A-Za-z][A-Za-z0-9]*)\s+[_A-Za-z][_A-Za-z0-9]*;"
+            dataStruct = self.instance.getInputStructure(functionToRun)
+            return (functionToRun, encode_abi(re.findall(memberRegex, dataStruct), data))
+
+        def createRequest(self, requestInput, payment=1e+16, requestedInsurance=1e+18, postProcessingGas=2e+4, claimDelay=0):
+            request = self.instance.submitRequest(
+                payment,
+                requestInput,
+                postProcessingGas,
+                requestedInsurance,
+                claimDelay,
+                {"from": self.owner}
+            )
+            request.wait(1)
+            return Request(request.return_value, self, requestInput, payment, requestedInsurance, postProcessingGas, claimDelay)
+
+
+        def cancelRequest(self, requestID):
+            self.instance.cancelRequest(requestID)
+
+        def sendFunds(self, amount):
+            self.instance.sendFunds({"from": self.owner, "value": amount})
+
+        def withdrawFunds(self, amount):
+            self.instance.withdrawFunds(amount)
+
+        def getFunds(self):
+            return self.instance.balance()
+
+    def getInstance():
+        if (len(ClientImplementation) > 0):
+            return ClientFactory.fromAddress(ClientImplementation[-1].address)
+        else:
+            return ClientFactory.create(AccountsManager.getFromIndex(0), BrokerFactory.getInstance())
+
+    def create(_owner, _broker):
+        ClientImplementation.deploy(
+            _broker.instance.address,
+            {"from": _owner}
+        )
+        return ClientFactory.fromAddress(ClientImplementation[-1])
+
+    def fromAddress(address):
+        instance = ClientImplementation.at(address)
+        client = ClientFactory.Client()
+        client.instance = instance
+        client.owner = AccountsManager.getFromKey(str(instance.owner()))
+        client.broker = BrokerFactory.fromAddress(str(instance.brokerContract()))
+        return client

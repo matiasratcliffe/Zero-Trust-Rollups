@@ -9,9 +9,8 @@ contract ClientImplementation is BaseClient {
 
     constructor(address brokerAddress) BaseClient(brokerAddress) {}
 
-    function clientLogic(bytes calldata inputData) external override pure returns (bytes memory) {
+    function clientLogic(ClientInput calldata input) external override pure returns (bytes memory) {
         bytes memory output = "";
-        ClientInput memory input = abi.decode(inputData, (ClientInput));
         if (input.functionToRun == 1) { output = functionOne(input.data); }
         else if (input.functionToRun == 2) { output = functionTwo(input.data); }
         else if (input.functionToRun == 3) { output = functionThree(input.data); }
@@ -36,6 +35,13 @@ contract ClientImplementation is BaseClient {
         return abi.encode(input.counter + 4);
     }
 
+    function getInputStructure(uint functionID) external pure returns (string memory) {
+        if (functionID == 1) { return "{uint counter;}"; }
+        else if (functionID == 2) { return "{uint counter;}"; }
+        else if (functionID == 3) { return "{uint counter;}"; }
+        else { return "Indavild function ID"; }
+    }
+
     function processResult(bytes calldata result) external onlyBroker override {
         require(address(this).balance >= 1000 gwei, "Insufficient funds");
         uint functionToRun;
@@ -51,11 +57,11 @@ contract ClientImplementation is BaseClient {
                 functionToRun = 1;
             }
         }
-        ClientInput memory data = ClientInput({
+        ClientInput memory input = ClientInput({
             functionToRun: functionToRun,
             data: abi.encode(counter)
         });
-        uint requestID = brokerContract.submitRequest{value: 1000 gwei}(abi.encode(data), 200000 wei, 1000 gwei, 1 minutes);
+        uint requestID = brokerContract.submitRequest{value: 1000 gwei}(input, 200000 wei, 1000 gwei, 1 minutes);
         emit requestSubmitted(requestID);
     }
 }
