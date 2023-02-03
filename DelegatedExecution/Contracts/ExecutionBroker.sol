@@ -61,7 +61,7 @@ contract ExecutionBroker is Transferable {
         Submission memory submission = Submission({
             issuer: address(0x0),
             timestamp: 0,
-            result: "",
+            result: "0x00",
             solidified: false
         });
         Request memory request = Request({

@@ -1,4 +1,2 @@
 dotenv: .env
-networks:
-  ganache-gui:
-    
+
