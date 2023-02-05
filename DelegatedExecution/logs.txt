@@ -1,0 +1,27 @@
+[32m------------------- New Execution -------------------[0m
+[32m[2023-02-05 20:10:06.994274] Instantiated broker[0m
+[32m[2023-02-05 20:10:07.475833] Instantiated client[0m
+[32m[2023-02-05 20:10:07.715422] Instantiated broker[0m
+[32m[2023-02-05 20:10:07.715422] Created executor[0m
+[32m[2023-02-05 20:10:07.715422] Populating executors buffers[0m
+[32m[2023-02-05 20:10:09.545347] Created request: 0[0m
+[32m[2023-02-05 20:10:09.726257] Instantiated client[0m
+[32m[2023-02-05 20:10:09.885510] Event[requestCreated]: {'requestID': 0, 'payment': 10000000000000000, 'challengeInsurance': 1000000000000000000, 'claimDelay': 0}[0m
+[32m[2023-02-05 20:10:10.043932] Instantiated broker[0m
+[32m[2023-02-05 20:10:12.230294] Instantiated client[0m
+[32m[2023-02-05 20:10:12.488437] Instantiated broker[0m
+[32m[2023-02-05 20:10:12.649131] Instantiated client[0m
+[32m[2023-02-05 20:10:12.936169] Instantiated broker[0m
+[32m[2023-02-05 20:10:13.472274] Request accepted: 0[0m
+[32m[2023-02-05 20:10:13.656049] Instantiated client[0m
+[32m[2023-02-05 20:10:13.915128] Instantiated broker[0m
+[32m[2023-02-05 20:10:14.069934] Instantiated client[0m
+[32m[2023-02-05 20:10:14.300551] Instantiated broker[0m
+[32m[2023-02-05 20:10:14.473617] Instantiated client[0m
+[32m[2023-02-05 20:10:14.769311] Instantiated broker[0m
+[32m[2023-02-05 20:10:14.918707] Result computed: 0 => 0x0000000000000000000000000000000000000000000000000000000000000064[0m
+[32m[2023-02-05 20:10:15.111915] Instantiated client[0m
+[32m[2023-02-05 20:10:15.327668] Instantiated broker[0m
+[32m[2023-02-05 20:10:15.852060] Result submitted: 0[0m
+[32m[2023-02-05 20:10:16.561081] Event[resultSubmitted]: {'requestID': 0, 'result': b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00d'}[0m
+[32m-----------------------------------------------------[0m

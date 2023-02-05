@@ -2,16 +2,24 @@ from scripts.classes.auxiliar.accountsManager import AccountsManager
 from scripts.classes.contracts import ClientFactory
 from scripts.classes.executor import Executor
 import code;
+from time import sleep
+from scripts.logger import Logger
 
+from brownie.network.event import EventWatcher
 
 def main():
+    Logger.log("------------------- New Execution -------------------", raw=True)
     client = ClientFactory.getInstance()
-    request = client.createRequest(client.encodeInput(1, [10]), funds=10)
-    executor = Executor(AccountsManager.getAccount(), client.broker)
-    client.broker.acceptRequest(request.id, executor.account) ## TODO actually I wouldnt do this here, I need a function in executor that runs one round of scan for open requests and accepts it
-    result = executor.computeResult(request.id)
-    print(result)
+    executor = Executor(AccountsManager.getAccount(), client.broker, True)
+    client.createRequest(client.encodeInput(1, [10]), funds=10)
+    sleep(2)
+    executor.solverLoopRound()
+    sleep(2)
+    Logger.log("-----------------------------------------------------", raw=True)
     code.interact(local=dict(globals(), **locals()))
+
+def callbackfunc(data):
+    print(f"Callback called: {str(data)}")
 
 if __name__ == "__main__":
     main()

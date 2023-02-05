@@ -43,8 +43,7 @@ contract ExecutionBroker is Transferable {
     
     event resultSubmitted(uint requestID, bytes result);
     event resultPostProcessed(uint requestID, bool success);
-    
-    event paymentClaimed(uint requestID, bool success);
+    event requestSolidified(uint requestID);
     
     event challengeProcessed(uint requestID, bytes result);
     event challengePayment(uint requestID, bool success);
@@ -78,6 +77,11 @@ contract ExecutionBroker is Transferable {
         requests.push(request);
         emit requestCreated(requests.length-1, msg.value, requestedInsurance, claimDelay);
         return requests.length - 1;
+    }
+
+    function publicizeRequest(uint requestID) public {  // This is to re emit the event In case the request gets forgotten
+        require(requests[requestID].acceptance.acceptor == address(0x00), "You cant publicize a taken request");
+        emit requestCreated(requestID, requests[requestID].payment, requests[requestID].challengeInsurance, requests[requestID].claimDelay);
     }
 
     function cancelRequest(uint requestID) public {
@@ -155,12 +159,12 @@ contract ExecutionBroker is Transferable {
         } // else, el original lo hizo bien, dejo que pase el tiempo y cobre
     }
 
-    function claimPayment(uint requestID) public {
+    function claimPayment(uint requestID) public returns (bool) {
         require(requests[requestID].submission.issuer == msg.sender, "This payment does not belong to you");
         require(!requests[requestID].submission.solidified, "The provided request has already solidified");
         require(requests[requestID].submission.timestamp + requests[requestID].claimDelay < block.timestamp, "The claim delay hasn't passed yet");
         bool transferSuccess = solidify(requestID);
-        emit paymentClaimed(requestID, transferSuccess);
+        return transferSuccess;
     }
 
     function isRequestOpen(uint requestID) public view returns (bool) {  // solo a modo de ayuda
@@ -170,6 +174,7 @@ contract ExecutionBroker is Transferable {
     function solidify(uint requestID) private returns (bool) {
         // first solidify, then pay, for reentrancy issues
         requests[requestID].submission.solidified = true;
+        emit requestSolidified(requestID);
         address payee = requests[requestID].submission.issuer;
         uint payAmount = requests[requestID].payment + requests[requestID].challengeInsurance;
         bool transferSuccess = internalTransferFunds(payAmount, payee);

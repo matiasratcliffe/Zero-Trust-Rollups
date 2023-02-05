@@ -23,16 +23,15 @@ class Submission:
 
 class Request:
     def __init__(self, requestID, chainRequest):
-        client = None  # TODO ClientFactory.fromAddress(str(chainRequest[5]))
-        self.__init__(
-            requestID,
-            client,
-            (int(chainRequest[0][0]), bytes(chainRequest[0][1])),
-            int(chainRequest[1]),
-            int(chainRequest[2]),
-            int(chainRequest[3]),
-            int(chainRequest[4])
-        )
+        self.id = requestID
+        self.input = (int(chainRequest[0][0]), bytes(chainRequest[0][1]))
+        self.payment = int(chainRequest[1])
+        self.postProcessingGas = int(chainRequest[2])
+        self.challengeInsurance = int(chainRequest[3])
+        self.claimDelay = int(chainRequest[4])
+        self.client = ClientFactory.fromAddress(str(chainRequest[5]))
+        self.acceptance = None
+        self.submission = None
         if (int(chainRequest[6][0], 16) != 0):
             self.acceptance = Acceptance(
                 AccountsManager.getFromKey(str(chainRequest[6][0]))
@@ -45,18 +44,6 @@ class Request:
                 chainRequest[7][3]
             )
         self.cancelled = chainRequest[8]
-
-    def __init__(self, _id, _client, _input, _payment, _postProcessingGas, _challengeInsurance, _claimDelay):
-        self.id = _id
-        self.input = _input
-        self.payment = _payment
-        self.postProcessingGas = _postProcessingGas
-        self.challengeInsurance = _challengeInsurance
-        self.claimDelay = _claimDelay
-        self.client = _client
-        self.cancelled = False
-        self.acceptance = None
-        self.submission = None
     
     def __str__(self):
         return f"{{id: {self.id}, input: ({self.input[0]}, 0x{self.input[1].hex()}), payment: {self.payment/1e+18} Eth, postProcessingGas: {self.postProcessingGas/1e+9} Gwei, challengeInsurance: {self.challengeInsurance/1e+18} Eth, claimDelay: {self.claimDelay/3600} Hours, client: {self.client}, cancelled: {self.cancelled}, acceptance: {self.acceptance}, submission: {self.submission}}}"
