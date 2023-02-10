@@ -1,9 +1,8 @@
 from scripts.logger import Logger
 
-
+@Logger.LogClassMethods
 class Executor:
     def __init__(self, account, broker, populateBuffers=False):
-        Logger.log("Created executor")
         self._listenForEvents = True
         self._minPayment = 1
         self._maxInsurance = 1e+18
@@ -31,7 +30,6 @@ class Executor:
         self.broker.instance.events.subscribe("requestSolidified", lambda event : self.unsolidifiedSubmissions.remove(event.args.requestID) if event.args.requestID in self.unsolidifiedSubmissions else None)
 
     def _populateBuffers(self):
-        Logger.log("Populating executors buffers")
         self.unacceptedRequests = []
         self.unsolidifiedSubmissions = []
         for req in self.broker.getRequests():
@@ -42,12 +40,11 @@ class Executor:
                 elif req.submission != None and req.submission.solidified:
                     Logger.log(f"Added request {req.id} to unsolidified submissions")
                     self.unsolidifiedSubmissions.append(req.id)
+    
     def _acceptNextOpenRequest(self):
         request = self.broker.getRequest(self.unacceptedRequests.pop(0))
         self.broker.acceptRequest(request.id, self.account)
-        Logger.log(f"Request accepted: {request.id}")
         return request.id
-
 
     def _computeResult(self, requestID):
         if self.broker.getRequest(requestID).acceptance.acceptor == self.account:
@@ -58,11 +55,9 @@ class Executor:
 
     def _submitResult(self, requestID, result):
         self.broker.submitResult(requestID, result)
-        Logger.log(f"Result submitted: {requestID}")
     
     def _challengeSubmission(self, requestID):
         self.broker.challengeSubmission(requestID, self.account)
-        Logger.log(f"Challenge submitted [{requestID}]")
 
     def solverLoopRound(self):
         if len(self.unacceptedRequests) > 0:
@@ -75,7 +70,6 @@ class Executor:
     def challengerLoopRound(self):
         if len(self.unsolidifiedSubmissions) > 0:
             request = self.broker.getRequest(self.unsolidifiedSubmissions.pop(0))
-            Logger.log(f"Challenging request {request.id}...", end='')
             result = self.computeResult(request.id)
             if result != request.submission.result:
                 self.challengeSubmission(request.id)

@@ -4,40 +4,27 @@ from datetime import datetime
 class Logger:
     loggingActive = True
     logIndentation = 0
-    def log(message, raw=False, indent=0):
+    def log(message, color=Fore.GREEN, raw=False):
+        indentation = Logger.logIndentation * '  '
         message += Style.RESET_ALL + "\n"
-        message = message if raw else f"[{datetime.now()}] {message}"
+        message = message if raw else f"[{datetime.now().strftime('%m-%d %H:%M:%S')}] {indentation}{message}"
         if Logger.loggingActive:
             with open("logs.txt", "a", encoding='utf8') as f:
-                f.write(Fore.GREEN + message)
-                print(Fore.GREEN + message, end='')
+                f.write(color + message)
     
     def LogClassMethods(classToDecorate):
+        exclusion_list = ["__str__"]
         for name, obj in vars(classToDecorate).items():
-            if callable(obj):
-                setattr(classToDecorate, name, Logger.LogMethod(obj))
+            if name not in exclusion_list and callable(obj):
+                setattr(classToDecorate, name, Logger.LogMethod(obj, methodPrefix=f"{classToDecorate.__name__}."))
         return classToDecorate
 
-    def LogMethod(methodToDecorate):
+    def LogMethod(methodToDecorate, methodPrefix=''):
         def decoratedMethod(*args, **kwargs):
-            indentation = Logger.logIndentation * '  '
-            Logger.log(f"{indentation}Called {methodToDecorate.__name__} with args: {args[1:]}")
+            Logger.log(f"Called {methodPrefix}{methodToDecorate.__name__} with args: {list(args)}", color=Fore.WHITE)
             Logger.logIndentation += 1
             returnVal = methodToDecorate(*args, **kwargs)
             Logger.logIndentation -= 1
-            Logger.log(f"{indentation}Returned from {methodToDecorate.__name__}: {returnVal}")
+            Logger.log(f"Returned from {methodPrefix}{methodToDecorate.__name__}: {returnVal}", color=Fore.WHITE)
+            return returnVal
         return decoratedMethod
-
-@Logger.LogClassMethods
-class MiClase:
-    Jajaja = 123
-    def __init__(self):
-        self.instanceFunc(123)
-    
-    def instanceFunc(self, asd):
-        self.classFunc("Jaja")
-
-    def classFunc(self, valor):
-        pass
-
-#MiClase()

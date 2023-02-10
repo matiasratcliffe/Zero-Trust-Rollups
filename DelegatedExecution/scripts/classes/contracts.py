@@ -54,6 +54,7 @@ class Request:
     def __repr__(self):
         return str(self)
 
+@Logger.LogClassMethods
 class BrokerFactory:
     ## TODO en el futuro sacar el deployment de las factories, y que las factories solo populen con data de config
     ## TODO OOOO quizas en el futuro pasar fromaddress a la clase contrato, y que el deployment sea de los factories
@@ -70,12 +71,12 @@ class BrokerFactory:
         return BrokerFactory.fromAddress(ExecutionBroker[-1])
 
     def fromAddress(address):
-        Logger.log("Instantiated broker")
         instance = ExecutionBroker.at(address)
         broker = Broker()
         broker.instance = instance
         return broker
 
+@Logger.LogClassMethods
 class Broker:
         def __eq__(self, other):
             return self.instance.address == other.instance.address
@@ -117,7 +118,7 @@ class Broker:
         def recoverPayment(self, amount, account, destination):
             self.instance.publicTransferFunds(amount, destination, {"from": account})
 
-
+@Logger.LogClassMethods
 class ClientFactory:
     def getInstance():
         if (len(ClientImplementation) > 0):
@@ -133,7 +134,6 @@ class ClientFactory:
         return ClientFactory.fromAddress(ClientImplementation[-1])
 
     def fromAddress(address):
-        Logger.log("Instantiated client")
         instance = ClientImplementation.at(address)
         client = Client()
         client.instance = instance
@@ -141,7 +141,7 @@ class ClientFactory:
         client.broker = BrokerFactory.fromAddress(str(instance.brokerContract()))
         return client
 
-
+@Logger.LogClassMethods
 class Client:
         def __str__(self):
             return f"<{self.instance.address}>"
@@ -167,7 +167,6 @@ class Client:
                 transactionData
             )
             request.wait(1)
-            Logger.log(f"Created request: {request.return_value}")
             return self.broker.getRequest(request.return_value)
 
         def cancelRequest(self, requestID):
