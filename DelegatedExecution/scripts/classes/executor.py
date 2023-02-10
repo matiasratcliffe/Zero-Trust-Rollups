@@ -2,7 +2,6 @@ from scripts.logger import Logger
 
 
 class Executor:
-
     def __init__(self, account, broker, populateBuffers=False):
         Logger.log("Created executor")
         self._listenForEvents = True
@@ -14,15 +13,7 @@ class Executor:
         self.unacceptedRequests = []
         self.unsolidifiedSubmissions = []
         if (populateBuffers):
-            Logger.log("Populating executors buffers")
-            for req in self.broker.getRequests():
-                if not req.cancelled:
-                    if req.acceptance == None:
-                        Logger.log(f"Added request {req.id} to unaccepted requests")
-                        self.unacceptedRequests.append(req.id)
-                    elif req.submission != None and req.submission.solidified:
-                        Logger.log(f"Added request {req.id} to unsolidified submissions")
-                        self.unsolidifiedSubmissions.append(req.id)
+            self._populateBuffers
         def addUnacceptedRequest(event):
             Logger.log(f"Event[{event.event}]: {dict(event.args)}")
             if self._listenForEvents:
@@ -39,6 +30,18 @@ class Executor:
         self.broker.instance.events.subscribe("resultSubmitted", lambda event : addUnsolidifiedSubmission(event))
         self.broker.instance.events.subscribe("requestSolidified", lambda event : self.unsolidifiedSubmissions.remove(event.args.requestID) if event.args.requestID in self.unsolidifiedSubmissions else None)
 
+    def _populateBuffers(self):
+        Logger.log("Populating executors buffers")
+        self.unacceptedRequests = []
+        self.unsolidifiedSubmissions = []
+        for req in self.broker.getRequests():
+            if not req.cancelled:
+                if req.acceptance == None:
+                    Logger.log(f"Added request {req.id} to unaccepted requests")
+                    self.unacceptedRequests.append(req.id)
+                elif req.submission != None and req.submission.solidified:
+                    Logger.log(f"Added request {req.id} to unsolidified submissions")
+                    self.unsolidifiedSubmissions.append(req.id)
     def _acceptNextOpenRequest(self):
         request = self.broker.getRequest(self.unacceptedRequests.pop(0))
         self.broker.acceptRequest(request.id, self.account)

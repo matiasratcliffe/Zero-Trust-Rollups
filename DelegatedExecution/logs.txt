@@ -25,3 +25,35 @@
 [32m[2023-02-05 20:10:15.852060] Result submitted: 0[0m
 [32m[2023-02-05 20:10:16.561081] Event[resultSubmitted]: {'requestID': 0, 'result': b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00d'}[0m
 [32m-----------------------------------------------------[0m
+[32m[2023-02-10 02:46:14.823925] Called __init__ with args: ()[0m
+[32m[2023-02-10 02:46:14.823925]   Called instanceFunc with args: (123,)[0m
+[32m[2023-02-10 02:46:14.827478]     Called classFunc with args: ('Jaja',)[0m
+[32m[2023-02-10 02:46:14.829227]     Returned from classFunc: None[0m
+[32m[2023-02-10 02:46:14.830640]   Returned from instanceFunc: None[0m
+[32m[2023-02-10 02:46:14.831640] Returned from __init__: None[0m
+[32m------------------- New Execution -------------------[0m
+[32m[2023-02-10 02:46:15.364707] Instantiated broker[0m
+[32m[2023-02-10 02:46:15.788441] Instantiated client[0m
+[32m[2023-02-10 02:46:16.097216] Instantiated broker[0m
+[32m[2023-02-10 02:46:16.097216] Created executor[0m
+[32m[2023-02-10 02:46:17.769785] Created request: 0[0m
+[32m[2023-02-10 02:46:17.965793] Instantiated client[0m
+[32m[2023-02-10 02:46:18.158992] Instantiated broker[0m
+[32m[2023-02-10 02:46:18.176534] Event[requestCreated]: {'requestID': 0, 'payment': 10000000000000000, 'challengeInsurance': 1000000000000000000, 'claimDelay': 0}[0m
+[32m[2023-02-10 02:46:20.393537] Instantiated client[0m
+[32m[2023-02-10 02:46:20.660051] Instantiated broker[0m
+[32m[2023-02-10 02:46:20.864779] Instantiated client[0m
+[32m[2023-02-10 02:46:21.168732] Instantiated broker[0m
+[32m[2023-02-10 02:46:21.551682] Request accepted: 0[0m
+[32m[2023-02-10 02:46:21.756491] Instantiated client[0m
+[32m[2023-02-10 02:46:21.989183] Instantiated broker[0m
+[32m[2023-02-10 02:46:22.184364] Instantiated client[0m
+[32m[2023-02-10 02:46:22.466699] Instantiated broker[0m
+[32m[2023-02-10 02:46:22.656097] Instantiated client[0m
+[32m[2023-02-10 02:46:22.939549] Instantiated broker[0m
+[32m[2023-02-10 02:46:23.056062] Result computed: 0 => 0x0000000000000000000000000000000000000000000000000000000000000064[0m
+[32m[2023-02-10 02:46:23.231127] Instantiated client[0m
+[32m[2023-02-10 02:46:23.544672] Instantiated broker[0m
+[32m[2023-02-10 02:46:24.033800] Result submitted: 0[0m
+[32m[2023-02-10 02:46:24.822071] Event[resultSubmitted]: {'requestID': 0, 'result': b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00d'}[0m
+[32m-----------------------------------------------------[0m

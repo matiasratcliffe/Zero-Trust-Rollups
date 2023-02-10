@@ -5,13 +5,18 @@
 
 //Titulo: Off-chain delegated code execution for on-chain code
 
-//Objetivo: El objetivo es plantear una alternativa a la ejecucion directa de codigo en blockchains basadas en el protocolo ethereum, valiendose de oraculos y un sistema de incentivos financieros para reducir el costo de la ejecucion de dicho codigo.
 
 // es un optimistic rollup? comparar con optimism y otras cosas existentes (es diferente porque lo mio esta pensado para alquiler de computo, no simplemente como metodo ahorrativo para dapps)
 
+//Objetivo:
+//El objetivo es plantear una alternativa a la ejecucion directa de codigo en blockchains basadas en el protocolo ethereum, valiendose de oraculos y un sistema de incentivos financieros para reducir el costo de la ejecucion de dicho codigo.
+
+//Pasos a seguir
 //Analizar las alternativas de ejecucion hoy en dia (local, cloud, blockchain, voluntary computing, ICP?), y exponer virtudes y defectos en cada uno, y una esperanza de en lo que este trabajo podria llegar a culminar
 //Proponer un modelo de ejecucion de codigo con resultados onchain pero ejecucion offchain, reduciendo el costo de gas
+//Implementar y deployar dicho modelo para analizar su desempeño
 
+//Observaciones
 //El objetivo no es crear un servicio competitivo a nivel mercado, sino mas bien explorar las posibilidades tecnicas de la tecnologia blockchain y los smart contracts
 
 // SPDX-License-Identifier: GPL-3.0

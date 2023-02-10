@@ -1,0 +1,46 @@
+[32m[2023-02-10 02:23:29.115643] Called __init__ with args: (<__main__.MiClase object at 0x000002026C663B20>,)[0m
+[32m[2023-02-10 02:23:29.115643] Called instanceFunc with args: (<__main__.MiClase object at 0x000002026C663B20>,)[0m
+[32m[2023-02-10 02:25:38.732193] Called __init__ with args: (<__main__.MiClase object at 0x00000221B7F63B50>,)[0m
+[32m[2023-02-10 02:25:38.732193] Called instanceFunc with args: (<__main__.MiClase object at 0x00000221B7F63B50>,)[0m
+[32m[2023-02-10 02:26:27.031738] Called __init__ with args: (<__main__.MiClase object at 0x000002C303C63AC0>,)[0m
+[32m[2023-02-10 02:26:27.031738] Called instanceFunc with args: (<__main__.MiClase object at 0x000002C303C63AC0>,)[0m
+[32m[2023-02-10 02:26:27.031738] Returned from instanceFunc: None[0m
+[32m[2023-02-10 02:26:27.040274] Returned from __init__: None[0m
+[32m[2023-02-10 02:28:36.572670] Called __init__ with args: (<__main__.MiClase object at 0x0000018FB9663AC0>,)[0m
+[32m[2023-02-10 02:28:36.572670] Called instanceFunc with args: (<__main__.MiClase object at 0x0000018FB9663AC0>,)[0m
+[32m[2023-02-10 02:28:36.586143] Returned from instanceFunc: None[0m
+[32m[2023-02-10 02:28:36.587045] Returned from __init__: None[0m
+[32m[2023-02-10 02:34:36.799857] Called __init__ with args: (<__main__.MiClase object at 0x000001BF85863A90>,)[0m
+[32m[2023-02-10 02:34:36.799857] 	Called instanceFunc with args: (<__main__.MiClase object at 0x000001BF85863A90>,)[0m
+[32m[2023-02-10 02:34:36.799857] 	Returned from instanceFunc: None[0m
+[32m[2023-02-10 02:34:36.799857] Returned from __init__: None[0m
+[32m[2023-02-10 02:35:48.783148] Called __init__ with args: (<__main__.MiClase object at 0x00000289AA1639D0>,)[0m
+[32m[2023-02-10 02:35:48.783148] 	Called instanceFunc with args: (<__main__.MiClase object at 0x00000289AA1639D0>, 123)[0m
+[32m[2023-02-10 02:35:48.783148] 		Called classFunc with args: (<__main__.MiClase object at 0x00000289AA1639D0>, 'Jaja')[0m
+[32m[2023-02-10 02:36:03.751442] Called __init__ with args: (<__main__.MiClase object at 0x0000016EE8C639D0>,)[0m
+[32m[2023-02-10 02:36:03.751442] 	Called instanceFunc with args: (<__main__.MiClase object at 0x0000016EE8C639D0>, 123)[0m
+[32m[2023-02-10 02:36:03.751442] 		Called classFunc with args: (<__main__.MiClase object at 0x0000016EE8C639D0>, 'Jaja')[0m
+[32m[2023-02-10 02:38:10.201074] 0Called __init__ with args: (<__main__.MiClase object at 0x000002A1CF7639D0>,)[0m
+[32m[2023-02-10 02:38:10.201074] 1Called instanceFunc with args: (<__main__.MiClase object at 0x000002A1CF7639D0>, 123)[0m
+[32m[2023-02-10 02:38:10.215696] 2Called classFunc with args: (<__main__.MiClase object at 0x000002A1CF7639D0>, 'Jaja')[0m
+[32m[2023-02-10 02:38:55.823229] Called __init__ with args: (<__main__.MiClase object at 0x0000018424C639D0>,)[0m
+[32m[2023-02-10 02:38:55.825378]     Called instanceFunc with args: (<__main__.MiClase object at 0x0000018424C639D0>, 123)[0m
+[32m[2023-02-10 02:38:55.827102]         Called classFunc with args: (<__main__.MiClase object at 0x0000018424C639D0>, 'Jaja')[0m
+[32m[2023-02-10 02:40:57.660467] Called __init__ with args: (<__main__.MiClase object at 0x000002EFF95639D0>,)[0m
+[32m[2023-02-10 02:40:57.660467]   Called instanceFunc with args: (<__main__.MiClase object at 0x000002EFF95639D0>, 123)[0m
+[32m[2023-02-10 02:40:57.660467]     Called classFunc with args: (<__main__.MiClase object at 0x000002EFF95639D0>, 'Jaja')[0m
+[32m[2023-02-10 02:40:59.418920] Called __init__ with args: (<__main__.MiClase object at 0x0000021E444639D0>,)[0m
+[32m[2023-02-10 02:40:59.418920]   Called instanceFunc with args: (<__main__.MiClase object at 0x0000021E444639D0>, 123)[0m
+[32m[2023-02-10 02:40:59.418920]     Called classFunc with args: (<__main__.MiClase object at 0x0000021E444639D0>, 'Jaja')[0m
+[32m[2023-02-10 02:41:24.773457] Called __init__ with args: (<__main__.MiClase object at 0x0000012AC4F63A30>,)[0m
+[32m[2023-02-10 02:41:24.773457]   Called instanceFunc with args: (<__main__.MiClase object at 0x0000012AC4F63A30>, 123)[0m
+[32m[2023-02-10 02:41:24.783293]     Called classFunc with args: (<__main__.MiClase object at 0x0000012AC4F63A30>, 'Jaja')[0m
+[32m[2023-02-10 02:41:24.784081]     Returned from classFunc: None[0m
+[32m[2023-02-10 02:41:24.784081]   Returned from instanceFunc: None[0m
+[32m[2023-02-10 02:41:24.784081] Returned from __init__: None[0m
+[32m[2023-02-10 02:42:01.309973] Called __init__ with args: ()[0m
+[32m[2023-02-10 02:42:01.309973]   Called instanceFunc with args: (123,)[0m
+[32m[2023-02-10 02:42:01.309973]     Called classFunc with args: ('Jaja',)[0m
+[32m[2023-02-10 02:42:01.319098]     Returned from classFunc: None[0m
+[32m[2023-02-10 02:42:01.320204]   Returned from instanceFunc: None[0m
+[32m[2023-02-10 02:42:01.320204] Returned from __init__: None[0m
