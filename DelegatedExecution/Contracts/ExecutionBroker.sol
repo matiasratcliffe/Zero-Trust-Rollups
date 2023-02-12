@@ -49,6 +49,8 @@ contract ExecutionBroker is Transferable {
     event challengePayment(uint requestID, bool success);
     
 
+    // Restricted interaction functions
+
     function submitRequest(BaseClient.ClientInput calldata input, uint postProcessingGas, uint requestedInsurance, uint claimDelay) public payable returns (uint) {
         // check msg.sender is an actual client - creo que no se puede, me parece que lo voy a tener que dejar asi, creo que no es una vulnerabilidad, onda, si no es del tipo, va a fallar eventualmente, y problema del boludo que lo registro mal
         require(msg.value - postProcessingGas > 0, "The post processing gas cannot takeup all of the supplied ether");  // en el bot de python, ver que efectivamente el net payment, valga la pena
@@ -89,6 +91,8 @@ contract ExecutionBroker is Transferable {
         bool transferSuccess = internalTransferFunds(requests[requestID].payment, payee);
         emit requestCancelled(requestID, transferSuccess);
     }
+
+    // Open interaction functions
 
     function publicizeRequest(uint requestID) public {  // This is to re emit the event In case the request gets forgotten
         require(requests[requestID].acceptance.acceptor == address(0x00), "You cant publicize a taken request");
@@ -136,7 +140,7 @@ contract ExecutionBroker is Transferable {
         emit resultSubmitted(requestID, result, msg.sender);
     }
 
-    function challengeSubmission(uint requestID) public {  // no hace falta el nuevo resultado ya que se va a recalcular regardless
+    function challengeSubmission(uint requestID) public returns (bool) {  // no hace falta el nuevo resultado ya que se va a recalcular regardless
         require(requests[requestID].submission.issuer != address(0x0), "There are no submissions for the challenged request");
         require(!requests[requestID].submission.solidified, "The challenged submission has already solidified");
 
@@ -156,7 +160,9 @@ contract ExecutionBroker is Transferable {
             bool transferSuccess = solidify(requestID);
             // No revierto si no es success porque una corrida on chain es muy valiosa como para arriesgar el revert
             emit challengePayment(requestID, transferSuccess);
+            return true;  // result was corrected
         } // else, el original lo hizo bien, dejo que pase el tiempo y cobre
+        return false;  // original was correct
     }
 
     function claimPayment(uint requestID) public returns (bool) {
@@ -167,9 +173,13 @@ contract ExecutionBroker is Transferable {
         return transferSuccess;
     }
 
+    // Public views
+
     function isRequestOpen(uint requestID) public view returns (bool) {  // solo a modo de ayuda
         return (!requests[requestID].cancelled && requests[requestID].acceptance.acceptor == address(0x0));
     }
+
+    // Private functions
 
     function solidify(uint requestID) private returns (bool) {
         // first solidify, then pay, for reentrancy issues

@@ -7,7 +7,7 @@ import "./BaseClient.sol";
 
 
 struct Request {
-    bytes input;
+    BaseClient.ClientInput input;
     uint payment; // In Wei; deberia tener en cuenta el computo y el gas de las operaciones de submit y claim
     uint postProcessingGas;  // In Wei; for the post processing, if any
     BaseClient client;
@@ -39,18 +39,18 @@ contract ExecutionBroker is Transferable {
     event requestAccepted(uint requestID, address acceptor);
     event acceptanceCancelled(uint requestID, address acceptor, bool refundSuccess);
     
-    event resultSubmitted(uint requestID, bytes result);
+    event resultSubmitted(uint requestID, bytes result, address submitter);
     event resultPostProcessed(uint requestID, bool success);
     
-    event paymentClaimed(uint requestID, bool success);
-    
-    event challengeProcessed(uint requestID, bytes result); mbape
+    event challengeProcessed(uint requestID, bytes result); //TODO
     event challengePayment(uint requestID, bool success);
     
 
-    function submitRequest(bytes calldata inputData, uint postProcessingGas, uint requestedInsurance, uint claimDelay) public payable returns (uint) {
+    // Restricted interaction functions
+
+    function submitRequest(BaseClient.ClientInput calldata input, uint postProcessingGas, uint requestedInsurance, uint claimDelay) public payable returns (uint) {
         // check msg.sender is an actual client - creo que no se puede, me parece que lo voy a tener que dejar asi, creo que no es una vulnerabilidad, onda, si no es del tipo, va a fallar eventualmente, y problema del boludo que lo registro mal
-        require(msg.value - postProcessingGas > 0, "The post processing gas cannot takeup all of the supplied ether");  // TODO en el bot de python, ver que efectivamente el net payment, valga la pena
+        require(msg.value - postProcessingGas > 0, "The post processing gas cannot takeup all of the supplied ether");  // en el bot de python, ver que efectivamente el net payment, valga la pena
         BaseClient clientImplementation = BaseClient(msg.sender);
         RequestAcceptance memory acceptance = RequestAcceptance({
             acceptor: address(0x0),
@@ -59,11 +59,11 @@ contract ExecutionBroker is Transferable {
         Submission memory submission = Submission({
             issuer: address(0x0),
             timestamp: 0,
-            result: "",
+            result: "0x00",
             solidified: false
         });
         Request memory request = Request({
-            input: inputData,
+            input: input,
             payment: msg.value,
             postProcessingGas: postProcessingGas,
             challengeInsurance: requestedInsurance,
@@ -86,6 +86,13 @@ contract ExecutionBroker is Transferable {
         address payable payee = payable(address(requests[requestID].client));
         bool transferSuccess = internalTransferFunds(requests[requestID].payment, payee);
         emit requestCancelled(requestID, transferSuccess);
+    }
+
+    // Open interaction functions
+
+    function publicizeRequest(uint requestID) public {  // This is to re emit the event In case the request gets forgotten
+        require(requests[requestID].acceptance.acceptor == address(0x00), "You cant publicize a taken request");
+        emit requestCreated(requestID, requests[requestID].payment, requests[requestID].challengeInsurance, requests[requestID].claimDelay);
     }
 
     function acceptRequest(uint requestID) public payable {
@@ -134,9 +141,9 @@ contract ExecutionBroker is Transferable {
         
     }
 
-    function claimPayment(uint requestID) public {
+    function claimPayment(uint requestID) public returns (bool) {
         require(requests[requestID].submission.issuer == msg.sender, "This payment does not belong to you");
-        require(!requests[requestID].submission.solidified, "The provided request has already been completed");
+        require(!requests[requestID].submission.solidified, "The provided request has already been completed");  // TODO check .solidified parameter
         require(requests[requestID].submission.timestamp + requests[requestID].claimDelay < block.timestamp, "The claim delay hasn't passed yet");
         requests[requestID].closed = true;
         address payee = requests[requestID].submission.issuer;
@@ -149,6 +156,8 @@ contract ExecutionBroker is Transferable {
         emit resultPostProcessed(requestID, callSuccess);
         emit paymentClaimed(requestID, transferSuccess);
     }
+
+    // Public views
 
     function isRequestOpen(uint requestID) public view returns (bool) {  // solo a modo de ayuda
         return (!requests[requestID].cancelled && requests[requestID].acceptance.acceptor == address(0x0));
