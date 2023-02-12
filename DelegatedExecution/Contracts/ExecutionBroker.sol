@@ -79,11 +79,6 @@ contract ExecutionBroker is Transferable {
         return requests.length - 1;
     }
 
-    function publicizeRequest(uint requestID) public {  // This is to re emit the event In case the request gets forgotten
-        require(requests[requestID].acceptance.acceptor == address(0x00), "You cant publicize a taken request");
-        emit requestCreated(requestID, requests[requestID].payment, requests[requestID].challengeInsurance, requests[requestID].claimDelay);
-    }
-
     function cancelRequest(uint requestID) public {
         require(!requests[requestID].cancelled, "The request was already cancelled");
         require(msg.sender == address(requests[requestID].client), "You cant cancel a request that was not made by you");
@@ -93,6 +88,11 @@ contract ExecutionBroker is Transferable {
         address payable payee = payable(address(requests[requestID].client));
         bool transferSuccess = internalTransferFunds(requests[requestID].payment, payee);
         emit requestCancelled(requestID, transferSuccess);
+    }
+
+    function publicizeRequest(uint requestID) public {  // This is to re emit the event In case the request gets forgotten
+        require(requests[requestID].acceptance.acceptor == address(0x00), "You cant publicize a taken request");
+        emit requestCreated(requestID, requests[requestID].payment, requests[requestID].challengeInsurance, requests[requestID].claimDelay);
     }
 
     function acceptRequest(uint requestID) public payable {
