@@ -10,8 +10,8 @@ import code
 def main():
     Logger.log("------------------- New Execution -------------------", raw=True)
     clientContract = ClientFactory.getInstance()
-    requestor = Requestor(clientContract, AccountsManager.getAccount())
-    executor = Executor(AccountsManager.getAccount(), clientContract.brokerContract, True)
+    requestor = Requestor(clientContract)
+    executor = Executor(AccountsManager.getAccount(), clientContract.brokerContract(), True)
     requestor.createRequest(functionToRun=1, dataArray=[10], funds=10)
     sleep(2)
     executor.solverLoopRound()

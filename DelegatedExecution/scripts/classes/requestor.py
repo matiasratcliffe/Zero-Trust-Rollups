@@ -1,3 +1,5 @@
+from scripts.classes.accountsManager import AccountsManager
+from brownie import ClientImplementation
 from scripts.logger import Logger
 from eth_abi import encode_abi
 import re
@@ -5,9 +7,9 @@ import re
 
 @Logger.LogClassMethods
 class Requestor:
-    def __init__(self, clientContract, owner):
-        self.client = clientContract
-        self.owner = owner
+    def __init__(self, clientContract):
+        self.client = ClientImplementation.at(clientContract)
+        self.owner = self.client.owner
 
     def _encodeInput(self, functionToRun, data):
         memberRegex = "([A-Za-z][A-Za-z0-9]*)\s+[_A-Za-z][_A-Za-z0-9]*;"
@@ -25,7 +27,7 @@ class Requestor:
             transactionData
         )
         request.wait(1)
-        return self.client.brokerContract.requests(request.return_value)
+        return request.return_value
 
     def cancelRequest(self, requestID):
         self.client.cancelRequest(requestID, {"from": self.owner})

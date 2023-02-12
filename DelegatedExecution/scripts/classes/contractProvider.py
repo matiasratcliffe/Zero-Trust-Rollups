@@ -1,5 +1,5 @@
 from brownie import ExecutionBroker, ClientImplementation
-from scripts.classes.auxiliar.accountsManager import AccountsManager
+from scripts.classes.accountsManager import AccountsManager
 from scripts.logger import Logger
 
 
@@ -28,7 +28,7 @@ class ClientFactory:
 
     def create(_owner, _broker):
         ClientImplementation.deploy(
-            _broker.instance.address,
+            _broker.address,
             {"from": _owner}
         )
         return ClientImplementation[-1]

@@ -1,6 +1,6 @@
 from scripts.logger import Logger
 from brownie.exceptions import VirtualMachineError
-from brownie import ClientImplementation
+from brownie import ExecutionBroker, ClientImplementation
 
 @Logger.LogClassMethods
 class Executor:
@@ -10,7 +10,7 @@ class Executor:
         self._maxInsurance = 1e+18
         self._maxDelay = 60 * 60 * 24
         self.account = account
-        self.broker = broker
+        self.broker = ExecutionBroker.at(broker)
         self.unacceptedRequests = []
         self.unsolidifiedSubmissions = []
         if (populateBuffers):
