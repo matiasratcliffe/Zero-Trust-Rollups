@@ -17,7 +17,7 @@ def main():
     executor.solverLoopRound()
     sleep(2)
     Logger.log("-----------------------------------------------------", raw=True)
-    #code.interact(local=dict(globals(), **locals()))
+    code.interact(local=dict(globals(), **locals()))
 
 
 if __name__ == "__main__":

@@ -2,6 +2,7 @@ from scripts.classes.utils.logger import Logger
 from brownie.exceptions import VirtualMachineError
 from brownie import ExecutionBroker, ClientImplementation
 
+
 @Logger.LogClassMethods
 class Executor:
     def __init__(self, account, broker, populateBuffers=False):

@@ -9,14 +9,14 @@ import re
 class Requestor:
     def __init__(self, clientContract):
         self.client = ClientImplementation.at(clientContract)
-        self.owner = self.client.owner
+        self.owner = self.client.owner()
 
     def _encodeInput(self, functionToRun, data):
         memberRegex = "([A-Za-z][A-Za-z0-9]*)\s+[_A-Za-z][_A-Za-z0-9]*;"
         dataStruct = self.client.getInputStructure(functionToRun)
         return (functionToRun, encode_abi(re.findall(memberRegex, dataStruct), data))
 
-    def createRequest(self, functionToRun, dataArray, payment=1e+16, requestedInsurance=1e+18, postProcessingGas=2e13, claimDelay=0, funds=0):
+    def createRequest(self, functionToRun, dataArray, payment=1e+16, postProcessingGas=2e13, requestedInsurance=1e+18, claimDelay=0, funds=0):
         transactionData = { "from": self.owner, "value": funds * 1e+18 }
         request = self.client.submitRequest(
             payment,
