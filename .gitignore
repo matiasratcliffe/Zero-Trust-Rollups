@@ -5,3 +5,4 @@
 **/.hypothesis
 **/build/
 **/reports/
+**/logs.txt

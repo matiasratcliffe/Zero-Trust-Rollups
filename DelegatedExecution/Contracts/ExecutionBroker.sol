@@ -41,7 +41,7 @@ contract ExecutionBroker is Transferable {
     event requestAccepted(uint requestID, address acceptor);
     event acceptanceCancelled(uint requestID, address acceptor, bool refundSuccess);
     
-    event resultSubmitted(uint requestID, bytes result);
+    event resultSubmitted(uint requestID, bytes result, address submitter);
     event resultPostProcessed(uint requestID, bool success);
     event requestSolidified(uint requestID);
     
@@ -51,7 +51,7 @@ contract ExecutionBroker is Transferable {
 
     function submitRequest(BaseClient.ClientInput calldata input, uint postProcessingGas, uint requestedInsurance, uint claimDelay) public payable returns (uint) {
         // check msg.sender is an actual client - creo que no se puede, me parece que lo voy a tener que dejar asi, creo que no es una vulnerabilidad, onda, si no es del tipo, va a fallar eventualmente, y problema del boludo que lo registro mal
-        require(msg.value - postProcessingGas > 0, "The post processing gas cannot takeup all of the supplied ether");  // TODO en el bot de python, ver que efectivamente el net payment, valga la pena
+        require(msg.value - postProcessingGas > 0, "The post processing gas cannot takeup all of the supplied ether");  // en el bot de python, ver que efectivamente el net payment, valga la pena
         BaseClient clientImplementation = BaseClient(msg.sender);
         RequestAcceptance memory acceptance = RequestAcceptance({
             acceptor: address(0x0),
@@ -133,7 +133,7 @@ contract ExecutionBroker is Transferable {
             solidified: false
         });
         requests[requestID].submission = submission;
-        emit resultSubmitted(requestID, result);
+        emit resultSubmitted(requestID, result, msg.sender);
     }
 
     function challengeSubmission(uint requestID) public {  // no hace falta el nuevo resultado ya que se va a recalcular regardless

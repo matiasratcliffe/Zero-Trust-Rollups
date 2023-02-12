@@ -1,4 +1,6 @@
 from scripts.logger import Logger
+from brownie.exceptions import VirtualMachineError
+from brownie import ClientImplementation
 
 @Logger.LogClassMethods
 class Executor:
@@ -12,7 +14,7 @@ class Executor:
         self.unacceptedRequests = []
         self.unsolidifiedSubmissions = []
         if (populateBuffers):
-            self._populateBuffers
+            self._populateBuffers()
         def addUnacceptedRequest(event):
             Logger.log(f"Event[{event.event}]: {dict(event.args)}")
             if self._listenForEvents:
@@ -20,44 +22,50 @@ class Executor:
                     self.unacceptedRequests.append(event.args.requestID)
         def addUnsolidifiedSubmission(event):
             Logger.log(f"Event[{event.event}]: {dict(event.args)}")
-            if self._listenForEvents:
+            if self._listenForEvents and event.args.submitter != self.account:
                 self.unsolidifiedSubmissions.append(event.args.requestID)
-        self.broker.instance.events.subscribe("requestCreated", lambda event : addUnacceptedRequest(event))
-        self.broker.instance.events.subscribe("acceptanceCancelled", lambda event : addUnacceptedRequest(event))
-        self.broker.instance.events.subscribe("requestCancelled", lambda event : self.unacceptedRequests.remove(event.args.requestID) if event.args.requestID in self.unacceptedRequests else None)
-        self.broker.instance.events.subscribe("requestAccepted", lambda event : self.unacceptedRequests.remove(event.args.requestID) if event.args.requestID in self.unacceptedRequests else None)
-        self.broker.instance.events.subscribe("resultSubmitted", lambda event : addUnsolidifiedSubmission(event))
-        self.broker.instance.events.subscribe("requestSolidified", lambda event : self.unsolidifiedSubmissions.remove(event.args.requestID) if event.args.requestID in self.unsolidifiedSubmissions else None)
+        self.broker.events.subscribe("requestCreated", addUnacceptedRequest)
+        self.broker.events.subscribe("acceptanceCancelled", addUnacceptedRequest)
+        self.broker.events.subscribe("requestCancelled", lambda event : self.unacceptedRequests.remove(event.args.requestID) if event.args.requestID in self.unacceptedRequests else None)
+        self.broker.events.subscribe("requestAccepted", lambda event : self.unacceptedRequests.remove(event.args.requestID) if event.args.requestID in self.unacceptedRequests else None)
+        self.broker.events.subscribe("resultSubmitted", addUnsolidifiedSubmission)
+        self.broker.events.subscribe("requestSolidified", lambda event : self.unsolidifiedSubmissions.remove(event.args.requestID) if event.args.requestID in self.unsolidifiedSubmissions else None)
 
     def _populateBuffers(self):
         self.unacceptedRequests = []
         self.unsolidifiedSubmissions = []
-        for req in self.broker.getRequests():
-            if not req.cancelled:
-                if req.acceptance == None:
-                    Logger.log(f"Added request {req.id} to unaccepted requests")
-                    self.unacceptedRequests.append(req.id)
-                elif req.submission != None and req.submission.solidified:
-                    Logger.log(f"Added request {req.id} to unsolidified submissions")
-                    self.unsolidifiedSubmissions.append(req.id)
+        reqID = 0
+        requests = []
+        try:
+            while True:
+                requests.append(self.broker.requests(reqID))
+                reqID += 1
+        except VirtualMachineError:
+            pass
+        for req in requests:
+            if not req.dict()['cancelled']:
+                if int(req.dict()['acceptance'][0], 16) == 0:
+                    Logger.log(f"Added request {requests.index(req)} to unaccepted requests")
+                    self.unacceptedRequests.append(requests.index(req))
+                elif int(req.dict()['submission'][0], 16) != 0 and not req.dict()['submission'][3]:
+                    Logger.log(f"Added request {requests.index(req)} to unsolidified submissions")
+                    self.unsolidifiedSubmissions.append(requests.index(req))
     
     def _acceptNextOpenRequest(self):
-        request = self.broker.getRequest(self.unacceptedRequests.pop(0))
-        self.broker.acceptRequest(request.id, self.account)
-        return request.id
+        reqID = self.unacceptedRequests.pop(0)
+        request = self.broker.requests(reqID)
+        self.broker.acceptRequest(reqID, {'from': self.account, 'value': request.dict()['challengeInsurance']})
 
     def _computeResult(self, requestID):
-        if self.broker.getRequest(requestID).acceptance.acceptor == self.account:
-            dataInput = self.broker.getRequest(requestID).input
-            result = self.broker.getRequest(requestID).client.instance.clientLogic(dataInput)
-            Logger.log(f"Result computed: {requestID} => {result}")
-            return result
+        if str(self.broker.requests(requestID).dict()['acceptance'][0]) == self.account.address:
+            client = ClientImplementation.at(self.broker.requests(requestID).dict()['client'])
+            return client.clientLogic(self.broker.requests(requestID).dict()['input'])
 
     def _submitResult(self, requestID, result):
-        self.broker.submitResult(requestID, result)
+        self.broker.submitResult(requestID, result, {'from': self.account})
     
     def _challengeSubmission(self, requestID):
-        self.broker.challengeSubmission(requestID, self.account)
+        self.broker.challengeSubmission(requestID, {'from': self.account})
 
     def solverLoopRound(self):
         if len(self.unacceptedRequests) > 0:
