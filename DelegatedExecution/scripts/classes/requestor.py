@@ -1,6 +1,6 @@
-from scripts.classes.accountsManager import AccountsManager
+from scripts.classes.utils.accountsManager import AccountsManager
 from brownie import ClientImplementation
-from scripts.logger import Logger
+from scripts.classes.utils.logger import Logger
 from eth_abi import encode_abi
 import re
 

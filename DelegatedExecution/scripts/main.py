@@ -1,8 +1,8 @@
-from scripts.classes.accountsManager import AccountsManager
-from scripts.classes.contractProvider import ClientFactory
+from scripts.classes.utils.accountsManager import AccountsManager
+from scripts.classes.utils.contractProvider import ClientFactory
 from scripts.classes.requestor import Requestor
 from scripts.classes.executor import Executor
-from scripts.logger import Logger
+from scripts.classes.utils.logger import Logger
 from time import sleep
 import code
 
@@ -17,7 +17,7 @@ def main():
     executor.solverLoopRound()
     sleep(2)
     Logger.log("-----------------------------------------------------", raw=True)
-    code.interact(local=dict(globals(), **locals()))
+    #code.interact(local=dict(globals(), **locals()))
 
 
 if __name__ == "__main__":

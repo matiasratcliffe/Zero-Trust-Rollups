@@ -1,4 +1,4 @@
-from scripts.logger import Logger
+from scripts.classes.utils.logger import Logger
 from brownie.exceptions import VirtualMachineError
 from brownie import ExecutionBroker, ClientImplementation
 

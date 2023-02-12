@@ -1,11 +1,10 @@
 from brownie import ExecutionBroker, ClientImplementation
-from scripts.classes.accountsManager import AccountsManager
-from scripts.logger import Logger
+from scripts.classes.utils.accountsManager import AccountsManager
+from scripts.classes.utils.logger import Logger
 
 
 @Logger.LogClassMethods
 class BrokerFactory:
-    ## TODO en el futuro sacar el deployment de las factories, y que las factories solo populen con data de config
     def getInstance():
         if (len(ExecutionBroker) > 0):
             return ExecutionBroker[-1]
@@ -14,7 +13,8 @@ class BrokerFactory:
 
     def create():
         ExecutionBroker.deploy(
-            {"from": AccountsManager.getAccount()}
+            {"from": AccountsManager.getAccount()},
+            publish_source=True
         )
         return ExecutionBroker[-1]
 
@@ -29,6 +29,7 @@ class ClientFactory:
     def create(_owner, _broker):
         ClientImplementation.deploy(
             _broker.address,
-            {"from": _owner}
+            {"from": _owner},
+            publish_source=True
         )
         return ClientImplementation[-1]

@@ -1,0 +1,182 @@
+{
+  "abi": [],
+  "allSourcePaths": {
+    "3": "contracts/Notes.sol"
+  },
+  "ast": {
+    "absolutePath": "contracts/Notes.sol",
+    "exportedSymbols": {
+      "DelegatedExecution": [
+        1204
+      ]
+    },
+    "id": 1205,
+    "license": "GPL-3.0",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1199,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.7",
+          ".0",
+          "<",
+          "0.9",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "1141:31:3"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "DelegatedExecution",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": true,
+        "id": 1204,
+        "linearizedBaseContracts": [
+          1204
+        ],
+        "name": "DelegatedExecution",
+        "nameLocation": "1184:18:3",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 1202,
+              "nodeType": "Block",
+              "src": "2829:2:3",
+              "statements": []
+            },
+            "id": 1203,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "funcMap",
+            "nameLocation": "2811:7:3",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1200,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2818:2:3"
+            },
+            "returnParameters": {
+              "id": 1201,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2829:0:3"
+            },
+            "scope": 1204,
+            "src": "2802:29:3",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "private"
+          }
+        ],
+        "scope": 1205,
+        "src": "1175:2158:3",
+        "usedErrors": []
+      }
+    ],
+    "src": "1141:5069:3"
+  },
+  "bytecode": "6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea2646970667358221220f21d2a49a9d3fb27e07655917becd97c0fd59e20d97856b1fb8085d56b298c2164736f6c63430008110033",
+  "bytecodeSha1": "73df0a6f5d0123eb2b2db0faf62b602aa77c123a",
+  "compiler": {
+    "evm_version": "istanbul",
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "version": "0.8.17+commit.8df45f5f"
+  },
+  "contractName": "DelegatedExecution",
+  "coverageMap": {
+    "branches": {
+      "3": {}
+    },
+    "statements": {
+      "3": {}
+    }
+  },
+  "dependencies": [],
+  "deployedBytecode": "6080604052600080fdfea2646970667358221220f21d2a49a9d3fb27e07655917becd97c0fd59e20d97856b1fb8085d56b298c2164736f6c63430008110033",
+  "deployedSourceMap": "1175:2158:3:-:0;;;;;",
+  "language": "Solidity",
+  "natspec": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "offset": [
+    1175,
+    3333
+  ],
+  "opcodes": "PUSH1 0x80 PUSH1 0x40 MSTORE PUSH1 0x0 DUP1 REVERT INVALID LOG2 PUSH5 0x6970667358 0x22 SLT KECCAK256 CALLCODE SAR 0x2A 0x49 0xA9 0xD3 0xFB 0x27 0xE0 PUSH23 0x55917BECD97C0FD59E20D97856B1FB8085D56B298C2164 PUSH20 0x6F6C634300081100330000000000000000000000 ",
+  "pcMap": {
+    "0": {
+      "offset": [
+        1175,
+        3333
+      ],
+      "op": "PUSH1",
+      "path": "3",
+      "value": "0x80"
+    },
+    "2": {
+      "fn": null,
+      "offset": [
+        1175,
+        3333
+      ],
+      "op": "PUSH1",
+      "path": "3",
+      "value": "0x40"
+    },
+    "4": {
+      "fn": null,
+      "offset": [
+        1175,
+        3333
+      ],
+      "op": "MSTORE",
+      "path": "3"
+    },
+    "5": {
+      "fn": null,
+      "offset": [
+        1175,
+        3333
+      ],
+      "op": "PUSH1",
+      "path": "3",
+      "value": "0x0"
+    },
+    "7": {
+      "fn": null,
+      "offset": [
+        1175,
+        3333
+      ],
+      "op": "DUP1",
+      "path": "3"
+    },
+    "8": {
+      "fn": null,
+      "offset": [
+        1175,
+        3333
+      ],
+      "op": "REVERT",
+      "path": "3"
+    }
+  },
+  "sha1": "2069ff3de06995f7a8c1e6f5ad83080cf963ca9d",
+  "source": "//programacion\n//estructura de datos\n//seguridad y criptografia\n//economia de la empresa\n\n//Titulo: Off-chain delegated code execution for on-chain code\n\n//Objetivo: El objetivo es plantear una alternativa a la ejecucion directa de codigo en blockchains basadas en el protocolo ethereum, valiendose de oraculos y un sistema de incentivos financieros para reducir el costo de la ejecucion de dicho codigo.\n\n// es un optimistic rollup? comparar con optimism y otras cosas existentes (es diferente porque lo mio esta pensado para alquiler de computo, no simplemente como metodo ahorrativo para dapps)\n\n//Analizar las alternativas de ejecucion hoy en dia (local, cloud, blockchain, voluntary computing, ICP?), y exponer virtudes y defectos en cada uno, y una esperanza de en lo que este trabajo podria llegar a culminar\n//Proponer un modelo de ejecucion de codigo con resultados onchain pero ejecucion offchain, reduciendo el costo de gas\n\n//El objetivo no es crear un servicio competitivo a nivel mercado, sino mas bien explorar las posibilidades tecnicas de la tecnologia blockchain y los smart contracts\n\n// SPDX-License-Identifier: GPL-3.0\n\npragma solidity >=0.7.0 <0.9.0;\n\n\ncontract DelegatedExecution {\n\n    // CUIDADO https://solidity-by-example.org/hacks/re-entrancy/\n\n    //struct FuncInput {} // TANTO INITIAL STATE COMO PARAMS DEBERIAN SER UNA CADENA DE BYTES DONDE LOS DATOS ESTEN CODIFICADOS. DEPENDE DEL CLIENTE QUE DECIDE PONER EN CADA UNO, PUEDE EMPAQUETAR TODO EN UNO SOLO Y DEJAR TODO VACIO PERO LA IDEA ES QUE EN STATE CODIFIQUE UN STRUCT QUE ESTE GUARDADO EN SU CONTRATO, Y EN PARAMS QUE SIMPLEMENTE SEAN PARAMETROS PROPUESTOS POR EL OFERENTE (AHI PODRIA CODIFICARSE LOS IDs DE LAS SUBFUNCIONES A EJECUTARSE EN ESA CORRIDA\n    \n    //Que el cliente tenga una funcion para hacer oferta!!!!!!!!!!!\n\n    //FuncState public state; // NO PUEDE HABER ESTADO YA QUE ESO VA EN CONTRA DEL DETERMINISMO DE LA FUNCION PURE\n\n    // Fijo pero revisar si hace falta cambiar (Persistir initial state para que el check sea determinista?)\n    //event funcTransacted(uint256 timestamp, uint256 offerID, address indexed issuer, FuncInput input, FuncState state);\n\t// one event per broker interaction?\n\n\t// Client Logic\n\n    // Depende del cliente\n    // Que el cliente overridee esta y ahi haga una cadena de ifs y en la data de input ponga un valor para que se elija la funcion a ejecutarse. Es importante que se overridee esta y no usar simplemente encodewithselector porque tiene que ser una funcion \"pure\"\n    //function funcLogic(FuncInput calldata input) public pure returns (FuncState memory finalState) {return finalState;} \n\n    // cambiar nombre a stateMap?\n    // NO FIJO (y en el cliente) ya que el cliente puede optar por transformarla en una funcion vacia y mantener un estado implicito\n    function funcMap() private {}\n\n    // TODO ver que onda el tema de si una ejecucion antigua resulta ser mala. o tema de manipulacion (SI LA EJECUCION ANTIGUA ES MALA Y PASO EL TIEMPO, A MAMARLA. LO UNICO QUE SE PUEDE CORROBORAR AL SOLIDIFICAR UN REQUEST ES SI EL RESULTADO SE PUEDE DECODIFICAR A CIERTO STRUCT)\n    // HACER QUE AL SOLIDIFICAR UNA FUNCION SE LLAME A UNA FUNCION QUE EN BASE CLIENT VA A SER VIRTUAL. ESTA SE PUEDE USAR PARA REGISTRAR OTRA PETICION EN BASE A LOS RESULTADOS, Y SI NO FUNCIONA, QUE SE JODA EL CLIENTE\n}\n\n// Otro mecanismo para evitar los challenges is que sea 100% democratic trust, seria que los ejecutores se registren en el broker,\n// y el broker vaya dispatcheando trabajos, para cada oferta, el cliente provee una clave publica (de un par descartable, aunque se\n// guarda la privada hasta el fin del proceso), y el broker le dispatchea el job a 3 (o N elegido por el cliente) ejecutores.\n// Los ejecutores submitean el encrypt(pubKeyDescartable,concat(resultado,executerAddress)) [lo del concat es para que nadie copie\n// el encryptado]. aca ver si poner un rango de tiempo despues del cual el cliente puede cancelar la oferta si no estan todos los\n// resultados (para eso limitar el N de ejecutores, porque si el cliente pone 1000 ejecutores, obvio que no va a estar y puede\n// retirarse. pensandolo mejor, que si por lo menos 3 ejecutores submitearon, que el cliente no se pueda retirar?) ver punishment\n// para ejecutores lentos. el punishment para ejecutores incorrectos es el gas que pagan para submitear (y reputacion que le baja la\n// prioridad de ser seleccionados?). cuestion, una vez estan todos los submit, el cliente revela la private key (usar escrow logic de\n// fondos lockeados para que el cliente no se haga el rata) y ahi ver cual es la moda en los resultados y tomar ese, repartiendo la\n// prima entre los buenos ejecutores\n// una mejora que puede tener este es que solo se publiquen los hashes del codigo y una referencia o alguna forma super comprimida del\n// codigo, asi deployar ClientImplementation no es tan caro. Es mas, capaz que ni hace falta una clase client, y puedo tomar varios\n// lenguajes de programacion... PENSALDOLO MEJOR, TIENE QUE SER DETERMINISTA EL RESULTADO, ASIQUE CUIDADO CON ESO\n// Ooooo, podria ser que dependa del ejecutor darse cuenta si la funcion es determinista o no, y en base a eso aceptar o no, pero eso me\n// forzaria a cambiar el sistema de dispatch por un sistema de oferta y demanda (parecido al primer modelo).\n// Hacer que la ejecucion sea en 2 partes sino: primero la parte determinista, que se submitea, y segundo, en base al resultado, la parte\n// de calls a apis, etc, tipo con oraculos o incluso submitear otro job. la estructura de return del determinista puede ser:\n// { \n//      data: bytes,\n//      oracleCalls: [...],\n//      contractCalls: [...]\n// }\n// y eso submitean los ejecutores, y despues depende del cliente ejecutar la funcion \"procesarResultado\" que hace las oracle calls (plug api registration with double key) y las\n// contract calls OnChain. Aca ver que onda con las contract calls ejecutadas en \"procesarResultado\" vs la RequestChain nativa del baseClient\n\n// TODO hacer contrato executor, ya para la segunda parte\n// la segunda parte me saca la necesidad de el gas massive challenge\n// la tercera parte me saca la necesidad de multiples executors, dando nacimiento a los Zero Trust rollups",
+  "sourceMap": "1175:2158:3:-:0;;;;;;;;;;;;;;;;;;;",
+  "sourcePath": "contracts/Notes.sol",
+  "type": "contract"
+}
