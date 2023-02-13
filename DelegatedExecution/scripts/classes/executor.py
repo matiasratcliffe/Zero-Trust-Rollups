@@ -1,6 +1,6 @@
 from scripts.classes.utils.logger import Logger
 from brownie.exceptions import VirtualMachineError
-from brownie import ExecutionBroker, ClientImplementation
+from scripts.classes.utils.contractProvider import ClientFactory, BrokerFactory
 
 
 @Logger.LogClassMethods
@@ -11,7 +11,7 @@ class Executor:
         self._maxInsurance = 1e+18
         self._maxDelay = 60 * 60 * 24
         self.account = account
-        self.broker = ExecutionBroker.at(broker)
+        self.broker = BrokerFactory.at(address=broker)
         self.unacceptedRequests = []
         self.unsolidifiedSubmissions = []
         if (populateBuffers):
@@ -59,7 +59,7 @@ class Executor:
 
     def _computeResult(self, requestID):
         if str(self.broker.requests(requestID).dict()['acceptance'][0]) == self.account.address:
-            client = ClientImplementation.at(self.broker.requests(requestID).dict()['client'])
+            client = ClientFactory.at(address=self.broker.requests(requestID).dict()['client'])
             return client.clientLogic(self.broker.requests(requestID).dict()['input'])
 
     def _submitResult(self, requestID, result):

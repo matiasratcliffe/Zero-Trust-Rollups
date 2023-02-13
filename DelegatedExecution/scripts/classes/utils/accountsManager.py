@@ -2,18 +2,21 @@ from brownie import network, config, accounts
 from random import randint
 
 
-class AccountsManager:
+class Accounts:
     def getAccount():
-        if len(accounts) == 0:
-            AccountsManager._loadAccounts()
-        return AccountsManager.getFromIndex(randint(0, len(accounts)-1))
+        if Accounts.count() == 0:
+            Accounts._loadAccounts()
+        return Accounts.getFromIndex(randint(0, len(accounts)-1))
     
+    def count():
+        return len(accounts)
+
     def _loadAccounts():
-        if network.show_active() in config["wallets"]:
-            for privateKey in config["wallets"][network.show_active()]:
+        if network.show_active() in config:
+            for privateKey in config[network.show_active()]["wallets"]:
                 accounts.add(privateKey)
         else:
-            raise f"No accounts provided for network: {network.show_active()}"
+            raise BaseException(f"No accounts provided for network: {network.show_active()}")
 
     def getFromIndex(index):
         return accounts[index]

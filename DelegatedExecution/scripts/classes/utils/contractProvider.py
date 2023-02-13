@@ -1,5 +1,5 @@
 from brownie import ExecutionBroker, ClientImplementation, config, network
-from scripts.classes.utils.accountsManager import AccountsManager
+from scripts.classes.utils.accountsManager import Accounts
 from scripts.classes.utils.logger import Logger
 
 
@@ -7,28 +7,38 @@ from scripts.classes.utils.logger import Logger
 class BrokerFactory:
     def getInstance():
         if "brokerContractAddress" in config["networks"][network.show_active()]:
-            return ExecutionBroker.at(config["networks"][network.show_active()]["brokerContractAddress"])
-        elif (len(ExecutionBroker) > 0):
-            return ExecutionBroker[-1]
+            return BrokerFactory.at(address=config["networks"][network.show_active()]["brokerContractAddress"])
+        elif (BrokerFactory.count() > 0):
+            return BrokerFactory.at(index=-1)
         else:
-            return BrokerFactory.create()
+            return BrokerFactory.create(Accounts.getAccount())
 
-    def create():
+    def create(account):
         ExecutionBroker.deploy(
-            {"from": AccountsManager.getAccount()},
+            {"from": account},
             publish_source=config["networks"][network.show_active()]["verify"]
         )
-        return ExecutionBroker[-1]
+        return BrokerFactory.at(index=-1)
+    
+    def at(index=None, address=None):
+        if address and not index:
+            return ExecutionBroker.at(address)
+        if index and not address:
+            return ExecutionBroker[index]
+        raise "This method requires 1 keyValue parameter (address XOR index)"
+
+    def count():
+        return len(ExecutionBroker)
 
 @Logger.LogClassMethods
 class ClientFactory:
     def getInstance():
         if "clientContractAddress" in config["networks"][network.show_active()]:
-            return ExecutionBroker.at(config["networks"][network.show_active()]["clientContractAddress"])
-        elif (len(ClientImplementation) > 0):
-            return ClientImplementation[-1]
+            return ClientFactory.at(address=config["networks"][network.show_active()]["clientContractAddress"])
+        elif (ClientFactory.count() > 0):
+            return ClientFactory.at(index=-1)
         else:
-            return ClientFactory.create(AccountsManager.getAccount(), BrokerFactory.getInstance())
+            return ClientFactory.create(Accounts.getAccount(), BrokerFactory.getInstance())
 
     def create(_owner, _broker):
         ClientImplementation.deploy(
@@ -36,4 +46,14 @@ class ClientFactory:
             {"from": _owner},
             publish_source=config["networks"][network.show_active()]["verify"]
         )
-        return ClientImplementation[-1]
+        return ClientFactory.at(index=-1)
+    
+    def at(index=None, address=None):
+        if address and not index:
+            return ClientImplementation.at(address)
+        if index and not address:
+            return ClientImplementation[index]
+        raise "This method requires 1 keyValue parameter (address XOR index)"
+
+    def count():
+        return len(ClientImplementation)

@@ -1,4 +1,4 @@
-from scripts.classes.utils.accountsManager import AccountsManager
+from scripts.classes.utils.accountsManager import Accounts
 from scripts.classes.utils.contractProvider import ClientFactory
 from scripts.classes.requestor import Requestor
 from scripts.classes.executor import Executor
@@ -11,7 +11,7 @@ def main():
     Logger.log("------------------- New Execution -------------------", raw=True)
     clientContract = ClientFactory.getInstance()
     requestor = Requestor(clientContract)
-    executor = Executor(AccountsManager.getAccount(), clientContract.brokerContract(), True)
+    executor = Executor(Accounts.getAccount(), clientContract.brokerContract(), True)
     requestor.createRequest(functionToRun=1, dataArray=[10], funds=10)
     sleep(2)
     executor.solverLoopRound()

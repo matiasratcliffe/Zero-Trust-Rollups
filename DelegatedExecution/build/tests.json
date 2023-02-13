@@ -1,0 +1,52 @@
+{
+  "contracts": {
+    "ClientImplementation": "420c927362af5f3bf4808835615bdaae54547b3c",
+    "DelegatedExecution": "73df0a6f5d0123eb2b2db0faf62b602aa77c123a",
+    "ExecutionBroker": "bd53b2f2649da90e4c8be861aa2688507a50c1b8",
+    "Ownable": "672f70f06f11b1d7dfeb0f73ad0bb11d0c9972ad",
+    "Transferable": "46d8302b7b373057f7bb873d07b598531307e853"
+  },
+  "tests": {
+    "tests/test_deployment.py": {
+      "coverage": false,
+      "isolated": false,
+      "results": "...",
+      "sha1": "efebf74137e6ca1e17f9e3d7be1e88a6b5e2843e",
+      "txhash": []
+    },
+    "tests/test_requestor.py": {
+      "coverage": false,
+      "isolated": false,
+      "results": "..........",
+      "sha1": "07379e061f053ca36355cabbe777b75ba796a562",
+      "txhash": [
+        "99d9c8de4a81b0da1cdd1ca6c6f8e649d6f3bac0"
+      ]
+    }
+  },
+  "tx": {
+    "99d9c8de4a81b0da1cdd1ca6c6f8e649d6f3bac0": {
+      "ClientImplementation": {
+        "0": [
+          [
+            2
+          ],
+          [
+            33
+          ],
+          []
+        ],
+        "1": [
+          [],
+          [],
+          []
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    }
+  }
+}
