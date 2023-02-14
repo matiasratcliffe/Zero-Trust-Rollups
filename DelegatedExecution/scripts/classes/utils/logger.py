@@ -25,7 +25,7 @@ class Logger:
     def LogMethod(methodPrefix='', color=Fore.WHITE):
         def methodDecorator(methodToDecorate):
             def decoratedMethod(*args, **kwargs):
-                Logger.log(f"Called {methodPrefix}{methodToDecorate.__name__} with args: {list(args)}", color=color)
+                Logger.log(f"Called {methodPrefix}{methodToDecorate.__name__} with args: {list(args)}{list(kwargs)}", color=color)
                 Logger.logIndentation += 1
                 returnVal = methodToDecorate(*args, **kwargs)
                 Logger.logIndentation -= 1

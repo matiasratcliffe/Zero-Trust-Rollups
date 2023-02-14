@@ -12,7 +12,7 @@ def main():
     clientContract = ClientFactory.getInstance()
     requestor = Requestor(clientContract)
     executor = Executor(Accounts.getAccount(), clientContract.brokerContract(), True)
-    requestor.createRequest(functionToRun=1, dataArray=[10], funds=10)
+    requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e+18)
     sleep(2)
     executor.solverLoopRound()
     sleep(2)

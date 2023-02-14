@@ -7,6 +7,7 @@ import "./BaseClient.sol";
 
 
 struct Request {
+    uint id;  // Index, for unicity when raw comparing
     BaseClient.ClientInput input;
     uint payment; // In Wei; deberia tener en cuenta el computo y el gas de las operaciones de submit y claim
     uint postProcessingGas;  // In Wei; for the post processing, if any
@@ -35,7 +36,7 @@ contract ExecutionBroker is Transferable {
 
     Request[] public requests;
 
-    event requestCreated(uint requestID, uint payment, uint challengeInsurance, uint claimDelay);
+    event requestCreated(uint requestID, uint payment, uint postProcessingGas, uint challengeInsurance, uint claimDelay);
     event requestCancelled(uint requestID, bool refundSuccess);
 
     event requestAccepted(uint requestID, address acceptor);
@@ -66,6 +67,7 @@ contract ExecutionBroker is Transferable {
             solidified: false
         });
         Request memory request = Request({
+            id: requests.length,
             input: input,
             payment: msg.value,  // aca esta incluido el post processing gas, para evitar tener que devolver aparte
             postProcessingGas: postProcessingGas,
@@ -77,8 +79,8 @@ contract ExecutionBroker is Transferable {
             cancelled: false
         });
         requests.push(request);
-        emit requestCreated(requests.length-1, msg.value, requestedInsurance, claimDelay);
-        return requests.length - 1;
+        emit requestCreated(request.id, msg.value, postProcessingGas, requestedInsurance, claimDelay);
+        return request.id;
     }
 
     function cancelRequest(uint requestID) public {
@@ -96,7 +98,7 @@ contract ExecutionBroker is Transferable {
 
     function publicizeRequest(uint requestID) public {  // This is to re emit the event In case the request gets forgotten
         require(requests[requestID].acceptance.acceptor == address(0x00), "You cant publicize a taken request");
-        emit requestCreated(requestID, requests[requestID].payment, requests[requestID].challengeInsurance, requests[requestID].claimDelay);
+        emit requestCreated(requestID, requests[requestID].payment, requests[requestID].postProcessingGas, requests[requestID].challengeInsurance, requests[requestID].claimDelay);
     }
 
     function acceptRequest(uint requestID) public payable {
@@ -177,6 +179,10 @@ contract ExecutionBroker is Transferable {
 
     function isRequestOpen(uint requestID) public view returns (bool) {  // solo a modo de ayuda
         return (!requests[requestID].cancelled && requests[requestID].acceptance.acceptor == address(0x0));
+    }
+
+    function requestCount() public view returns (uint) {
+        return requests.length;
     }
 
     // Private functions

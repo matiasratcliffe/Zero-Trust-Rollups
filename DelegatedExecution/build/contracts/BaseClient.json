@@ -218,22 +218,22 @@
         177
       ],
       "ExecutionBroker": [
-        996
+        1012
       ],
       "Ownable": [
-        1039
+        1055
       ],
       "Request": [
-        204
+        206
       ],
       "RequestAcceptance": [
-        209
+        211
       ],
       "Submission": [
-        218
+        220
       ],
       "Transferable": [
-        1123
+        1139
       ]
     },
     "id": 178,
@@ -261,7 +261,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 178,
-        "sourceUnit": 997,
+        "sourceUnit": 1013,
         "src": "70:31:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -273,7 +273,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 178,
-        "sourceUnit": 1040,
+        "sourceUnit": 1056,
         "src": "102:23:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -289,7 +289,7 @@
                 "160:7:0"
               ],
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 1039,
+              "referencedDeclaration": 1055,
               "src": "160:7:0"
             },
             "id": 5,
@@ -304,7 +304,7 @@
         "id": 177,
         "linearizedBaseContracts": [
           177,
-          1039
+          1055
         ],
         "name": "BaseClient",
         "nameLocation": "146:10:0",
@@ -389,7 +389,7 @@
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_ExecutionBroker_$996",
+              "typeIdentifier": "t_contract$_ExecutionBroker_$1012",
               "typeString": "contract ExecutionBroker"
             },
             "typeName": {
@@ -402,13 +402,13 @@
                   "255:15:0"
                 ],
                 "nodeType": "IdentifierPath",
-                "referencedDeclaration": 996,
+                "referencedDeclaration": 1012,
                 "src": "255:15:0"
               },
-              "referencedDeclaration": 996,
+              "referencedDeclaration": 1012,
               "src": "255:15:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_ExecutionBroker_$996",
+                "typeIdentifier": "t_contract$_ExecutionBroker_$1012",
                 "typeString": "contract ExecutionBroker"
               }
             },
@@ -479,7 +479,7 @@
                       "referencedDeclaration": 13,
                       "src": "433:14:0",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ExecutionBroker_$996",
+                        "typeIdentifier": "t_contract$_ExecutionBroker_$1012",
                         "typeString": "contract ExecutionBroker"
                       }
                     },
@@ -511,10 +511,10 @@
                         "name": "ExecutionBroker",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 996,
+                        "referencedDeclaration": 1012,
                         "src": "450:15:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_ExecutionBroker_$996_$",
+                          "typeIdentifier": "t_type$_t_contract$_ExecutionBroker_$1012_$",
                           "typeString": "type(contract ExecutionBroker)"
                         }
                       },
@@ -530,13 +530,13 @@
                       "src": "450:30:0",
                       "tryCall": false,
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ExecutionBroker_$996",
+                        "typeIdentifier": "t_contract$_ExecutionBroker_$1012",
                         "typeString": "contract ExecutionBroker"
                       }
                     },
                     "src": "433:47:0",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ExecutionBroker_$996",
+                      "typeIdentifier": "t_contract$_ExecutionBroker_$1012",
                       "typeString": "contract ExecutionBroker"
                     }
                   },
@@ -658,7 +658,7 @@
                               "referencedDeclaration": 13,
                               "src": "555:14:0",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_ExecutionBroker_$996",
+                                "typeIdentifier": "t_contract$_ExecutionBroker_$1012",
                                 "typeString": "contract ExecutionBroker"
                               }
                             }
@@ -666,7 +666,7 @@
                           "expression": {
                             "argumentTypes": [
                               {
-                                "typeIdentifier": "t_contract$_ExecutionBroker_$996",
+                                "typeIdentifier": "t_contract$_ExecutionBroker_$1012",
                                 "typeString": "contract ExecutionBroker"
                               }
                             ],
@@ -1397,7 +1397,7 @@
                           "referencedDeclaration": 13,
                           "src": "1212:14:0",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_contract$_ExecutionBroker_$996",
+                            "typeIdentifier": "t_contract$_ExecutionBroker_$1012",
                             "typeString": "contract ExecutionBroker"
                           }
                         },
@@ -1409,7 +1409,7 @@
                         "memberLocation": "1227:13:0",
                         "memberName": "submitRequest",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 382,
+                        "referencedDeclaration": 385,
                         "src": "1212:28:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_function_external_payable$_t_struct$_ClientInput_$10_memory_ptr_$_t_uint256_$_t_uint256_$_t_uint256_$returns$_t_uint256_$",
@@ -1553,7 +1553,7 @@
                     "1067:9:0"
                   ],
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 1008,
+                  "referencedDeclaration": 1024,
                   "src": "1067:9:0"
                 },
                 "nodeType": "ModifierInvocation",
@@ -1792,7 +1792,7 @@
                         "referencedDeclaration": 13,
                         "src": "1463:14:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ExecutionBroker_$996",
+                          "typeIdentifier": "t_contract$_ExecutionBroker_$1012",
                           "typeString": "contract ExecutionBroker"
                         }
                       },
@@ -1804,7 +1804,7 @@
                       "memberLocation": "1478:13:0",
                       "memberName": "cancelRequest",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 460,
+                      "referencedDeclaration": 463,
                       "src": "1463:28:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_uint256_$returns$__$",
@@ -1848,7 +1848,7 @@
                     "1443:9:0"
                   ],
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 1008,
+                  "referencedDeclaration": 1024,
                   "src": "1443:9:0"
                 },
                 "nodeType": "ModifierInvocation",
@@ -2399,7 +2399,7 @@
                     "1605:9:0"
                   ],
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 1008,
+                  "referencedDeclaration": 1024,
                   "src": "1605:9:0"
                 },
                 "nodeType": "ModifierInvocation",
