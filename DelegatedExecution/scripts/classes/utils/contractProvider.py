@@ -3,7 +3,7 @@ from scripts.classes.utils.accountsManager import Accounts
 from scripts.classes.utils.logger import Logger
 
 
-@Logger.LogClassMethods
+@Logger.LogClassMethods()
 class BrokerFactory:
     def getInstance():
         if "brokerContractAddress" in config["networks"][network.show_active()]:
@@ -30,7 +30,7 @@ class BrokerFactory:
     def count():
         return len(ExecutionBroker)
 
-@Logger.LogClassMethods
+@Logger.LogClassMethods()
 class ClientFactory:
     def getInstance():
         if "clientContractAddress" in config["networks"][network.show_active()]:
@@ -38,12 +38,12 @@ class ClientFactory:
         elif (ClientFactory.count() > 0):
             return ClientFactory.at(index=-1)
         else:
-            return ClientFactory.create(Accounts.getAccount(), BrokerFactory.getInstance())
+            return ClientFactory.create(owner=Accounts.getAccount(), broker=BrokerFactory.getInstance())
 
-    def create(_owner, _broker):
+    def create(owner, broker):
         ClientImplementation.deploy(
-            _broker.address,
-            {"from": _owner},
+            broker.address,
+            {"from": owner},
             publish_source=config["networks"][network.show_active()]["verify"]
         )
         return ClientFactory.at(index=-1)

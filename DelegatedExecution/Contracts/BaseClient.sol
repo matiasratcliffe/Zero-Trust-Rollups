@@ -29,6 +29,7 @@ abstract contract BaseClient is Ownable {
 
     function clientLogic(ClientInput calldata input) external virtual pure returns (bytes memory);
     function processResult(bytes calldata result) external virtual onlyBroker {}
+    function getInputStructure(uint functionID) external virtual pure returns (string memory);
 
     function submitRequest(uint payment, ClientInput calldata input, uint postProcessingGas, uint requestedInsurance, uint claimDelay) external onlyOwner payable returns (uint) {
         require(payment <= msg.value + address(this).balance, "Insufficient funds");

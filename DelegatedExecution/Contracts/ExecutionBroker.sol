@@ -67,7 +67,7 @@ contract ExecutionBroker is Transferable {
         });
         Request memory request = Request({
             input: input,
-            payment: msg.value,
+            payment: msg.value,  // aca esta incluido el post processing gas, para evitar tener que devolver aparte
             postProcessingGas: postProcessingGas,
             challengeInsurance: requestedInsurance,
             claimDelay: claimDelay,

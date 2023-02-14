@@ -3,7 +3,7 @@ from brownie.exceptions import VirtualMachineError
 from scripts.classes.utils.contractProvider import ClientFactory, BrokerFactory
 
 
-@Logger.LogClassMethods
+@Logger.LogClassMethods()
 class Executor:
     def __init__(self, account, broker, populateBuffers=False):
         self._listenForEvents = True
@@ -52,10 +52,17 @@ class Executor:
                     Logger.log(f"Added request {requests.index(req)} to unsolidified submissions")
                     self.unsolidifiedSubmissions.append(requests.index(req))
     
+    def _acceptRequest(self, requestID):
+        request = self.broker.requests(requestID)
+        self.broker.acceptRequest(requestID, {'from': self.account, 'value': request.dict()['challengeInsurance']})
+        self.unacceptedRequests.pop(self.unacceptedRequests.index(requestID))
+
+    def _cancelAcceptance(self, requestID):
+        self.broker.cancelAcceptance(requestID, {'from': self.account})
+
     def _acceptNextOpenRequest(self):
-        reqID = self.unacceptedRequests.pop(0)
-        request = self.broker.requests(reqID)
-        self.broker.acceptRequest(reqID, {'from': self.account, 'value': request.dict()['challengeInsurance']})
+        reqID = self.unacceptedRequests[0]
+        self._acceptRequest(reqID)
 
     def _computeResult(self, requestID):
         if str(self.broker.requests(requestID).dict()['acceptance'][0]) == self.account.address:
@@ -67,6 +74,7 @@ class Executor:
     
     def _challengeSubmission(self, requestID):
         self.broker.challengeSubmission(requestID, {'from': self.account})
+        self.unsolidifiedSubmissions.pop(self.unsolidifiedSubmissions.index(requestID))
 
     def solverLoopRound(self):
         if len(self.unacceptedRequests) > 0:
@@ -78,7 +86,7 @@ class Executor:
 
     def challengerLoopRound(self):
         if len(self.unsolidifiedSubmissions) > 0:
-            request = self.broker.getRequest(self.unsolidifiedSubmissions.pop(0))
+            request = self.broker.getRequest(self.unsolidifiedSubmissions[0])
             result = self.computeResult(request.id)
             if result != request.submission.result:
                 self.challengeSubmission(request.id)

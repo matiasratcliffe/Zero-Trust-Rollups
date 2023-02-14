@@ -2,6 +2,7 @@ from colorama import Fore, Style
 from datetime import datetime
 
 class Logger:
+    colors = Fore
     loggingActive = True
     logIndentation = 0
     def log(message, color=Fore.GREEN, raw=False):
@@ -12,19 +13,23 @@ class Logger:
             with open("logs.txt", "a", encoding='utf8') as f:
                 f.write(color + message)
     
-    def LogClassMethods(classToDecorate):
-        exclusion_list = ["__str__"]
-        for name, obj in vars(classToDecorate).items():
-            if name not in exclusion_list and callable(obj):
-                setattr(classToDecorate, name, Logger.LogMethod(obj, methodPrefix=f"{classToDecorate.__name__}."))
-        return classToDecorate
+    def LogClassMethods(color=Fore.WHITE):
+        def classDecorator(classToDecorate):
+            exclusion_list = ["__str__"]
+            for name, obj in vars(classToDecorate).items():
+                if name not in exclusion_list and callable(obj):
+                    setattr(classToDecorate, name, Logger.LogMethod(methodPrefix=f"{classToDecorate.__name__}.", color=color)(obj))
+            return classToDecorate
+        return classDecorator
 
-    def LogMethod(methodToDecorate, methodPrefix=''):
-        def decoratedMethod(*args, **kwargs):
-            Logger.log(f"Called {methodPrefix}{methodToDecorate.__name__} with args: {list(args)}", color=Fore.WHITE)
-            Logger.logIndentation += 1
-            returnVal = methodToDecorate(*args, **kwargs)
-            Logger.logIndentation -= 1
-            Logger.log(f"Returned from {methodPrefix}{methodToDecorate.__name__}: {returnVal}", color=Fore.WHITE)
-            return returnVal
-        return decoratedMethod
+    def LogMethod(methodPrefix='', color=Fore.WHITE):
+        def methodDecorator(methodToDecorate):
+            def decoratedMethod(*args, **kwargs):
+                Logger.log(f"Called {methodPrefix}{methodToDecorate.__name__} with args: {list(args)}", color=color)
+                Logger.logIndentation += 1
+                returnVal = methodToDecorate(*args, **kwargs)
+                Logger.logIndentation -= 1
+                Logger.log(f"Returned from {methodPrefix}{methodToDecorate.__name__}: {returnVal}", color=color)
+                return returnVal
+            return decoratedMethod
+        return methodDecorator

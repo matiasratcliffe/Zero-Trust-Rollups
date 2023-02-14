@@ -35,7 +35,7 @@ contract ClientImplementation is BaseClient {
         return abi.encode(input.counter + 4);
     }
 
-    function getInputStructure(uint functionID) external pure returns (string memory) {
+    function getInputStructure(uint functionID) external override pure returns (string memory) {
         if (functionID == 1) { return "{uint counter;}"; }
         else if (functionID == 2) { return "{uint counter;}"; }
         else if (functionID == 3) { return "{uint counter;}"; }

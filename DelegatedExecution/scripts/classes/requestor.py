@@ -5,7 +5,7 @@ from eth_abi import encode
 import re
 
 
-@Logger.LogClassMethods
+@Logger.LogClassMethods()
 class Requestor:
     def __init__(self, clientContract):
         self.client = ClientFactory.at(address=clientContract)
@@ -20,7 +20,7 @@ class Requestor:
         return (functionToRun, encode(self._getFunctionTypes(functionToRun), data))
 
     def createRequest(self, functionToRun, dataArray, payment=1e+16, postProcessingGas=2e13, requestedInsurance=1e+18, claimDelay=0, funds=0):
-        transactionData = { "from": self.owner, "value": funds * 1e+18 }
+        transactionData = { "from": self.owner, "value": funds }
         request = self.client.submitRequest(
             payment,
             self._encodeInput(functionToRun, dataArray),
