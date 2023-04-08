@@ -13,6 +13,8 @@ abstract contract BaseClient is Ownable {
         bytes data;
     }
 
+    //TODO hacer una funcion que reciba dinero y emita un evento
+
     ExecutionBroker public brokerContract;
 
     event requestSubmitted(uint requestID);

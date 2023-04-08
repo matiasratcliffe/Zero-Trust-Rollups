@@ -84,6 +84,7 @@ contract ExecutionBroker is Transferable {
     }
 
     function cancelRequest(uint requestID) public {
+        require(requestID < requests.length, "Index out of range");
         require(!requests[requestID].cancelled, "The request was already cancelled");
         require(msg.sender == address(requests[requestID].client), "You cant cancel a request that was not made by you");
         require(requests[requestID].acceptance.acceptor == address(0x0), "You cant cancel an accepted request");

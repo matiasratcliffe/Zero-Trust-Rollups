@@ -8,16 +8,15 @@ from eth_abi.exceptions import ValueOutOfBounds
 from eth_abi import decode
 from brownie import network
 import pytest
+import time
 
 
 class TestRequestor:
     def setup_method(self, method):
-        Logger.logIndentation=0
+        Logger.indentationLevel=0
 
     def teardown_method(self, method):
         pass
-
-    # TODO deberia hacer que ciertas cosas fallen antes en python? tipo chequear aca? o mejor que fallen en la chain? que me importa mas testear?
 
     def test_creation(self):
         if network.show_active() == "development":
@@ -37,23 +36,21 @@ class TestRequestor:
         requestor = Requestor(ClientFactory.getInstance())
         requestor.withdrawFunds(requestor.getFunds())  # This is just in case there are funds left from another test
         ownerOriginalBalance = requestor.owner.balance()
-        valueToSend = ownerOriginalBalance // 10
+        valueToSend = ownerOriginalBalance // 100
         assert valueToSend > 0
-        requestor.sendFunds(valueToSend)
+        transaction = requestor.sendFunds(valueToSend)
         assert requestor.getFunds() == valueToSend
-        assert requestor.owner.balance() == ownerOriginalBalance - valueToSend
-        #TODO tener en cuenta el gas
+        assert requestor.owner.balance() == ownerOriginalBalance - valueToSend - (transaction.gas_used * transaction.gas_price)
 
     def test_withdraw_funds(self):
         requestor = Requestor(ClientFactory.getInstance())
         requestor.withdrawFunds(requestor.getFunds())  # This is just in case there are funds left from another test
-        valueToSend = requestor.owner.balance() // 10
+        valueToSend = requestor.owner.balance() // 100
         assert valueToSend > 0
         requestor.sendFunds(valueToSend)
         ownerOriginalBalance = requestor.owner.balance()
-        requestor.withdrawFunds(valueToSend)
-        assert requestor.owner.balance() == ownerOriginalBalance + valueToSend
-        #TODO tener en cuenta el gas
+        transaction = requestor.withdrawFunds(valueToSend)
+        assert requestor.owner.balance() == ownerOriginalBalance + valueToSend - (transaction.gas_used * transaction.gas_price)
 
     def test_oversend_funds(self):
         requestor = Requestor(ClientFactory.getInstance())
@@ -62,7 +59,7 @@ class TestRequestor:
 
     def test_overwithdraw_funds(self):
         requestor = Requestor(ClientFactory.getInstance())
-        with pytest.raises(VirtualMachineError, match="revert: Insufficient funds"):
+        with pytest.raises(Exception, match="Insufficient funds"):
             requestor.withdrawFunds(requestor.getFunds() + 1)
     
     def test_encode_input(self):
@@ -118,12 +115,12 @@ class TestRequestor:
     def test_create_request_without_funds(self):
         requestor = Requestor(ClientFactory.getInstance())
         requestor.withdrawFunds(requestor.getFunds())  # This is just in case there are funds left from another test
-        with pytest.raises(VirtualMachineError, match="revert: Insufficient funds"):
+        with pytest.raises(Exception, match="Insufficient funds"):
             requestor.createRequest(functionToRun=1, dataArray=[10])
 
     def test_create_request_with_excess_post_processing_gas(self):
         requestor = Requestor(ClientFactory.getInstance())
-        with pytest.raises(VirtualMachineError, match="revert: The post processing gas cannot takeup all of the supplied ether"):
+        with pytest.raises(Exception, match="The post processing gas cannot takeup all of the supplied ether"):
             requestor.createRequest(
                 functionToRun=1,
                 dataArray=[10],
@@ -136,16 +133,15 @@ class TestRequestor:
         requestor = Requestor(ClientFactory.getInstance())
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
-        request = broker.requests(reqID)
-        assert request[9] == False
+        assert broker.requests(reqID)[9] == False
         requestor.cancelRequest(reqID)
-        request = broker.requests(reqID)
-        assert request[9] == True
+        time.sleep(3)
+        assert broker.requests(reqID)[9] == True
 
     def test_cancel_non_existing_request(self):
         requestor = Requestor(ClientFactory.getInstance())
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
-        with pytest.raises(VirtualMachineError, match="revert: Index out of range"):
+        with pytest.raises(Exception, match="Index out of range"):
             requestor.cancelRequest(broker.requestCount())
 
     def test_cancel_foreign_request(self):
@@ -156,14 +152,14 @@ class TestRequestor:
         requestor1 = Requestor(ClientFactory.create(owner=account1, broker=broker))
         requestor2 = Requestor(ClientFactory.create(owner=account2, broker=broker))
         reqID = requestor1.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
-        with pytest.raises(VirtualMachineError, match="revert: You cant cancel a request that was not made by you"):
+        with pytest.raises(Exception, match="You cant cancel a request that was not made by you"):
             requestor2.cancelRequest(reqID)
 
     def test_cancel_cancelled_request(self):
         requestor = Requestor(ClientFactory.getInstance())
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
         requestor.cancelRequest(reqID)
-        with pytest.raises(VirtualMachineError, match="revert: The request was already cancelled"):
+        with pytest.raises(Exception, match="The request was already cancelled"):
             requestor.cancelRequest(reqID)
 
     def test_cancel_accepted_request(self):
@@ -174,24 +170,30 @@ class TestRequestor:
         assert request[9] == False
         executor = Executor(Accounts.getAccount(), broker, True)
         executor._acceptRequest(reqID)
+        time.sleep(3)
         assert broker.requests(reqID)[7][0] == executor.account
-        with pytest.raises(VirtualMachineError, match="revert: You cant cancel an accepted request"):
+        with pytest.raises(Exception, match="You cant cancel an accepted request"):
             requestor.cancelRequest(reqID)
 
     def test_cancel_accepted_then_unnacepted_request(self):
         requestor = Requestor(ClientFactory.getInstance())
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        time.sleep(3)
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
-        request = broker.requests(reqID)
-        assert request[9] == False
+        assert broker.requests(reqID)[9] == False
         executor = Executor(Accounts.getAccount(), broker, True)
         executor._acceptRequest(reqID)
+        time.sleep(3)
         assert broker.requests(reqID)[7][0] == executor.account
         executor._cancelAcceptance(reqID)
+        time.sleep(3)
         assert int(broker.requests(reqID)[7][0], 16) == 0
         requestor.cancelRequest(reqID)
-        request = broker.requests(reqID)
-        assert request[9] == True
+        time.sleep(3)
+        assert broker.requests(reqID)[9] == True
+
+    def test_publicize_request():
+        raise "implement this"
 
     # Low level tests
 
@@ -201,7 +203,7 @@ class TestRequestor:
         account2 = Accounts.getFromIndex(1)
         broker = BrokerFactory.getInstance()
         client = ClientFactory.create(owner=account1, broker=broker)
-        with pytest.raises(VirtualMachineError, match="revert: Function accessible only by the owner"):
+        with pytest.raises(Exception, match="Function accessible only by the owner"):
             client.withdrawFunds(client.balance(), {'from': account2})
 
     def test_cancel_request_only_owner(self):
@@ -211,7 +213,7 @@ class TestRequestor:
         broker = BrokerFactory.getInstance()
         requestor = Requestor(ClientFactory.create(owner=account1, broker=broker))
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
-        with pytest.raises(VirtualMachineError, match="revert: Function accessible only by the owner"):
+        with pytest.raises(Exception, match="Function accessible only by the owner"):
             requestor.client.cancelRequest(reqID, {'from': account2})
 
     def test_submit_request_only_owner(self):
@@ -220,7 +222,7 @@ class TestRequestor:
         account2 = Accounts.getFromIndex(1)
         broker = BrokerFactory.getInstance()
         client = ClientFactory.create(owner=account1, broker=broker)
-        with pytest.raises(VirtualMachineError, match="revert: Function accessible only by the owner"):
+        with pytest.raises(Exception, match="Function accessible only by the owner"):
             client.submitRequest(
                 1e+16,
                 (0, 0),  # This would yield an error on the broker but the request should never make it out of the client contract
@@ -233,10 +235,8 @@ class TestRequestor:
     def test_process_result_only_broker(self):
         client = ClientFactory.getInstance()
         account = Accounts.getFromKey(client.owner())
-        with pytest.raises(VirtualMachineError, match="revert: Can only be called by the registered broker contract"):
+        with pytest.raises(Exception, match="Can only be called by the registered broker contract"):
             client.processResult(
                 0,  # This would yield an error but the call should never make it past the modifiers
                 {'from': account}
             )
-
-    # TODO maybe reorganize some of these tests as some of them are ClientContract tests rather than requestor tests

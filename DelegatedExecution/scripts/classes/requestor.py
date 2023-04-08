@@ -33,13 +33,15 @@ class Requestor:
         return request.return_value
 
     def cancelRequest(self, requestID):
-        self.client.cancelRequest(requestID, {"from": self.owner})
+        transaction = self.client.cancelRequest(requestID, {"from": self.owner})
+        transaction.wait(1)
+        return transaction
 
     def sendFunds(self, amount):
-        self.client.sendFunds({"from": self.owner, "value": amount})
+        return self.client.sendFunds({"from": self.owner, "value": amount})
 
     def withdrawFunds(self, amount):
-        self.client.withdrawFunds(amount, {"from": self.owner})
+        return self.client.withdrawFunds(amount, {"from": self.owner})
 
     def getFunds(self):
         return self.client.balance()
