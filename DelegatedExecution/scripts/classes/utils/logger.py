@@ -3,7 +3,7 @@ from datetime import datetime
 
 class Logger:
     colors = Fore
-    loggingActive = True
+    loggingActive = False
     indentationLevel = 0
     def log(message, color=Fore.GREEN, raw=False, logIndentation=None, indentationPattern="| "):
         if logIndentation == None:

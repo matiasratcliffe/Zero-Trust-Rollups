@@ -5,7 +5,7 @@ from scripts.classes.utils.contractProvider import ClientFactory, BrokerFactory
 
 @Logger.LogClassMethods()
 class Executor:
-    def __init__(self, account, broker, populateBuffers=False):
+    def __init__(self, account, broker, populateBuffers=True):
         self._listenForEvents = True
         self._minPayment = 1
         self._maxInsurance = 1e+18

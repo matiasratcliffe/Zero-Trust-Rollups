@@ -135,7 +135,7 @@ class TestRequestor:
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
         assert broker.requests(reqID)[9] == False
         requestor.cancelRequest(reqID)
-        time.sleep(3)
+        time.sleep(2)
         assert broker.requests(reqID)[9] == True
 
     def test_cancel_non_existing_request(self):
@@ -166,11 +166,10 @@ class TestRequestor:
         requestor = Requestor(ClientFactory.getInstance())
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
-        request = broker.requests(reqID)
-        assert request[9] == False
-        executor = Executor(Accounts.getAccount(), broker, True)
+        assert broker.requests(reqID)[9] == False
+        executor = Executor(Accounts.getAccount(), broker)
         executor._acceptRequest(reqID)
-        time.sleep(3)
+        time.sleep(2)
         assert broker.requests(reqID)[7][0] == executor.account
         with pytest.raises(Exception, match="You cant cancel an accepted request"):
             requestor.cancelRequest(reqID)
@@ -178,18 +177,18 @@ class TestRequestor:
     def test_cancel_accepted_then_unnacepted_request(self):
         requestor = Requestor(ClientFactory.getInstance())
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
-        time.sleep(3)
+        time.sleep(2)
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
         assert broker.requests(reqID)[9] == False
-        executor = Executor(Accounts.getAccount(), broker, True)
+        executor = Executor(Accounts.getAccount(), broker)
         executor._acceptRequest(reqID)
-        time.sleep(3)
+        time.sleep(2)
         assert broker.requests(reqID)[7][0] == executor.account
         executor._cancelAcceptance(reqID)
-        time.sleep(3)
+        time.sleep(2)
         assert int(broker.requests(reqID)[7][0], 16) == 0
         requestor.cancelRequest(reqID)
-        time.sleep(3)
+        time.sleep(2)
         assert broker.requests(reqID)[9] == True
 
     def test_publicize_request():
