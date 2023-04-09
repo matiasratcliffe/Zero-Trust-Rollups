@@ -30,7 +30,7 @@ class Logger:
     def LogMethod(methodPrefix='', color=Fore.WHITE):
         def methodDecorator(methodToDecorate):
             def decoratedMethod(*args, **kwargs):
-                Logger.log(f"┌Called {methodPrefix}{methodToDecorate.__name__} with args: {list(args)}{list(kwargs)}", color=color)
+                Logger.log(f"┌Called {methodPrefix}{methodToDecorate.__name__} with args: {list(args)}{list(kwargs)}", color=color)  # TODO kwargs me imprime solo los nombres y no los valores, testear con una interactive shell los diferentes casos de *args y **kwargs
                 Logger.indentationLevel += 1
                 returnVal = methodToDecorate(*args, **kwargs)
                 Logger.indentationLevel -= 1

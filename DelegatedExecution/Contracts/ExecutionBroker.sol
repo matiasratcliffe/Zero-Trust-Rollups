@@ -169,12 +169,12 @@ contract ExecutionBroker is Transferable {
         return false;  // original was correct
     }
 
-    event print2(uint subtime, uint delay, uint blocktime);
+    event print2(uint subtime, uint delay, uint blocktime); //TODO borrar
     function claimPayment(uint requestID) public returns (bool) {
         require(requests[requestID].submission.issuer == msg.sender, "This payment does not belong to you");
         require(!requests[requestID].submission.solidified, "The provided request has already solidified");
         emit print2(requests[requestID].submission.timestamp, requests[requestID].claimDelay, block.timestamp);
-        //require(requests[requestID].submission.timestamp + requests[requestID].claimDelay < block.timestamp, "The claim delay hasn't passed yet");
+        //require(requests[requestID].submission.timestamp + requests[requestID].claimDelay < block.timestamp, "The claim delay hasn't passed yet"); TODO uncomment
         bool transferSuccess = solidify(requestID);
         return transferSuccess;
     }
@@ -190,7 +190,7 @@ contract ExecutionBroker is Transferable {
     }
 
     // Private functions
-    event printer(uint requestID, address payable payee, uint payment, uint insurance, uint totalPayment, uint preBalance, uint postBalance);
+    event printer(uint requestID, address payable payee, uint payment, uint insurance, uint totalPayment, uint preBalance, uint postBalance); //TODO Borrar
     function solidify(uint requestID) private returns (bool) {
         // first solidify, then pay, for reentrancy issues
         requests[requestID].submission.solidified = true;
@@ -207,5 +207,9 @@ contract ExecutionBroker is Transferable {
         //emit resultPostProcessed(requestID, callSuccess);
 
         return transferSuccess;
+    }
+
+    function fundFunc() public payable {
+
     }
 }

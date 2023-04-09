@@ -238,9 +238,8 @@ class TestExecutor:
     def test_claim_payment(self):
         requestor = Requestor(ClientFactory.getInstance())  # TODO todos los tests en los que compare gas, revisar que aveces se usa la misma cuenta para el cliente y el executor, aunque quizas, como tomo el original balance despues de la creacion de las requests, no me afecte. pero por prolijidad es mejor separarlo
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
-        raise "probar crear request con menos payment y insurance"
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
-        executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
+        executor = Executor(Accounts.getFromIndex(0), broker, populateBuffers=False)
         originalBalance = executor.account.balance()
         transaction1 = executor._acceptRequest(reqID)
         result = executor._computeResult(reqID)
@@ -248,12 +247,13 @@ class TestExecutor:
         time.sleep(2)
         assert broker.requests(reqID)[8][0] == executor.account
         assert broker.requests(reqID)[8][3] == False
+        preClaimBalance = executor.account.balance()
         transaction3 = broker.claimPayment(reqID, {"from": executor.account})
-        time.sleep(2) #time.sleep(60)
+        time.sleep(2)
         assert transaction3.return_value == True
         assert broker.requests(reqID)[8][0] == executor.account
         assert broker.requests(reqID)[8][3] == True
-        assert executor.account.balance() == originalBalance - (transaction1.gas_used * transaction1.gas_price) - (transaction2.gas_used * transaction2.gas_price) - (transaction3.gas_used * transaction3.gas_price) + broker.requests(reqID)[2] + broker.requests(reqID)[4]
+        assert executor.account.balance() == preClaimBalance - (transaction1.gas_used * transaction1.gas_price) - (transaction2.gas_used * transaction2.gas_price) - (transaction3.gas_used * transaction3.gas_price) + broker.requests(reqID)[2] + broker.requests(reqID)[4]
         Logger.log(f"Pre-Execution balance: {originalBalance} ----- Post-Execution balance: {executor.account.balance()}")
         #TODO no tengo en cuenta el tema de post processing gas para ver el tema del costo total y la conveniencia
 

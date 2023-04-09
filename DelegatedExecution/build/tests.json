@@ -2,7 +2,7 @@
   "contracts": {
     "ClientImplementation": "b12d4fc1f2a109edfc5a6c3c4fc6ac215f696c9b",
     "DelegatedExecution": "73df0a6f5d0123eb2b2db0faf62b602aa77c123a",
-    "ExecutionBroker": "acb7643dba1f4d0bc7dbe5b602bfdd81fd3efa0b",
+    "ExecutionBroker": "236c43ec789b07862e1986b3ead1465d8858cd69",
     "Ownable": "672f70f06f11b1d7dfeb0f73ad0bb11d0c9972ad",
     "Transferable": "46d8302b7b373057f7bb873d07b598531307e853"
   },
