@@ -1,6 +1,7 @@
 from scripts.classes.utils.contractProvider import BrokerFactory, ClientFactory
 from scripts.classes.utils.accountsManager import Accounts
 from scripts.classes.utils.logger import Logger
+from brownie.convert.datatypes import HexString
 from scripts.classes.requestor import Requestor
 from scripts.classes.executor import Executor
 import pytest
@@ -36,16 +37,16 @@ class TestExecutor:
         requestor = Requestor(ClientFactory.getInstance())
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
-        executor = Executor(Accounts.getAccount(), broker)
+        executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
         assert int(broker.requests(reqID)[7][0], 16) == 0
         executor._acceptRequest(reqID)
-        time.sleep(2)
+        #time.sleep(2)
         assert broker.requests(reqID)[7][0] == executor.account
 
     def test_accept_cancelled_request(self):
         requestor = Requestor(ClientFactory.getInstance())
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
-        executor = Executor(Accounts.getAccount(), broker)
+        executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
         requestor.cancelRequest(reqID)
         assert broker.requests(reqID)[9] == True
@@ -56,7 +57,7 @@ class TestExecutor:
         requestor = Requestor(ClientFactory.getInstance())
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
-        executor = Executor(Accounts.getAccount(), broker)
+        executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
         assert int(broker.requests(reqID)[7][0], 16) == 0
         executor._acceptRequest(reqID)
         with pytest.raises(Exception, match="Someone already accepted the request"):
@@ -80,12 +81,10 @@ class TestExecutor:
         requestor = Requestor(ClientFactory.getInstance())
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
-        executor = Executor(Accounts.getAccount(), broker)
+        executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
         executor._acceptRequest(reqID)
-        time.sleep(2)
-        assert broker.requests(reqID)[7][0] == executor.account
         executor._cancelAcceptance(reqID)
-        time.sleep(2)
+        #time.sleep(2)
         assert int(broker.requests(reqID)[7][0], 16) == 0
     
     def test_cancel_acceptance_on_non_existing_request(self):
@@ -97,42 +96,113 @@ class TestExecutor:
         requestor = Requestor(ClientFactory.getInstance())
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
-        executor = Executor(Accounts.getAccount(), broker)
+        executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
         with pytest.raises(Exception, match="There is no acceptance in place for the provided requestID"):
             executor._cancelAcceptance(reqID)
 
     def test_cancel_acceptance_on_submitted_request(self):
-        pass
+        requestor = Requestor(ClientFactory.getInstance())
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
+        executor._acceptRequest(reqID)
+        result = executor._computeResult(reqID)
+        executor._submitResult(reqID, result)
+        #time.sleep(2)
+        assert broker.requests(reqID)[8][0] == executor.account
+        with pytest.raises(Exception, match="This request already has a submission"):
+            executor._cancelAcceptance(reqID)
 
     def test_cancel_foreign_acceptance(self):
         requestor = Requestor(ClientFactory.getInstance())
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
-        executor1 = Executor(Accounts.getFromIndex(0), broker)
-        executor2 = Executor(Accounts.getFromIndex(1), broker)
+        executor1 = Executor(Accounts.getFromIndex(0), broker, populateBuffers=False)
+        executor2 = Executor(Accounts.getFromIndex(1), broker, populateBuffers=False)
         executor1._acceptRequest(reqID)
-        time.sleep(2)
+        #time.sleep(2)
         assert broker.requests(reqID)[7][0] == executor1.account
         with pytest.raises(Exception, match="You cant cancel an acceptance that does not belong to you"):
             executor2._cancelAcceptance(reqID)
 
     def test_submit_result(self):
-        pass
+        requestor = Requestor(ClientFactory.getInstance())
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
+        executor._acceptRequest(reqID)
+        result = executor._computeResult(reqID)
+        executor._submitResult(reqID, result)
+        #time.sleep(2)
+        assert broker.requests(reqID)[8][0] == executor.account
+        assert broker.requests(reqID)[8][2] == result
+        assert broker.requests(reqID)[8][3] == False
 
     def test_submit_result_for_unaccepted_request(self):
-        pass
-    
+        requestor = Requestor(ClientFactory.getInstance())
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
+        result = executor._computeResult(reqID)
+        with pytest.raises(Exception, match="You need to accept the request first"):
+            executor._submitResult(reqID, result)
+
     def test_submit_result_for_already_submitted_request(self):
-        pass
+        requestor = Requestor(ClientFactory.getInstance())
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
+        executor._acceptRequest(reqID)
+        result = executor._computeResult(reqID)
+        executor._submitResult(reqID, result)
+        #time.sleep(2)
+        with pytest.raises(Exception, match="There is already a submission for this request"):
+            executor._submitResult(reqID, result)
 
     def test_submit_result_for_foreign_acceptance(self):
-        pass
+        requestor = Requestor(ClientFactory.getInstance())
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor1 = Executor(Accounts.getFromIndex(0), broker, populateBuffers=False)
+        executor2 = Executor(Accounts.getFromIndex(1), broker, populateBuffers=False)
+        executor1._acceptRequest(reqID)
+        result = executor2._computeResult(reqID)
+        with pytest.raises(Exception, match="Someone else has accepted the Request"):
+            executor2._submitResult(reqID, result)
 
-    def test_challenge_submission(self):
+    def test_challenge_erroneous_submission(self):
+        requestor = Requestor(ClientFactory.getInstance())
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor1 = Executor(Accounts.getFromIndex(0), broker, populateBuffers=False)
+        executor2 = Executor(Accounts.getFromIndex(1), broker, populateBuffers=False)
+        executor1._acceptRequest(reqID)
+        result = executor1._computeResult(reqID)
+        alteredResult = HexString((int.from_bytes(result, "big") + 1), "bytes32")
+        executor1._submitResult(reqID, alteredResult)
+        assert broker.requests(reqID)[8][0] == executor1.account
+        assert broker.requests(reqID)[8][2] == alteredResult
+        assert broker.requests(reqID)[8][3] == False
+        challengeSuccess = executor2._challengeSubmission(reqID).return_value
+        assert challengeSuccess == True
+        assert broker.requests(reqID)[8][0] == executor2.account
+        assert broker.requests(reqID)[8][2] == result
+        assert broker.requests(reqID)[8][3] == True
+
+    def test_challenge_correct_submission(self):
+        #TODO test solidifies
         pass
 
     def test_challenge_unsibmitted_request(self):
-        pass
+        requestor = Requestor(ClientFactory.getInstance())
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
+        with pytest.raises(Exception, match="There are no submissions for the challenged request"):
+            executor._challengeSubmission(reqID)
+        executor._acceptRequest(reqID)
+        with pytest.raises(Exception, match="There are no submissions for the challenged request"):
+            executor._challengeSubmission(reqID)
 
     def test_challenge_solidified_submission(self):
         pass
@@ -156,4 +226,5 @@ class TestExecutor:
     def test_challenger_loop_round(self):
         pass
 
+    #TODO test post process result
     # Test Transferable TODO??? worth it???

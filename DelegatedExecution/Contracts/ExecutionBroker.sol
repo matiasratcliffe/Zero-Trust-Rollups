@@ -119,7 +119,7 @@ contract ExecutionBroker is Transferable {
     function cancelAcceptance(uint requestID) public {
         // check request unsubmitted (at this point it cant be cancelled because the acceptance blocks it
         require(requests[requestID].acceptance.acceptor != address(0x0), "There is no acceptance in place for the provided requestID");
-        require(requests[requestID].submission.issuer == address(0x0), "The results for this request have already beem submitted");
+        require(requests[requestID].submission.issuer == address(0x0), "This request already has a submission");
         require(requests[requestID].acceptance.acceptor == msg.sender, "You cant cancel an acceptance that does not belong to you");
         address payable payee = payable(requests[requestID].acceptance.acceptor);
         requests[requestID].acceptance.acceptor = address(0x0);

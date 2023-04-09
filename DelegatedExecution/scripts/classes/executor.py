@@ -1,11 +1,11 @@
-from scripts.classes.utils.logger import Logger
-from brownie.exceptions import VirtualMachineError
 from scripts.classes.utils.contractProvider import ClientFactory, BrokerFactory
+from scripts.classes.utils.logger import Logger
+import time
 
 
 @Logger.LogClassMethods()
 class Executor:
-    def __init__(self, account, broker, populateBuffers=True):
+    def __init__(self, account, broker, populateBuffers):
         self._listenForEvents = True
         self._minPayment = 1
         self._maxInsurance = 1e+18
@@ -23,11 +23,11 @@ class Executor:
             challengeInsurance = request[4]
             claimDelay = request[5]
             if self._listenForEvents:
-                if payment >= self._minPayment and challengeInsurance <= self._maxInsurance and claimDelay <= self._maxDelay:
+                if payment >= self._minPayment and challengeInsurance <= self._maxInsurance and claimDelay <= self._maxDelay and event.args.requestID not in self.unacceptedRequests:
                     self.unacceptedRequests.append(event.args.requestID)
         def addUnsolidifiedSubmission(event):
             Logger.log(f"Event[{event.event}]: {dict(event.args)}", logIndentation=0)
-            if self._listenForEvents and event.args.submitter != self.account:  # TODO pedir al broker el request en base al reqID y mirar si vale la pena el gas/insurance
+            if self._listenForEvents and event.args.submitter != self.account and event.args.requestID not in self.unsolidifiedSubmissions:  # TODO pedir al broker el request en base al reqID y mirar si vale la pena el gas/insurance
                 self.unsolidifiedSubmissions.append(event.args.requestID)
         def removeUnacceptedRequest(event):
             Logger.log(f"Event[{event.event}]: {dict(event.args)}", logIndentation=0)
@@ -63,7 +63,8 @@ class Executor:
         request = self.broker.requests(requestID)
         transaction = self.broker.acceptRequest(requestID, {'from': self.account, 'value': request.dict()['challengeInsurance']})
         transaction.wait(1)
-        self.unacceptedRequests.pop(self.unacceptedRequests.index(requestID))
+        if requestID in self.unacceptedRequests:
+            self.unacceptedRequests.pop(self.unacceptedRequests.index(requestID))
         return transaction
 
     def _cancelAcceptance(self, requestID):
@@ -73,12 +74,11 @@ class Executor:
 
     def _acceptNextOpenRequest(self):
         reqID = self.unacceptedRequests[0]
-        self._acceptRequest(reqID)
+        self._acceptRequest(reqID)  # TODO what if anything here fails? TEST THAT TOO
 
     def _computeResult(self, requestID):
-        if str(self.broker.requests(requestID).dict()['acceptance'][0]) == self.account.address:
-            client = ClientFactory.at(address=self.broker.requests(requestID).dict()['client'])
-            return client.clientLogic(self.broker.requests(requestID).dict()['input'])
+        client = ClientFactory.at(address=self.broker.requests(requestID).dict()['client'])
+        return client.clientLogic(self.broker.requests(requestID).dict()['input'])
 
     def _submitResult(self, requestID, result):
         transaction = self.broker.submitResult(requestID, result, {'from': self.account})
@@ -88,14 +88,17 @@ class Executor:
     def _challengeSubmission(self, requestID):
         transaction = self.broker.challengeSubmission(requestID, {'from': self.account})
         transaction.wait(1)
-        self.unsolidifiedSubmissions.pop(self.unsolidifiedSubmissions.index(requestID))
+        if requestID in self.unsolidifiedSubmissions:
+            self.unsolidifiedSubmissions.pop(self.unsolidifiedSubmissions.index(requestID))
         return transaction
 
     def solverLoopRound(self):
         if len(self.unacceptedRequests) > 0:
             requestID = self._acceptNextOpenRequest()
-            result = self._computeResult(requestID)
-            self._submitResult(requestID, result)
+            time.sleep(2)
+            if str(self.broker.requests(requestID).dict()['acceptance'][0]) == self.account.address:
+                result = self._computeResult(requestID)
+                self._submitResult(requestID, result)
         else:
             Logger.log("Unaccepted requests buffer empty")
 

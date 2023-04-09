@@ -3,8 +3,11 @@ from datetime import datetime
 
 class Logger:
     colors = Fore
-    loggingActive = False
+    loggingActive = True
     indentationLevel = 0
+    encoding = "utf8"
+    logsFile = "logs.txt"
+
     def log(message, color=Fore.GREEN, raw=False, logIndentation=None, indentationPattern="| "):
         if logIndentation == None:
             logIndentation = Logger.indentationLevel
@@ -12,7 +15,7 @@ class Logger:
         message += Style.RESET_ALL + "\n"
         message = message if raw else f"[{datetime.now().strftime('%m-%d %H:%M:%S')}] {indentation}{message}"
         if Logger.loggingActive:
-            with open("logs.txt", "a", encoding='utf8') as f:
+            with open(Logger.logsFile, "a", encoding=Logger.encoding) as f:
                 f.write(color + message)  # [console]::bufferwidth = 327;cls;Get-Content -Encoding UTF8 -Path "logs.txt" -Wait
     
     def LogClassMethods(color=Fore.WHITE):

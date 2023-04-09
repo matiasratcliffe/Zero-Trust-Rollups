@@ -167,7 +167,7 @@ class TestRequestor:
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
         assert broker.requests(reqID)[9] == False
-        executor = Executor(Accounts.getAccount(), broker)
+        executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
         executor._acceptRequest(reqID)
         time.sleep(2)
         assert broker.requests(reqID)[7][0] == executor.account
@@ -180,7 +180,7 @@ class TestRequestor:
         time.sleep(2)
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
         assert broker.requests(reqID)[9] == False
-        executor = Executor(Accounts.getAccount(), broker)
+        executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
         executor._acceptRequest(reqID)
         time.sleep(2)
         assert broker.requests(reqID)[7][0] == executor.account
@@ -191,8 +191,15 @@ class TestRequestor:
         time.sleep(2)
         assert broker.requests(reqID)[9] == True
 
-    def test_publicize_request():
-        raise "implement this"
+    def test_publicize_request(self):
+        requestor = Requestor(ClientFactory.getInstance())
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e+18)
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
+        assert reqID not in executor.unacceptedRequests
+        requestor.publicizeRequest(reqID)
+        time.sleep(2)
+        assert reqID in executor.unacceptedRequests
 
     # Low level tests
 

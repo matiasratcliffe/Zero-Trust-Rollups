@@ -1,6 +1,7 @@
-from scripts.classes.utils.contractProvider import ClientFactory
+from scripts.classes.utils.contractProvider import ClientFactory, BrokerFactory
 from scripts.classes.utils.accountsManager import Accounts
 from scripts.classes.utils.logger import Logger
+from brownie.convert.datatypes import HexString
 from eth_abi import encode
 import re
 
@@ -17,7 +18,7 @@ class Requestor:
         return re.findall(memberRegex, dataStruct)
 
     def _encodeInput(self, functionToRun, data):
-        return (functionToRun, encode(self._getFunctionTypes(functionToRun), data))
+        return (functionToRun, HexString(encode(self._getFunctionTypes(functionToRun), data), "bytes"))
 
     def createRequest(self, functionToRun, dataArray, payment=1e+16, postProcessingGas=2e13, requestedInsurance=1e+18, claimDelay=0, funds=0):
         transactionData = { "from": self.owner, "value": funds }
@@ -45,3 +46,7 @@ class Requestor:
 
     def getFunds(self):
         return self.client.balance()
+
+    def publicizeRequest(self, requestID):
+        broker = BrokerFactory.at(address=self.client.brokerContract())
+        broker.publicizeRequest(requestID, {"from": self.owner})
