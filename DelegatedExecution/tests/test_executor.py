@@ -65,7 +65,7 @@ class TestExecutor:
 
     def test_accept_request_wrong_insurance(self):
         requestor = Requestor(ClientFactory.getInstance())
-        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18, requestedInsurance=1e18)
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
         with pytest.raises(Exception, match="Incorrect amount of insurance provided"):
             broker.acceptRequest(reqID, {'from': Accounts.getAccount(), 'value': 0})
@@ -183,15 +183,32 @@ class TestExecutor:
         assert broker.requests(reqID)[8][0] == executor1.account
         assert broker.requests(reqID)[8][2] == alteredResult
         assert broker.requests(reqID)[8][3] == False
+        originalBalance = executor2.account.balance()
         challengeSuccess = executor2._challengeSubmission(reqID).return_value
         assert challengeSuccess == True
         assert broker.requests(reqID)[8][0] == executor2.account
         assert broker.requests(reqID)[8][2] == result
         assert broker.requests(reqID)[8][3] == True
+        Logger.log(f"Pre-Challenge balance: {originalBalance} ----- Post-Challenge balance: {executor2.account.balance()}")
+        raise "check with -i challenge gas y por que me emite el evento con un reqID incrementado???"
 
     def test_challenge_correct_submission(self):
-        #TODO test solidifies
-        pass
+        requestor = Requestor(ClientFactory.getInstance())
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor1 = Executor(Accounts.getFromIndex(0), broker, populateBuffers=False)
+        executor2 = Executor(Accounts.getFromIndex(1), broker, populateBuffers=False)
+        executor1._acceptRequest(reqID)
+        result = executor1._computeResult(reqID)
+        executor1._submitResult(reqID, result)
+        assert broker.requests(reqID)[8][0] == executor1.account
+        assert broker.requests(reqID)[8][2] == result
+        assert broker.requests(reqID)[8][3] == False
+        challengeSuccess = executor2._challengeSubmission(reqID).return_value
+        assert challengeSuccess == False
+        assert broker.requests(reqID)[8][0] == executor1.account
+        assert broker.requests(reqID)[8][2] == result
+        assert broker.requests(reqID)[8][3] == False
 
     def test_challenge_unsibmitted_request(self):
         requestor = Requestor(ClientFactory.getInstance())
@@ -205,11 +222,41 @@ class TestExecutor:
             executor._challengeSubmission(reqID)
 
     def test_challenge_solidified_submission(self):
-        pass
+        requestor = Requestor(ClientFactory.getInstance())
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
+        executor._acceptRequest(reqID)
+        alteredResult = HexString((int.from_bytes(executor._computeResult(reqID), "big") + 1), "bytes32")
+        executor._submitResult(reqID, alteredResult)
+        assert broker.requests(reqID)[8][3] == False
+        executor._challengeSubmission(reqID)
+        assert broker.requests(reqID)[8][3] == True
+        with pytest.raises(Exception, match="The challenged submission has already solidified"):
+            executor._challengeSubmission(reqID)
 
     def test_claim_payment(self):
-        #TODO test solidified too in here
-        pass
+        requestor = Requestor(ClientFactory.getInstance())  # TODO todos los tests en los que compare gas, revisar que aveces se usa la misma cuenta para el cliente y el executor, aunque quizas, como tomo el original balance despues de la creacion de las requests, no me afecte. pero por prolijidad es mejor separarlo
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        raise "probar crear request con menos payment y insurance"
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
+        originalBalance = executor.account.balance()
+        transaction1 = executor._acceptRequest(reqID)
+        result = executor._computeResult(reqID)
+        transaction2 = executor._submitResult(reqID, result)
+        time.sleep(2)
+        assert broker.requests(reqID)[8][0] == executor.account
+        assert broker.requests(reqID)[8][3] == False
+        transaction3 = broker.claimPayment(reqID, {"from": executor.account})
+        time.sleep(2) #time.sleep(60)
+        assert transaction3.return_value == True
+        assert broker.requests(reqID)[8][0] == executor.account
+        assert broker.requests(reqID)[8][3] == True
+        assert executor.account.balance() == originalBalance - (transaction1.gas_used * transaction1.gas_price) - (transaction2.gas_used * transaction2.gas_price) - (transaction3.gas_used * transaction3.gas_price) + broker.requests(reqID)[2] + broker.requests(reqID)[4]
+        Logger.log(f"Pre-Execution balance: {originalBalance} ----- Post-Execution balance: {executor.account.balance()}")
+        #TODO no tengo en cuenta el tema de post processing gas para ver el tema del costo total y la conveniencia
+
 
     def test_claim_foreign_payment(self):
         pass

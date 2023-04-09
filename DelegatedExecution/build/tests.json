@@ -2,18 +2,10 @@
   "contracts": {
     "ClientImplementation": "b12d4fc1f2a109edfc5a6c3c4fc6ac215f696c9b",
     "DelegatedExecution": "73df0a6f5d0123eb2b2db0faf62b602aa77c123a",
-    "ExecutionBroker": "85255c1b416561cc26c1c91261d9e3e3c2e6aca8",
+    "ExecutionBroker": "acb7643dba1f4d0bc7dbe5b602bfdd81fd3efa0b",
     "Ownable": "672f70f06f11b1d7dfeb0f73ad0bb11d0c9972ad",
     "Transferable": "46d8302b7b373057f7bb873d07b598531307e853"
   },
-  "tests": {
-    "tests/test_deployment.py": {
-      "coverage": false,
-      "isolated": false,
-      "results": "...",
-      "sha1": "7f0f152fcbebae3c629254782005fb8cd9dbf9d9",
-      "txhash": []
-    }
-  },
+  "tests": {},
   "tx": {}
 }

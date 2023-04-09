@@ -6,7 +6,7 @@ class Accounts:
     def getAccount():
         if Accounts.count() == 0:
             Accounts._loadAccounts()
-        return Accounts.getFromIndex(randint(0, len(accounts)-1))
+        return Accounts.getFromIndex(randint(0, len(accounts)-1)) # TODO, que no sea random, sino que rote respecto a la ultima entregada?
     
     def count():
         return len(accounts)
