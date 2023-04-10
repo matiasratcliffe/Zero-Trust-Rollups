@@ -2,10 +2,32 @@
   "contracts": {
     "ClientImplementation": "b12d4fc1f2a109edfc5a6c3c4fc6ac215f696c9b",
     "DelegatedExecution": "73df0a6f5d0123eb2b2db0faf62b602aa77c123a",
-    "ExecutionBroker": "236c43ec789b07862e1986b3ead1465d8858cd69",
+    "ExecutionBroker": "ceeaea3761fca2500b50583f143e58af80d69e0e",
     "Ownable": "672f70f06f11b1d7dfeb0f73ad0bb11d0c9972ad",
     "Transferable": "46d8302b7b373057f7bb873d07b598531307e853"
   },
-  "tests": {},
+  "tests": {
+    "tests/test_deployment.py": {
+      "coverage": false,
+      "isolated": false,
+      "results": "...",
+      "sha1": "83606ea823cb64db41322822cfdd3df70fe61d2d",
+      "txhash": []
+    },
+    "tests/test_executor.py": {
+      "coverage": false,
+      "isolated": false,
+      "results": "....................F.......F.......",
+      "sha1": "510ba9242e1c291c1b609a5feb84e774733168ea",
+      "txhash": []
+    },
+    "tests/test_requestor.py": {
+      "coverage": false,
+      "isolated": false,
+      "results": "..................F....",
+      "sha1": "0080aa767379236f3dca9a371cedfbe207380392",
+      "txhash": []
+    }
+  },
   "tx": {}
 }

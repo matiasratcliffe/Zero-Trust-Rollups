@@ -78,9 +78,8 @@ contract ExecutionBroker is Transferable {
             submission: submission,
             cancelled: false
         });
-        emit requestCreated(request.id, msg.value, postProcessingGas, requestedInsurance, claimDelay); //TODO por que me crea requestid =1 y no 0?
-        requests.push(request);
         emit requestCreated(request.id, msg.value, postProcessingGas, requestedInsurance, claimDelay);
+        requests.push(request);
         return request.id;
     }
 
@@ -165,16 +164,16 @@ contract ExecutionBroker is Transferable {
             // No revierto si no es success porque una corrida on chain es muy valiosa como para arriesgar el revert
             emit challengePayment(requestID, transferSuccess);
             return true;  // result was corrected
-        } // else, el original lo hizo bien, dejo que pase el tiempo y cobre TODO decidir si quiero pagar un challenge a una sub correcta
-        return false;  // original was correct
+        } else {  // el original lo hizo bien, dejo que pase el tiempo y cobre TODO decidir si quiero pagar un challenge a una sub correcta
+            return false;  // original was correct
+        }
     }
 
-    event print2(uint subtime, uint delay, uint blocktime); //TODO borrar
     function claimPayment(uint requestID) public returns (bool) {
+        require(requests[requestID].submission.issuer != address(0x0), "There are no submissions for the provided request");
         require(requests[requestID].submission.issuer == msg.sender, "This payment does not belong to you");
         require(!requests[requestID].submission.solidified, "The provided request has already solidified");
-        emit print2(requests[requestID].submission.timestamp, requests[requestID].claimDelay, block.timestamp);
-        //require(requests[requestID].submission.timestamp + requests[requestID].claimDelay < block.timestamp, "The claim delay hasn't passed yet"); TODO uncomment
+        require(requests[requestID].submission.timestamp + requests[requestID].claimDelay < block.timestamp, "The claim delay hasn't passed yet");
         bool transferSuccess = solidify(requestID);
         return transferSuccess;
     }
@@ -190,26 +189,20 @@ contract ExecutionBroker is Transferable {
     }
 
     // Private functions
-    event printer(uint requestID, address payable payee, uint payment, uint insurance, uint totalPayment, uint preBalance, uint postBalance); //TODO Borrar
     function solidify(uint requestID) private returns (bool) {
         // first solidify, then pay, for reentrancy issues
         requests[requestID].submission.solidified = true;
         emit requestSolidified(requestID);
-        uint prebalance = address(this).balance;
         address payable payee = payable(requests[requestID].submission.issuer);
         uint payAmount = requests[requestID].payment + requests[requestID].challengeInsurance;
         bool transferSuccess = internalTransferFunds(payAmount, payee);
-        emit printer(requestID, payee, requests[requestID].payment, requests[requestID].challengeInsurance, payAmount, prebalance, address(this).balance); //TODO borrar
         
         // capaz la logica de encadenamiento es mejor definirla en python, o un mix
         bytes memory data = abi.encodeWithSelector(requests[requestID].client.processResult.selector, requests[requestID].submission.result);
-        //TODO uncomment (bool callSuccess, ) = address(requests[requestID].client).call{gas: requests[requestID].postProcessingGas}(data);  // el delegate para que me aparezca el sender como el broker. cuidado si esto no me hace una vulnerabilidad, puedo vaciar fondos desde client? no deberia pasar nada, ni el broker ni el client puede extraer fondos
-        //emit resultPostProcessed(requestID, callSuccess);
+        (bool callSuccess, ) = address(requests[requestID].client).call{gas: requests[requestID].postProcessingGas}(data);  // el delegate para que me aparezca el sender como el broker. cuidado si esto no me hace una vulnerabilidad, puedo vaciar fondos desde client? no deberia pasar nada, ni el broker ni el client puede extraer fondos
+        emit resultPostProcessed(requestID, callSuccess);
 
         return transferSuccess;
     }
 
-    function fundFunc() public payable {
-
-    }
 }

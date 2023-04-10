@@ -9,13 +9,18 @@ import time
 
 
 class TestExecutor:
+    def setup(self):
+        pass
+
+    def teardown(self):
+        pass
+
     def setup_method(self, method):
         Logger.indentationLevel=0
 
     def teardown_method(self, method):
         pass
 
-    # TODO tests de ExecutionBroker y de executor (comportamiento de los buffers y eventos), isrequestopen?
     # TODO tests de transferable
 
     def test_is_request_open(self):
@@ -40,7 +45,6 @@ class TestExecutor:
         executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
         assert int(broker.requests(reqID)[7][0], 16) == 0
         executor._acceptRequest(reqID)
-        #time.sleep(2)
         assert broker.requests(reqID)[7][0] == executor.account
 
     def test_accept_cancelled_request(self):
@@ -84,7 +88,6 @@ class TestExecutor:
         executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
         executor._acceptRequest(reqID)
         executor._cancelAcceptance(reqID)
-        #time.sleep(2)
         assert int(broker.requests(reqID)[7][0], 16) == 0
     
     def test_cancel_acceptance_on_non_existing_request(self):
@@ -108,7 +111,6 @@ class TestExecutor:
         executor._acceptRequest(reqID)
         result = executor._computeResult(reqID)
         executor._submitResult(reqID, result)
-        #time.sleep(2)
         assert broker.requests(reqID)[8][0] == executor.account
         with pytest.raises(Exception, match="This request already has a submission"):
             executor._cancelAcceptance(reqID)
@@ -120,7 +122,6 @@ class TestExecutor:
         executor1 = Executor(Accounts.getFromIndex(0), broker, populateBuffers=False)
         executor2 = Executor(Accounts.getFromIndex(1), broker, populateBuffers=False)
         executor1._acceptRequest(reqID)
-        #time.sleep(2)
         assert broker.requests(reqID)[7][0] == executor1.account
         with pytest.raises(Exception, match="You cant cancel an acceptance that does not belong to you"):
             executor2._cancelAcceptance(reqID)
@@ -133,7 +134,6 @@ class TestExecutor:
         executor._acceptRequest(reqID)
         result = executor._computeResult(reqID)
         executor._submitResult(reqID, result)
-        #time.sleep(2)
         assert broker.requests(reqID)[8][0] == executor.account
         assert broker.requests(reqID)[8][2] == result
         assert broker.requests(reqID)[8][3] == False
@@ -155,7 +155,6 @@ class TestExecutor:
         executor._acceptRequest(reqID)
         result = executor._computeResult(reqID)
         executor._submitResult(reqID, result)
-        #time.sleep(2)
         with pytest.raises(Exception, match="There is already a submission for this request"):
             executor._submitResult(reqID, result)
 
@@ -190,7 +189,6 @@ class TestExecutor:
         assert broker.requests(reqID)[8][2] == result
         assert broker.requests(reqID)[8][3] == True
         Logger.log(f"Pre-Challenge balance: {originalBalance} ----- Post-Challenge balance: {executor2.account.balance()}")
-        raise "check with -i challenge gas y por que me emite el evento con un reqID incrementado???"
 
     def test_challenge_correct_submission(self):
         requestor = Requestor(ClientFactory.getInstance())
@@ -236,7 +234,7 @@ class TestExecutor:
             executor._challengeSubmission(reqID)
 
     def test_claim_payment(self):
-        requestor = Requestor(ClientFactory.getInstance())  # TODO todos los tests en los que compare gas, revisar que aveces se usa la misma cuenta para el cliente y el executor, aunque quizas, como tomo el original balance despues de la creacion de las requests, no me afecte. pero por prolijidad es mejor separarlo
+        requestor = Requestor(ClientFactory.getInstance())
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
         executor = Executor(Accounts.getFromIndex(0), broker, populateBuffers=False)
@@ -248,6 +246,7 @@ class TestExecutor:
         assert broker.requests(reqID)[8][0] == executor.account
         assert broker.requests(reqID)[8][3] == False
         preClaimBalance = executor.account.balance()
+        time.sleep(3)
         transaction3 = broker.claimPayment(reqID, {"from": executor.account})
         time.sleep(2)
         assert transaction3.return_value == True
@@ -255,23 +254,184 @@ class TestExecutor:
         assert broker.requests(reqID)[8][3] == True
         assert executor.account.balance() == preClaimBalance - (transaction1.gas_used * transaction1.gas_price) - (transaction2.gas_used * transaction2.gas_price) - (transaction3.gas_used * transaction3.gas_price) + broker.requests(reqID)[2] + broker.requests(reqID)[4]
         Logger.log(f"Pre-Execution balance: {originalBalance} ----- Post-Execution balance: {executor.account.balance()}")
-        #TODO no tengo en cuenta el tema de post processing gas para ver el tema del costo total y la conveniencia
 
+    def test_claim_payment_for_unsubmitted_request(self):
+        requestor = Requestor(ClientFactory.getInstance())
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        with pytest.raises(Exception, match="There are no submissions for the provided request"):
+            broker.claimPayment(reqID, {"from": Accounts.getAccount()})
 
     def test_claim_foreign_payment(self):
-        pass
+        requestor = Requestor(ClientFactory.getInstance())
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor = Executor(Accounts.getFromIndex(0), broker, populateBuffers=False)
+        executor._acceptRequest(reqID)
+        result = executor._computeResult(reqID)
+        executor._submitResult(reqID, result)
+        assert broker.requests(reqID)[8][0] == executor.account
+        assert broker.requests(reqID)[8][3] == False
+        with pytest.raises(Exception, match="This payment does not belong to you"):
+            broker.claimPayment(reqID, {"from": Accounts.getFromIndex(1)})
 
     def test_claim_solidified_payment(self):
-        pass
+        requestor = Requestor(ClientFactory.getInstance())
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
+        executor._acceptRequest(reqID)
+        alteredResult = HexString((int.from_bytes(executor._computeResult(reqID), "big") + 1), "bytes32")
+        executor._submitResult(reqID, alteredResult)
+        executor._challengeSubmission(reqID)
+        assert broker.requests(reqID)[8][3] == True
+        with pytest.raises(Exception, match="The provided request has already solidified"):
+            broker.claimPayment(reqID, {"from": executor.account})
 
     def test_claim_premature_payment(self):
-        pass
+        requestor = Requestor(ClientFactory.getInstance())
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18, claimDelay=3600)
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
+        executor._acceptRequest(reqID)
+        result = executor._computeResult(reqID)
+        executor._submitResult(reqID, result)
+        assert broker.requests(reqID)[8][0] == executor.account
+        assert broker.requests(reqID)[8][3] == False
+        with pytest.raises(Exception, match="The claim delay hasn't passed yet"):
+            broker.claimPayment(reqID, {"from": executor.account})
+
+    def test_populate_unaccepted_requests_buffer(self):
+        requestor = Requestor(ClientFactory.getInstance())
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor = Executor(Accounts.getAccount(), broker, populateBuffers=True)
+        assert reqID in executor.unacceptedRequests
+
+    def test_populate_unsolidified_submissions_buffer(self):
+        requestor = Requestor(ClientFactory.getInstance())
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor1 = Executor(Accounts.getAccount(), broker, populateBuffers=False)
+        executor1._acceptRequest(reqID)
+        result = executor1._computeResult(reqID)
+        executor1._submitResult(reqID, result)
+        executor2 = Executor(Accounts.getAccount(), broker, populateBuffers=True)
+        assert reqID in executor2.unsolidifiedSubmissions
+
+    def test_listen_to_request_created_event(self):
+        requestor = Requestor(ClientFactory.getInstance())
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        time.sleep(4)
+        assert reqID in executor.unacceptedRequests
+
+    def test_listen_to_acceptance_cancelled_event(self):
+        requestor = Requestor(ClientFactory.getInstance())
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor1 = Executor(Accounts.getAccount(), broker, populateBuffers=False)
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        executor1._acceptRequest(reqID)
+        executor2 = Executor(Accounts.getAccount(), broker, populateBuffers=False)
+        assert reqID not in executor2.unacceptedRequests
+        executor1._cancelAcceptance(reqID)
+        time.sleep(5)
+        assert reqID in executor2.unacceptedRequests
+
+    def test_listen_to_request_cancelled_event(self):
+        requestor = Requestor(ClientFactory.getInstance())
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        executor = Executor(Accounts.getAccount(), broker, populateBuffers=True)
+        assert reqID in executor.unacceptedRequests
+        requestor.cancelRequest(reqID)
+        time.sleep(2)
+        assert reqID not in executor.unacceptedRequests
+
+    def test_listen_to_request_accepted_event(self):
+        requestor = Requestor(ClientFactory.getInstance())
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor1 = Executor(Accounts.getAccount(), broker, populateBuffers=False)
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        executor2 = Executor(Accounts.getAccount(), broker, populateBuffers=True)
+        assert reqID in executor2.unacceptedRequests
+        executor1._acceptRequest(reqID)
+        time.sleep(2)
+        assert reqID not in executor2.unacceptedRequests
+
+    def test_listen_to_result_submitted_event(self):
+        requestor = Requestor(ClientFactory.getInstance())
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor1 = Executor(Accounts.getAccount(), broker, populateBuffers=False)
+        executor1._acceptRequest(reqID)
+        result = executor1._computeResult(reqID)
+        executor2 = Executor(Accounts.getAccount(), broker, populateBuffers=True)
+        assert reqID not in executor2.unsolidifiedSubmissions
+        executor1._submitResult(reqID, result)
+        time.sleep(2)
+        assert reqID in executor2.unsolidifiedSubmissions
+
+    def test_listen_to_request_solidified_event(self):
+        requestor = Requestor(ClientFactory.getInstance())
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor1 = Executor(Accounts.getAccount(), broker, populateBuffers=False)
+        executor1._acceptRequest(reqID)
+        alteredResult = HexString((int.from_bytes(executor1._computeResult(reqID), "big") + 1), "bytes32")
+        executor1._submitResult(reqID, alteredResult)
+        executor2 = Executor(Accounts.getAccount(), broker, populateBuffers=True)
+        assert reqID in executor2.unsolidifiedSubmissions
+        executor1._challengeSubmission(reqID)
+        time.sleep(3)
+        assert reqID not in executor2.unsolidifiedSubmissions
 
     def test_solver_loop_round(self):
-        pass
+        requestor = Requestor(ClientFactory.getInstance())
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        time.sleep(5) # TODO ver tema timers si es por el exceso de threads, si al matarlos se relaja
+        assert reqID in executor.unacceptedRequests
+        executor.solverLoopRound()
+        assert reqID not in executor.unacceptedRequests
+        assert broker.requests(reqID)[8][0] == executor.account
+        assert broker.requests(reqID)[8][3] == False
+        assert executor._challengeSubmission(reqID).return_value == False  # TODO me parece que es mejor si el challenge me la solidifica
 
-    def test_challenger_loop_round(self):
-        pass
+    def test_challenger_loop_round_erroneous_submission(self):
+        requestor = Requestor(ClientFactory.getInstance())
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor1 = Executor(Accounts.getFromIndex(0), broker, populateBuffers=False)
+        executor1._acceptRequest(reqID)
+        executor2 = Executor(Accounts.getFromIndex(1), broker, populateBuffers=False)
+        assert reqID not in executor2.unsolidifiedSubmissions
+        alteredResult = HexString((int.from_bytes(executor1._computeResult(reqID), "big") + 1), "bytes32")
+        executor1._submitResult(reqID, alteredResult)
+        time.sleep(1)
+        assert reqID in executor2.unsolidifiedSubmissions
+        executor2.challengerLoopRound()
+        assert reqID not in executor2.unsolidifiedSubmissions
+        assert broker.requests(reqID)[8][0] == executor2.account
+        assert broker.requests(reqID)[8][3] == True
+
+    def test_challenger_loop_round_correct_submission(self):
+        requestor = Requestor(ClientFactory.getInstance())
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor1 = Executor(Accounts.getFromIndex(0), broker, populateBuffers=False)
+        executor1._acceptRequest(reqID)
+        executor2 = Executor(Accounts.getFromIndex(1), broker, populateBuffers=False)
+        assert reqID not in executor2.unsolidifiedSubmissions
+        result = executor1._computeResult(reqID)
+        executor1._submitResult(reqID, result)
+        time.sleep(3)
+        assert reqID in executor2.unsolidifiedSubmissions
+        executor2.challengerLoopRound()
+        assert reqID not in executor2.unsolidifiedSubmissions
+        assert broker.requests(reqID)[8][0] == executor1.account
+        assert broker.requests(reqID)[8][3] == False  # TODO change this to True so it gets solidified
 
     #TODO test post process result
-    # Test Transferable TODO??? worth it???

@@ -7,6 +7,12 @@ from brownie import network
 
 
 class TestDeployment:
+    def setup(self):
+        pass
+
+    def teardown(self):
+        pass
+
     def setup_method(self, method):
         Logger.logIndentation=0
 

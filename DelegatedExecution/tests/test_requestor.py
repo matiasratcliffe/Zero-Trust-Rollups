@@ -12,6 +12,12 @@ import time
 
 
 class TestRequestor:
+    def setup(self):
+        pass
+
+    def teardown(self):
+        pass
+
     def setup_method(self, method):
         Logger.indentationLevel=0
 
@@ -182,13 +188,13 @@ class TestRequestor:
         assert broker.requests(reqID)[9] == False
         executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
         executor._acceptRequest(reqID)
-        time.sleep(2)
+        time.sleep(3)
         assert broker.requests(reqID)[7][0] == executor.account
         executor._cancelAcceptance(reqID)
-        time.sleep(2)
+        time.sleep(4)
         assert int(broker.requests(reqID)[7][0], 16) == 0
         requestor.cancelRequest(reqID)
-        time.sleep(2)
+        time.sleep(3)
         assert broker.requests(reqID)[9] == True
 
     def test_publicize_request(self):
@@ -198,7 +204,7 @@ class TestRequestor:
         executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
         assert reqID not in executor.unacceptedRequests
         requestor.publicizeRequest(reqID)
-        time.sleep(2)
+        time.sleep(4)
         assert reqID in executor.unacceptedRequests
 
     # Low level tests
