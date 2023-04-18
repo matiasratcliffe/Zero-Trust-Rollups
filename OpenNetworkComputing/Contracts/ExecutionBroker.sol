@@ -13,13 +13,13 @@ struct Executors {
 }
 
 struct Request {
-    uint id;  // Index, for unicity when raw comparing
+    uint id;
     BaseClient.ClientInput input;
-    uint payment; // In Wei; deberia tener en cuenta el computo y el gas de las operaciones de submit y claim
-    uint postProcessingGas;  // In Wei; for the post processing, if any
+    uint payment; // In Wei; deberia tener en cuenta el computo y el gas de las operaciones de submit; y se divide entre los executors
+    uint amountOfExecutors;
+    uint postProcessingGas;
     BaseClient client;
-    address acceptor;
-    Submission submission;
+    Submission[] submissions;
     bool cancelled;
 }
 
@@ -27,7 +27,7 @@ struct Submission {
     address issuer;
     uint timestamp;
     bytes result;
-    bool solidified;
+    //bool solidified;
 }
 
 
@@ -76,6 +76,7 @@ contract ExecutionBroker is Transferable {
 
     function submitRequest(BaseClient.ClientInput calldata input, uint postProcessingGas) public payable returns (uint) {
         require(msg.value - postProcessingGas > 0, "The post processing gas cannot takeup all of the supplied ether");  // en el bot de python, ver que efectivamente el net payment, valga la pena
+        uint pseudoRandom = block.number;
         BaseClient clientImplementation = BaseClient(msg.sender);
         Submission memory submission = Submission({
             issuer: address(0x0),
@@ -93,7 +94,7 @@ contract ExecutionBroker is Transferable {
             submission: submission,
             cancelled: false
         });
-        emit requestCreated(request.id, msg.value, postProcessingGas, requestedInsurance, claimDelay);
+        emit requestCreated(request.id, msg.value, postProcessingGas, requestedInsurance, claimDelay); // TODO hacer un for con los executors y emitir pa cada uno?
         requests.push(request);
         return request.id;
     }
