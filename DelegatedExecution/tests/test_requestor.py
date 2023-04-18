@@ -22,7 +22,7 @@ class TestRequestor:
         Logger.indentationLevel=0
 
     def teardown_method(self, method):
-        pass
+        network.event.event_watcher.reset()
 
     def test_creation(self):
         if network.show_active() == "development":

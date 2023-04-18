@@ -11,21 +11,7 @@
       "coverage": false,
       "isolated": false,
       "results": "...",
-      "sha1": "83606ea823cb64db41322822cfdd3df70fe61d2d",
-      "txhash": []
-    },
-    "tests/test_executor.py": {
-      "coverage": false,
-      "isolated": false,
-      "results": "....................F.......F.......",
-      "sha1": "510ba9242e1c291c1b609a5feb84e774733168ea",
-      "txhash": []
-    },
-    "tests/test_requestor.py": {
-      "coverage": false,
-      "isolated": false,
-      "results": "..................F....",
-      "sha1": "0080aa767379236f3dca9a371cedfbe207380392",
+      "sha1": "95f004941e4594fff0821b04e3f701e7b954ab99",
       "txhash": []
     }
   },

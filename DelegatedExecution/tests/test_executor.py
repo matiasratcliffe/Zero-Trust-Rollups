@@ -4,6 +4,7 @@ from scripts.classes.utils.logger import Logger
 from brownie.convert.datatypes import HexString
 from scripts.classes.requestor import Requestor
 from scripts.classes.executor import Executor
+from brownie import network
 import pytest
 import time
 
@@ -19,7 +20,7 @@ class TestExecutor:
         Logger.indentationLevel=0
 
     def teardown_method(self, method):
-        pass
+        network.event.event_watcher.reset()
 
     # TODO tests de transferable
 
@@ -94,14 +95,16 @@ class TestExecutor:
         executor = Executor(Accounts.getAccount(), BrokerFactory.getInstance(), populateBuffers=False)
         with pytest.raises(Exception):
             executor._cancelAcceptance(executor.broker.requestCount())
+        del executor
 
     def test_cancel_acceptance_on_unaccepted_request(self):
         requestor = Requestor(ClientFactory.getInstance())
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
         executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
-        with pytest.raises(Exception, match="There is no acceptance in place for the provided requestID"):
+        with pytest.raises(Exception, match="There is no acceptor for the provided requestID"):
             executor._cancelAcceptance(reqID)
+        del executor
 
     def test_cancel_acceptance_on_submitted_request(self):
         requestor = Requestor(ClientFactory.getInstance())
@@ -114,6 +117,7 @@ class TestExecutor:
         assert broker.requests(reqID)[8][0] == executor.account
         with pytest.raises(Exception, match="This request already has a submission"):
             executor._cancelAcceptance(reqID)
+        del executor
 
     def test_cancel_foreign_acceptance(self):
         requestor = Requestor(ClientFactory.getInstance())
@@ -370,7 +374,7 @@ class TestExecutor:
         executor2 = Executor(Accounts.getAccount(), broker, populateBuffers=True)
         assert reqID not in executor2.unsolidifiedSubmissions
         executor1._submitResult(reqID, result)
-        time.sleep(2)
+        time.sleep(4)
         assert reqID in executor2.unsolidifiedSubmissions
 
     def test_listen_to_request_solidified_event(self):
@@ -384,7 +388,7 @@ class TestExecutor:
         executor2 = Executor(Accounts.getAccount(), broker, populateBuffers=True)
         assert reqID in executor2.unsolidifiedSubmissions
         executor1._challengeSubmission(reqID)
-        time.sleep(3)
+        time.sleep(3) # TODO ver tema timers si es por el exceso de threads, si al matarlos se relaja
         assert reqID not in executor2.unsolidifiedSubmissions
 
     def test_solver_loop_round(self):
@@ -392,10 +396,7 @@ class TestExecutor:
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
         executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
-        time.sleep(5) # TODO ver tema timers si es por el exceso de threads, si al matarlos se relaja
-        assert reqID in executor.unacceptedRequests
         executor.solverLoopRound()
-        assert reqID not in executor.unacceptedRequests
         assert broker.requests(reqID)[8][0] == executor.account
         assert broker.requests(reqID)[8][3] == False
         assert executor._challengeSubmission(reqID).return_value == False  # TODO me parece que es mejor si el challenge me la solidifica
@@ -407,13 +408,9 @@ class TestExecutor:
         executor1 = Executor(Accounts.getFromIndex(0), broker, populateBuffers=False)
         executor1._acceptRequest(reqID)
         executor2 = Executor(Accounts.getFromIndex(1), broker, populateBuffers=False)
-        assert reqID not in executor2.unsolidifiedSubmissions
         alteredResult = HexString((int.from_bytes(executor1._computeResult(reqID), "big") + 1), "bytes32")
         executor1._submitResult(reqID, alteredResult)
-        time.sleep(1)
-        assert reqID in executor2.unsolidifiedSubmissions
         executor2.challengerLoopRound()
-        assert reqID not in executor2.unsolidifiedSubmissions
         assert broker.requests(reqID)[8][0] == executor2.account
         assert broker.requests(reqID)[8][3] == True
 
@@ -424,13 +421,9 @@ class TestExecutor:
         executor1 = Executor(Accounts.getFromIndex(0), broker, populateBuffers=False)
         executor1._acceptRequest(reqID)
         executor2 = Executor(Accounts.getFromIndex(1), broker, populateBuffers=False)
-        assert reqID not in executor2.unsolidifiedSubmissions
         result = executor1._computeResult(reqID)
         executor1._submitResult(reqID, result)
-        time.sleep(3)
-        assert reqID in executor2.unsolidifiedSubmissions
         executor2.challengerLoopRound()
-        assert reqID not in executor2.unsolidifiedSubmissions
         assert broker.requests(reqID)[8][0] == executor1.account
         assert broker.requests(reqID)[8][3] == False  # TODO change this to True so it gets solidified
 

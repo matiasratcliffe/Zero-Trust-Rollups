@@ -6,6 +6,12 @@ import "./Transferable.sol";
 import "./BaseClient.sol";
 
 
+struct Executors {
+    address[] addresses;
+    mapping (address => bool) existance;
+    uint size;
+}
+
 struct Request {
     uint id;  // Index, for unicity when raw comparing
     BaseClient.ClientInput input;
@@ -30,6 +36,7 @@ struct Submission {
 contract ExecutionBroker is Transferable {
 
     Request[] public requests;
+    Executors public executors;
 
     event requestCreated(uint requestID, uint payment, uint postProcessingGas, uint challengeInsurance, uint claimDelay);
     event requestCancelled(uint requestID, bool refundSuccess);
@@ -46,6 +53,19 @@ contract ExecutionBroker is Transferable {
     
 
     // Restricted interaction functions
+
+    function registerExecutor() public returns (uint) {
+        require(executors.existance[msg.sender] == false, "This address is already registered as an executor");
+        executors.addresses.push(msg.sender);
+        executors.existance[msg.sender] = true;
+        executors.size = executors.addresses.length;  // This is because solidity is shit and wont let me have a struct without a non array type
+        return(executors.size - 1);
+    }
+
+    function unregisterExecutor() public returns (bool) {
+        
+        return true;
+    }
 
     function submitRequest(BaseClient.ClientInput calldata input, uint postProcessingGas, uint requestedInsurance, uint claimDelay) public payable returns (uint) {
         // check msg.sender is an actual client - creo que no se puede, me parece que lo voy a tener que dejar asi, creo que no es una vulnerabilidad, onda, si no es del tipo, va a fallar eventualmente, y problema del boludo que lo registro mal
@@ -125,31 +145,6 @@ contract ExecutionBroker is Transferable {
         });
         requests[requestID].submission = submission;
         emit resultSubmitted(requestID, result, msg.sender);
-    }
-
-    function challengeSubmission(uint requestID) public returns (bool) {
-        require(requests[requestID].submission.issuer != address(0x0), "There are no submissions for the challenged request");
-        require(!requests[requestID].submission.solidified, "The challenged submission has already solidified");
-
-		bytes memory submittedResult = requests[requestID].submission.result;
-        BaseClient.ClientInput memory requestInput = requests[requestID].input;
-        bytes memory trueFinalResult = requests[requestID].client.clientLogic(requestInput);
-        emit challengeProcessed(requestID, trueFinalResult);
-
-        if (keccak256(submittedResult) != keccak256(trueFinalResult)) {
-            Submission memory submission = Submission({
-                issuer: msg.sender,
-                timestamp: block.timestamp,
-                result: trueFinalResult,
-                solidified: false
-            });
-            requests[requestID].submission = submission;  // notar que en las requests que se resolvieron por challenge el acceptor es diferente al issuer (a menos que alguien se autochallengee)
-            bool transferSuccess = solidify(requestID);
-            emit challengePayment(requestID, transferSuccess);
-            return true;  // result was corrected
-        } else {  // el original lo hizo bien, dejo que pase el tiempo y cobre TODO decidir si quiero pagar un challenge a una sub correcta
-            return false;  // original was correct
-        }
     }
 
     function claimPayment(uint requestID) public returns (bool) {

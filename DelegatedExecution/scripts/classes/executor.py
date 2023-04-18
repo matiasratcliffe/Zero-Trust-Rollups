@@ -11,7 +11,7 @@ class Executor:
         self._maxInsurance = 1e+18
         self._maxDelay = 60 * 60 * 24
         self.account = account
-        self.broker = BrokerFactory.at(address=broker)
+        self.broker = broker #BrokerFactory.at(address=broker) TODO check this!!!
         self.unacceptedRequests = []
         self.unsolidifiedSubmissions = []
         if (populateBuffers):
@@ -44,9 +44,6 @@ class Executor:
         self.broker.events.subscribe("requestAccepted", removeUnacceptedRequest)
         self.broker.events.subscribe("resultSubmitted", addUnsolidifiedSubmission)
         self.broker.events.subscribe("requestSolidified", removeUnsolidifiedSubmission)
-
-    def __del__(self):
-        Logger.log(f"Destroyed {self}", color=Logger.colors.RED) #TODO check this
 
     def _populateBuffers(self):
         self.unacceptedRequests = []
