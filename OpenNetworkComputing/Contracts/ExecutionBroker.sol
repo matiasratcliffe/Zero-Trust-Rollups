@@ -8,7 +8,7 @@ import "./BaseClient.sol";
 
 struct Executors {
     address[] addresses;
-    mapping (address => bool) existance;
+    mapping (address => uint) index;
     uint size;
 }
 
@@ -17,8 +17,6 @@ struct Request {
     BaseClient.ClientInput input;
     uint payment; // In Wei; deberia tener en cuenta el computo y el gas de las operaciones de submit y claim
     uint postProcessingGas;  // In Wei; for the post processing, if any
-    uint challengeInsurance;  // amount of gas for challenges, deberia ser mayor al gas estimado, just in case
-    uint claimDelay;  // the minimum amount of time that needs to pass between a submission and a payment claim, to allow for possible challengers, in secconds
     BaseClient client;
     address acceptor;
     Submission submission;
@@ -54,21 +52,29 @@ contract ExecutionBroker is Transferable {
 
     // Restricted interaction functions
 
+    constructor() {
+        executors.addresses.push(address(0x0));  // This is to reserve the index 0
+    }
+
     function registerExecutor() public returns (uint) {
-        require(executors.existance[msg.sender] == false, "This address is already registered as an executor");
+        require(executors.index[msg.sender] == 0, "This address is already registered as an executor");
         executors.addresses.push(msg.sender);
-        executors.existance[msg.sender] = true;
-        executors.size = executors.addresses.length;  // This is because solidity is shit and wont let me have a struct without a non array type
-        return(executors.size - 1);
+        uint index = executors.addresses.length - 1;
+        executors.index[msg.sender] = index;
+        executors.size++;
+        return(index);
     }
 
     function unregisterExecutor() public returns (bool) {
-        
+        require(executors.index[msg.sender] != 0, "This address is not registered as an executor");
+        uint index = executors.index[msg.sender];
+        delete executors.addresses[index];
+        delete executors.index[msg.sender];
+        executors.size--;
         return true;
     }
 
-    function submitRequest(BaseClient.ClientInput calldata input, uint postProcessingGas, uint requestedInsurance, uint claimDelay) public payable returns (uint) {
-        // check msg.sender is an actual client - creo que no se puede, me parece que lo voy a tener que dejar asi, creo que no es una vulnerabilidad, onda, si no es del tipo, va a fallar eventualmente, y problema del boludo que lo registro mal
+    function submitRequest(BaseClient.ClientInput calldata input, uint postProcessingGas) public payable returns (uint) {
         require(msg.value - postProcessingGas > 0, "The post processing gas cannot takeup all of the supplied ether");  // en el bot de python, ver que efectivamente el net payment, valga la pena
         BaseClient clientImplementation = BaseClient(msg.sender);
         Submission memory submission = Submission({
@@ -82,8 +88,6 @@ contract ExecutionBroker is Transferable {
             input: input,
             payment: msg.value,  // aca esta incluido el post processing gas, para evitar tener que devolver aparte
             postProcessingGas: postProcessingGas,
-            challengeInsurance: requestedInsurance,
-            claimDelay: claimDelay,
             client: clientImplementation,
             acceptor: address(0x0),
             submission: submission,
