@@ -19,7 +19,7 @@ struct Request {
     uint amountOfExecutors;
     uint postProcessingGas;
     BaseClient client;
-    Submission[] submissions;
+    //Submission[] submissions;
     bool cancelled;
 }
 
@@ -56,6 +56,22 @@ contract ExecutionBroker is Transferable {
         executors.addresses.push(address(0x0));  // This is to reserve the index 0
     }
 
+    function getExecutorsList() public view returns (address[] memory) {
+        address[] memory addresses = new address[](executors.size);
+        uint j = 0;
+        for (uint i = 0; i < executors.addresses.length; i++) {
+            if (executors.addresses[i] != address(0x0)) {
+                addresses[j] = executors.addresses[i];
+                j++;
+            }
+        }
+        return addresses;
+    }
+
+    function getExecutorsSize() public view returns (uint) {
+        return executors.size;
+    }
+
     function registerExecutor() public returns (uint) {
         require(executors.index[msg.sender] == 0, "This address is already registered as an executor");
         executors.addresses.push(msg.sender);
@@ -74,31 +90,46 @@ contract ExecutionBroker is Transferable {
         return true;
     }
 
-    function submitRequest(BaseClient.ClientInput calldata input, uint postProcessingGas) public payable returns (uint) {
+    uint myint=0;
+    function getRandomNumbers(uint amount, uint floor, uint ceiling) public returns (uint[] memory) {
+        myint++;
+        require(floor < ceiling, "The floor must be smaller than the ceiling");
+        uint range = ceiling - floor;
+        uint[] memory numbers = new uint[](amount);
+        for (uint i = 0; i < amount; i++) {
+            uint seed = (uint(blockhash(block.number - 1 - i)) / block.timestamp) + (block.timestamp ** 3);  // TODO ver porque me parece que dividir no hace ni pingo
+            uint number = (seed % range) + floor;
+            numbers[i] = number;
+        }
+        return numbers;
+    }
+
+    function submitRequest(BaseClient.ClientInput calldata input, uint postProcessingGas, uint amountOfExecutors) public payable returns (uint) {
         require(msg.value - postProcessingGas > 0, "The post processing gas cannot takeup all of the supplied ether");  // en el bot de python, ver que efectivamente el net payment, valga la pena
-        uint pseudoRandom = block.number;
+        require(amountOfExecutors <= executors.size, "You exceeded the number of available executors");
+        // TODO ver tema pago, porque no hay incentivo, medio que te mandan a ejecutar por obligacion y capaz paga miseria. Capaz que haya pago cero, solo un lock en un escrow, y que los ejecutores incluyan en su respuesta encriptada el virtual-gas que les tomo ejecutar localmente
         BaseClient clientImplementation = BaseClient(msg.sender);
-        Submission memory submission = Submission({
+        /*Submission memory submission = Submission({
             issuer: address(0x0),
             timestamp: 0,
             result: abi.encode(0),
             solidified: false
-        });
+        });*/
         Request memory request = Request({
             id: requests.length,
             input: input,
             payment: msg.value,  // aca esta incluido el post processing gas, para evitar tener que devolver aparte
+            amountOfExecutors: amountOfExecutors,
             postProcessingGas: postProcessingGas,
             client: clientImplementation,
-            acceptor: address(0x0),
-            submission: submission,
+            //submission: submission,
             cancelled: false
         });
-        emit requestCreated(request.id, msg.value, postProcessingGas, requestedInsurance, claimDelay); // TODO hacer un for con los executors y emitir pa cada uno?
+        //emit requestCreated(request.id, msg.value, postProcessingGas, requestedInsurance, claimDelay); // TODO hacer un for con los executors y emitir pa cada uno?
         requests.push(request);
         return request.id;
     }
-
+/*
     function cancelRequest(uint requestID) public {
         require(requestID < requests.length, "Index out of range");
         require(!requests[requestID].cancelled, "The request was already cancelled");
@@ -186,5 +217,5 @@ contract ExecutionBroker is Transferable {
 
         return transferSuccess;
     }
-
+*/
 }

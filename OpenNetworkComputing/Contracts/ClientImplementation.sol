@@ -8,7 +8,7 @@ import "./BaseClient.sol";
 contract ClientImplementation is BaseClient {
 
     constructor(address brokerAddress) BaseClient(brokerAddress) {}
-
+/*
     function clientLogic(ClientInput calldata input) external override pure returns (bytes memory) {
         bytes memory output = "";
         if (input.functionToRun == 1) { output = functionOne(input.data); }
@@ -63,5 +63,5 @@ contract ClientImplementation is BaseClient {
         });
         uint requestID = brokerContract.submitRequest{value: 1000 gwei}(input, 200000 wei, 1000 gwei, 1 minutes);
         emit requestSubmitted(requestID);
-    }
+    }*/
 }

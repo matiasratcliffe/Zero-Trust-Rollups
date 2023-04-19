@@ -29,7 +29,7 @@ abstract contract BaseClient is Ownable {
         _;
     }
 
-    function clientLogic(ClientInput calldata input) external virtual pure returns (bytes memory);
+    /*function clientLogic(ClientInput calldata input) external virtual pure returns (bytes memory);
     function processResult(bytes calldata result) external virtual onlyBroker {}
     function getInputStructure(uint functionID) external virtual pure returns (string memory);
 
@@ -51,6 +51,6 @@ abstract contract BaseClient is Ownable {
         address payable payee = payable(msg.sender);
         (bool success, ) = payee.call{value: value}("");
         return success;
-    }
+    }*/
 
 }
