@@ -50,7 +50,6 @@ contract ExecutionBroker is Transferable {
     function submitRequest(BaseClient.ClientInput calldata input, uint postProcessingGas, uint requestedInsurance, uint claimDelay) public payable returns (uint) {
         // check msg.sender is an actual client - creo que no se puede, me parece que lo voy a tener que dejar asi, creo que no es una vulnerabilidad, onda, si no es del tipo, va a fallar eventualmente, y problema del boludo que lo registro mal
         require(msg.value - postProcessingGas > 0, "The post processing gas cannot takeup all of the supplied ether");  // en el bot de python, ver que efectivamente el net payment, valga la pena
-        BaseClient clientImplementation = BaseClient(msg.sender);
         Submission memory submission = Submission({
             issuer: address(0x0),
             timestamp: 0,
@@ -64,7 +63,7 @@ contract ExecutionBroker is Transferable {
             postProcessingGas: postProcessingGas,
             challengeInsurance: requestedInsurance,
             claimDelay: claimDelay,
-            client: clientImplementation,
+            client: BaseClient(msg.sender),
             acceptor: address(0x0),
             submission: submission,
             cancelled: false
@@ -82,7 +81,7 @@ contract ExecutionBroker is Transferable {
         //delete requests[requestID], no puedo hacer esto, this fucks up the ids
         requests[requestID].cancelled = true;
         address payable payee = payable(address(requests[requestID].client));
-        bool transferSuccess = internalTransferFunds(requests[requestID].payment, payee);
+        bool transferSuccess = _internalTransferFunds(requests[requestID].payment, payee);
         emit requestCancelled(requestID, transferSuccess);
     }
 
@@ -109,7 +108,7 @@ contract ExecutionBroker is Transferable {
         require(requests[requestID].acceptor == msg.sender, "You cant cancel an acceptance that does not belong to you");
         address payable payee = payable(requests[requestID].acceptor);
         requests[requestID].acceptor = address(0x0);
-        bool transferSuccess = internalTransferFunds(requests[requestID].challengeInsurance, payee);
+        bool transferSuccess = _internalTransferFunds(requests[requestID].challengeInsurance, payee);
         emit acceptanceCancelled(requestID, payee, transferSuccess);
     }
 
@@ -144,7 +143,7 @@ contract ExecutionBroker is Transferable {
                 solidified: false
             });
             requests[requestID].submission = submission;  // notar que en las requests que se resolvieron por challenge el acceptor es diferente al issuer (a menos que alguien se autochallengee)
-            bool transferSuccess = solidify(requestID);
+            bool transferSuccess = _solidify(requestID);
             emit challengePayment(requestID, transferSuccess);
             return true;  // result was corrected
         } else {  // el original lo hizo bien, dejo que pase el tiempo y cobre TODO decidir si quiero pagar un challenge a una sub correcta
@@ -157,7 +156,7 @@ contract ExecutionBroker is Transferable {
         require(requests[requestID].submission.issuer == msg.sender, "This payment does not belong to you");
         require(!requests[requestID].submission.solidified, "The provided request has already solidified");
         require(requests[requestID].submission.timestamp + requests[requestID].claimDelay < block.timestamp, "The claim delay hasn't passed yet");
-        bool transferSuccess = solidify(requestID);
+        bool transferSuccess = _solidify(requestID);
         return transferSuccess;
     }
 
@@ -172,13 +171,13 @@ contract ExecutionBroker is Transferable {
     }
 
     // Private functions
-    function solidify(uint requestID) private returns (bool) {
+    function _solidify(uint requestID) private returns (bool) {
         // first solidify, then pay, for reentrancy issues
         requests[requestID].submission.solidified = true;
         emit requestSolidified(requestID);
         address payable payee = payable(requests[requestID].submission.issuer);
         uint payAmount = requests[requestID].payment + requests[requestID].challengeInsurance;
-        bool transferSuccess = internalTransferFunds(payAmount, payee);
+        bool transferSuccess = _internalTransferFunds(payAmount, payee);
         
         bytes memory data = abi.encodeWithSelector(requests[requestID].client.processResult.selector, requests[requestID].submission.result);
         (bool callSuccess, ) = address(requests[requestID].client).call{gas: requests[requestID].postProcessingGas}(data);  // el delegate para que me aparezca el sender como el broker. cuidado si esto no me hace una vulnerabilidad, puedo vaciar fondos desde client? no deberia pasar nada, ni el broker ni el client puede extraer fondos

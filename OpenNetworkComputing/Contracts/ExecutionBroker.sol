@@ -3,38 +3,49 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 import "./Transferable.sol";
-import "./BaseClient.sol";
 
 
-struct Executors {
-    address[] addresses;
-    mapping (address => uint) index;
-    uint size;
+struct Executor {
+    address executorAddress;
+    // Locked eth?
+    // Reputation?
+}
+
+struct ExecutorsCollection {
+    Executor[] activeExecutors;  // Not in a mapping because I need to be able to index them by uint
+    mapping (address => Executor) inactiveExecutors;
+    mapping (address => Executor) busyExecutors;
+    mapping (address => uint) indexOf;
+    uint amountOfActiveExecutors;
 }
 
 struct Request {
     uint id;
-    BaseClient.ClientInput input;
+    address clientAddress; // TODO ver si lo hago con address o con BaseClient para incluir postprocessing
+    string inputReference;
+    string codeReference;
     uint payment; // In Wei; deberia tener en cuenta el computo y el gas de las operaciones de submit; y se divide entre los executors
-    uint amountOfExecutors;
-    uint postProcessingGas;
-    BaseClient client;
-    //Submission[] submissions;
-    bool cancelled;
+    // TODO ver tema entorno de ejecucion restringido y capaz hacer payment fijo???
+    //uint postProcessingGas;
+    bool cancelled; // TODO o closed?
 }
 
-struct Submission {
-    address issuer;
+struct TaskAssignment {
+    address executorAddress;
     uint timestamp;
     bytes result;
-    //bool solidified;
+    bool submitted;
 }
 
 
 contract ExecutionBroker is Transferable {
 
+    // TODO hacer mapping para paused executors
+    uint public constant EXECUTION_TIME_FRAME_SECONDS = 3600;
+
     Request[] public requests;
-    Executors public executors;
+    mapping (uint => TaskAssignment[]) public taskAssignmentsMap;
+    ExecutorsCollection public executorsCollection;
 
     event requestCreated(uint requestID, uint payment, uint postProcessingGas, uint challengeInsurance, uint claimDelay);
     event requestCancelled(uint requestID, bool refundSuccess);
@@ -48,89 +59,136 @@ contract ExecutionBroker is Transferable {
     
     event challengeProcessed(uint requestID, bytes result);
     event challengePayment(uint requestID, bool success);
+
+    event executorPaused(address executorAddress);
+    event executorLocked(address executorAddress);
+    event executorUnlocked(address executorAddress);
+    event executorPunished(address executorAddress); // TODO que masss???
     
 
     // Restricted interaction functions
 
     constructor() {
-        executors.addresses.push(address(0x0));  // This is to reserve the index 0
+        blockhash(9);
+        Executor memory executor = Executor({
+            executorAddress: address(0x0)
+        });
+        executorsCollection.activeExecutors.push(executor);  // This is to reserve the index 0, because when you delete an entry in the address => uint map, it gets set to 0
     }
 
-    function getExecutorsList() public view returns (address[] memory) {
-        address[] memory addresses = new address[](executors.size);
+    // Public views
+
+    /*function isRequestOpen(uint requestID) public view returns (bool) {  // solo a modo de ayuda
+        return (!requests[requestID].cancelled && requests[requestID].acceptor == address(0x0));
+    }*/
+
+    function requestCount() public view returns (uint) {
+        return requests.length;
+    }
+
+    function getActiveExecutorsList() public view returns (address[] memory) {
+        address[] memory addresses = new address[](executorsCollection.amountOfActiveExecutors);
         uint j = 0;
-        for (uint i = 0; i < executors.addresses.length; i++) {
-            if (executors.addresses[i] != address(0x0)) {
-                addresses[j] = executors.addresses[i];
+        for (uint i = 0; i < executorsCollection.activeExecutors.length; i++) {
+            if (executorsCollection.activeExecutors[i].executorAddress != address(0x0)) {
+                addresses[j] = executorsCollection.activeExecutors[i].executorAddress;
                 j++;
             }
         }
         return addresses;
     }
 
-    function getExecutorsSize() public view returns (uint) {
-        return executors.size;
+    function getAmountOfActiveExecutors() public view returns (uint) {
+        return executorsCollection.amountOfActiveExecutors;
     }
 
-    function registerExecutor() public returns (uint) {
-        require(executors.index[msg.sender] == 0, "This address is already registered as an executor");
-        executors.addresses.push(msg.sender);
-        uint index = executors.addresses.length - 1;
-        executors.index[msg.sender] = index;
-        executors.size++;
-        return(index);
-    }
-
-    function unregisterExecutor() public returns (bool) {
-        require(executors.index[msg.sender] != 0, "This address is not registered as an executor");
-        uint index = executors.index[msg.sender];
-        delete executors.addresses[index];
-        delete executors.index[msg.sender];
-        executors.size--;
-        return true;
-    }
-
-    uint myint=0;
-    function getRandomNumbers(uint amount, uint floor, uint ceiling) public returns (uint[] memory) {
-        myint++;
-        require(floor < ceiling, "The floor must be smaller than the ceiling");
-        uint range = ceiling - floor;
-        uint[] memory numbers = new uint[](amount);
-        for (uint i = 0; i < amount; i++) {
-            uint seed = (uint(blockhash(block.number - 1 - i)) / block.timestamp) + (block.timestamp ** 3);  // TODO ver porque me parece que dividir no hace ni pingo
-            uint number = (seed % range) + floor;
-            numbers[i] = number;
+    function getExecutor(uint position) public view returns (Executor memory) {
+        require(position < executorsCollection.amountOfActiveExecutors, "You are selecting a position outside the existing executors");
+        uint j = 0;
+        for (uint i = 0; i < executorsCollection.activeExecutors.length; i++) {
+            if (executorsCollection.activeExecutors[i].executorAddress == address(0x0)) {
+                continue;
+            }
+            if (j == position) {
+                return executorsCollection.activeExecutors[i];
+            }
+            j++;
         }
-        return numbers;
     }
 
-    function submitRequest(BaseClient.ClientInput calldata input, uint postProcessingGas, uint amountOfExecutors) public payable returns (uint) {
-        require(msg.value - postProcessingGas > 0, "The post processing gas cannot takeup all of the supplied ether");  // en el bot de python, ver que efectivamente el net payment, valga la pena
-        require(amountOfExecutors <= executors.size, "You exceeded the number of available executors");
+    // Open interaction functions
+
+    function registerExecutor() public returns (uint) {  // TODO podria buscar el primer cero? indexOf? ir subiendo hasta que valga cero o sea igual a size
+        // TODO ver tema de requerir fondos lockeados
+        require(executorsCollection.inactiveExecutors[msg.sender].executorAddress == address(0x0), "The executor is already present, but inactive");
+        return _registerExecutor(Executor({
+            executorAddress: msg.sender
+        }));
+    }
+
+    function pauseExecutor() public {
+        _pauseExecutor(msg.sender);
+    }
+
+    function unpauseExecutor() public returns (uint) {
+        require(executorsCollection.inactiveExecutors[msg.sender].executorAddress == msg.sender, "This address does not belong to a paused executor");
+        uint executorIndex = _registerExecutor(executorsCollection.inactiveExecutors[msg.sender]);
+        delete executorsCollection.inactiveExecutors[msg.sender];
+        return executorIndex;
+    }
+
+    function getRandomNumber(uint floor, uint ceiling, uint blockOffset) public view returns (uint) {
+        require(floor <= ceiling, "The floor cant be bigger than the ceiling");
+        uint range = ceiling - floor;
+        uint seed = (uint(blockhash(block.number - 1 - blockOffset)) / block.timestamp) + (block.timestamp ** 3);
+        uint number = (seed % (range | 1)) + floor;
+        return number;
+    }
+
+    function submitRequest(string calldata inputReference, string calldata codeReference, uint amountOfExecutors) public payable returns (uint) {
+        //require(msg.value - postProcessingGas > 0, "The post processing gas cannot takeup all of the supplied ether");  // en el bot de python, ver que efectivamente el net payment, valga la pena
+        require(amountOfExecutors <= executorsCollection.amountOfActiveExecutors, "You exceeded the number of available executors");
+        require(amountOfExecutors % 2 == 1, "You must choose an odd amount of executors");
         // TODO ver tema pago, porque no hay incentivo, medio que te mandan a ejecutar por obligacion y capaz paga miseria. Capaz que haya pago cero, solo un lock en un escrow, y que los ejecutores incluyan en su respuesta encriptada el virtual-gas que les tomo ejecutar localmente
-        BaseClient clientImplementation = BaseClient(msg.sender);
-        /*Submission memory submission = Submission({
-            issuer: address(0x0),
-            timestamp: 0,
-            result: abi.encode(0),
-            solidified: false
-        });*/
         Request memory request = Request({
             id: requests.length,
-            input: input,
+            clientAddress: msg.sender,
+            inputReference: inputReference,
+            codeReference: codeReference,
             payment: msg.value,  // aca esta incluido el post processing gas, para evitar tener que devolver aparte
-            amountOfExecutors: amountOfExecutors,
-            postProcessingGas: postProcessingGas,
-            client: clientImplementation,
-            //submission: submission,
+            //postProcessingGas: postProcessingGas,
+            //client: BaseClient(msg.sender),
             cancelled: false
         });
-        //emit requestCreated(request.id, msg.value, postProcessingGas, requestedInsurance, claimDelay); // TODO hacer un for con los executors y emitir pa cada uno?
         requests.push(request);
+        //emit requestCreated(request.id, msg.value, postProcessingGas, requestedInsurance, claimDelay); TODO
+        TaskAssignment[] storage taskAssignments = taskAssignmentsMap[request.id];
+        for (uint i = 0; i < amountOfExecutors; i++) {
+            address executorAddress = getExecutor(getRandomNumber(1, executorsCollection.amountOfActiveExecutors, i)).executorAddress;
+            taskAssignments.push(TaskAssignment({
+                executorAddress: executorAddress,
+                timestamp: block.timestamp,
+                result: abi.encode(0),
+                submitted: false
+            }));
+            _lockExecutor(executorAddress);
+        }
         return request.id;
     }
+
+    function rotateExecutors(uint requestID) public {
+        require(requests[requestID].clientAddress == msg.sender, "You cant rotate a request that was not made by you");
+        for (uint i = 0; i < taskAssignmentsMap[requestID].length; i++) {
+            if (block.timestamp >= (taskAssignmentsMap[requestID][i].timestamp + EXECUTION_TIME_FRAME_SECONDS)) {
+                //if (executorsCollection.amountOfActiveExecutors)
+                // TODO maybe que el gas de ejecutar esto sea devuelto de el los fondos lockeados del ejecutor, aparentemente se puede saber tx.gas es gas price
+                // TODO chequear que el que reemplaza no sea el mismo? o simplemente lo deshabilito hasta que el ejecutor manualmente se rehabilite?
+            }
+        }
+    }
+
 /*
-    function cancelRequest(uint requestID) public {
+    function cancelRequest(uint requestID) public { TODO que se pueda cancelar o rotare executores, alternativamente (bah, cancelar solo si ninguno ejecuto)
         require(requestID < requests.length, "Index out of range");
         require(!requests[requestID].cancelled, "The request was already cancelled");
         require(msg.sender == address(requests[requestID].client), "You cant cancel a request that was not made by you");
@@ -141,8 +199,6 @@ contract ExecutionBroker is Transferable {
         bool transferSuccess = internalTransferFunds(requests[requestID].payment, payee);
         emit requestCancelled(requestID, transferSuccess);
     }
-
-    // Open interaction functions
 
     function publicizeRequest(uint requestID) public {  // This is to re emit the event In case the request gets forgotten
         require(requests[requestID].acceptor == address(0x00), "You cant publicize a taken request");
@@ -192,16 +248,6 @@ contract ExecutionBroker is Transferable {
         return transferSuccess;
     }
 
-    // Public views
-
-    function isRequestOpen(uint requestID) public view returns (bool) {  // solo a modo de ayuda
-        return (!requests[requestID].cancelled && requests[requestID].acceptor == address(0x0));
-    }
-
-    function requestCount() public view returns (uint) {
-        return requests.length;
-    }
-
     // Private functions
     function solidify(uint requestID) private returns (bool) {
         // first solidify, then pay, for reentrancy issues
@@ -218,4 +264,46 @@ contract ExecutionBroker is Transferable {
         return transferSuccess;
     }
 */
+    function _punishExecutor(address executorAddress) private {
+        // TODO ver si bajo rep, elimino de executors, o slasheo
+    }
+
+    function _pauseExecutor(address executorAddress) private {
+        require(executorsCollection.indexOf[executorAddress] != 0, "This address does not belong to an active executor");
+        uint executorIndex = executorsCollection.indexOf[executorAddress];
+        Executor memory executor = executorsCollection.activeExecutors[executorIndex];
+        executorsCollection.inactiveExecutors[executorAddress] = executor;
+        delete executorsCollection.activeExecutors[executorIndex];
+        delete executorsCollection.indexOf[executorAddress];
+        executorsCollection.amountOfActiveExecutors--;
+        emit executorPaused(executorAddress);
+    }
+
+    function _lockExecutor(address executorAddress) private {
+        require(executorsCollection.indexOf[executorAddress] != 0, "This address does not belong to an active executor");
+        uint executorIndex = executorsCollection.indexOf[executorAddress];
+        Executor memory executor = executorsCollection.activeExecutors[executorIndex];
+        executorsCollection.busyExecutors[executorAddress] = executor;
+        delete executorsCollection.activeExecutors[executorIndex];
+        delete executorsCollection.indexOf[executorAddress];
+        executorsCollection.amountOfActiveExecutors--;
+        emit executorLocked(executorAddress);
+    }
+
+    function _unlockExecutor(address executorAddress) private returns (uint) {
+        require(executorsCollection.busyExecutors[executorAddress].executorAddress == executorAddress, "This address does not belong to a locked executor");
+        uint executorIndex = _registerExecutor(executorsCollection.busyExecutors[executorAddress]);
+        delete executorsCollection.busyExecutors[executorAddress];
+        return executorIndex;
+    }
+
+    function _registerExecutor(Executor memory executor) private returns (uint) {
+        require(executorsCollection.indexOf[msg.sender] == 0, "This address is already registered as an active executor");
+        executorsCollection.activeExecutors.push(executor);
+        uint executorIndex = executorsCollection.activeExecutors.length - 1;
+        executorsCollection.indexOf[msg.sender] = executorIndex;
+        executorsCollection.amountOfActiveExecutors++;
+        return executorIndex;
+    }
+
 }

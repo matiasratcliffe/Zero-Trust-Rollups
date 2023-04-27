@@ -11,26 +11,26 @@ contract ClientImplementation is BaseClient {
 
     function clientLogic(ClientInput calldata input) external override pure returns (bytes memory) {
         bytes memory output = "";
-        if (input.functionToRun == 1) { output = functionOne(input.data); }
-        else if (input.functionToRun == 2) { output = functionTwo(input.data); }
-        else if (input.functionToRun == 3) { output = functionThree(input.data); }
+        if (input.functionToRun == 1) { output = _functionOne(input.data); }
+        else if (input.functionToRun == 2) { output = _functionTwo(input.data); }
+        else if (input.functionToRun == 3) { output = _functionThree(input.data); }
         return output;
     }
 
     struct OneInput {uint counter;}
-    function functionOne(bytes memory data) private pure returns (bytes memory) {
+    function _functionOne(bytes memory data) private pure returns (bytes memory) {
         OneInput memory input = abi.decode(data, (OneInput));
         return abi.encode(input.counter * 10);
     }
 
     struct TwoInput {uint counter;}
-    function functionTwo(bytes memory data) private pure returns (bytes memory) {
+    function _functionTwo(bytes memory data) private pure returns (bytes memory) {
         TwoInput memory input = abi.decode(data, (TwoInput));
         return abi.encode(input.counter + 7);
     }
 
     struct ThreeInput {uint counter;}
-    function functionThree(bytes memory data) private pure returns (bytes memory) {
+    function _functionThree(bytes memory data) private pure returns (bytes memory) {
         ThreeInput memory input = abi.decode(data, (ThreeInput));
         return abi.encode(input.counter + 4);
     }
