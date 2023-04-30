@@ -176,7 +176,7 @@ class TestRequestor:
         executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
         executor._acceptRequest(reqID)
         time.sleep(2)
-        assert broker.requests(reqID)[7][0] == executor.account
+        assert broker.requests(reqID)[7] == executor.account
         with pytest.raises(Exception, match="You cant cancel an accepted request"):
             requestor.cancelRequest(reqID)
 
@@ -189,10 +189,10 @@ class TestRequestor:
         executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
         executor._acceptRequest(reqID)
         time.sleep(3)
-        assert broker.requests(reqID)[7][0] == executor.account
+        assert broker.requests(reqID)[7] == executor.account
         executor._cancelAcceptance(reqID)
         time.sleep(4)
-        assert int(broker.requests(reqID)[7][0], 16) == 0
+        assert int(broker.requests(reqID)[7], 16) == 0
         requestor.cancelRequest(reqID)
         time.sleep(3)
         assert broker.requests(reqID)[9] == True

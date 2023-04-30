@@ -44,9 +44,9 @@ class TestExecutor:
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
         executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
-        assert int(broker.requests(reqID)[7][0], 16) == 0
+        assert int(broker.requests(reqID)[7], 16) == 0
         executor._acceptRequest(reqID)
-        assert broker.requests(reqID)[7][0] == executor.account
+        assert broker.requests(reqID)[7] == executor.account
 
     def test_accept_cancelled_request(self):
         requestor = Requestor(ClientFactory.getInstance())
@@ -63,7 +63,7 @@ class TestExecutor:
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
         executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
-        assert int(broker.requests(reqID)[7][0], 16) == 0
+        assert int(broker.requests(reqID)[7], 16) == 0
         executor._acceptRequest(reqID)
         with pytest.raises(Exception, match="Someone already accepted the request"):
             executor._acceptRequest(reqID)        
@@ -89,7 +89,7 @@ class TestExecutor:
         executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
         executor._acceptRequest(reqID)
         executor._cancelAcceptance(reqID)
-        assert int(broker.requests(reqID)[7][0], 16) == 0
+        assert int(broker.requests(reqID)[7], 16) == 0
     
     def test_cancel_acceptance_on_non_existing_request(self):
         executor = Executor(Accounts.getAccount(), BrokerFactory.getInstance(), populateBuffers=False)
@@ -126,7 +126,7 @@ class TestExecutor:
         executor1 = Executor(Accounts.getFromIndex(0), broker, populateBuffers=False)
         executor2 = Executor(Accounts.getFromIndex(1), broker, populateBuffers=False)
         executor1._acceptRequest(reqID)
-        assert broker.requests(reqID)[7][0] == executor1.account
+        assert broker.requests(reqID)[7] == executor1.account
         with pytest.raises(Exception, match="You cant cancel an acceptance that does not belong to you"):
             executor2._cancelAcceptance(reqID)
 
@@ -396,6 +396,7 @@ class TestExecutor:
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
         executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        time.sleep(3)
         executor.solverLoopRound()
         assert broker.requests(reqID)[8][0] == executor.account
         assert broker.requests(reqID)[8][3] == False
@@ -410,6 +411,7 @@ class TestExecutor:
         executor2 = Executor(Accounts.getFromIndex(1), broker, populateBuffers=False)
         alteredResult = HexString((int.from_bytes(executor1._computeResult(reqID), "big") + 1), "bytes32")
         executor1._submitResult(reqID, alteredResult)
+        time.sleep(3)
         executor2.challengerLoopRound()
         assert broker.requests(reqID)[8][0] == executor2.account
         assert broker.requests(reqID)[8][3] == True
@@ -423,6 +425,7 @@ class TestExecutor:
         executor2 = Executor(Accounts.getFromIndex(1), broker, populateBuffers=False)
         result = executor1._computeResult(reqID)
         executor1._submitResult(reqID, result)
+        time.sleep(3)
         executor2.challengerLoopRound()
         assert broker.requests(reqID)[8][0] == executor1.account
         assert broker.requests(reqID)[8][3] == False  # TODO change this to True so it gets solidified

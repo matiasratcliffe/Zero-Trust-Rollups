@@ -52,7 +52,7 @@ class Executor:
         #Logger.log(f"requests: {requests}", color=Logger.colors.RED, raw=True)
         for index, req in enumerate(requests):
             if not req.dict()['cancelled']:
-                if int(req.dict()['acceptance'][0], 16) == 0:
+                if int(req.dict()['acceptor'], 16) == 0:
                     Logger.log(f"Added request {index} to unaccepted requests")
                     self.unacceptedRequests.append(index)
                 elif int(req.dict()['submission'][0], 16) != 0 and not req.dict()['submission'][3]:
@@ -96,7 +96,7 @@ class Executor:
             requestID = self.unacceptedRequests.pop(0)
             self._acceptRequest(requestID)  # TODO what if anything here fails? TEST THAT TOO
             time.sleep(2) # TODO loop here?
-            if str(self.broker.requests(requestID).dict()['acceptance'][0]) == self.account.address:
+            if str(self.broker.requests(requestID).dict()['acceptor']) == self.account.address:
                 result = self._computeResult(requestID)
                 self._submitResult(requestID, result)
         else:

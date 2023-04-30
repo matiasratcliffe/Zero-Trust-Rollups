@@ -208,8 +208,8 @@
   ],
   "allSourcePaths": {
     "0": "contracts/BaseClient.sol",
-    "1": "contracts/ExecutionBroker.sol",
-    "2": "contracts/Ownable.sol"
+    "2": "contracts/ExecutionBroker.sol",
+    "3": "contracts/Ownable.sol"
   },
   "ast": {
     "absolutePath": "contracts/BaseClient.sol",
@@ -218,22 +218,19 @@
         177
       ],
       "ExecutionBroker": [
-        1038
+        1286
       ],
       "Ownable": [
-        1081
+        1413
       ],
       "Request": [
-        206
-      ],
-      "RequestAcceptance": [
-        211
+        491
       ],
       "Submission": [
-        220
+        500
       ],
       "Transferable": [
-        1165
+        1370
       ]
     },
     "id": 178,
@@ -261,7 +258,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 178,
-        "sourceUnit": 1039,
+        "sourceUnit": 1287,
         "src": "70:31:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -273,7 +270,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 178,
-        "sourceUnit": 1082,
+        "sourceUnit": 1414,
         "src": "102:23:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -289,7 +286,7 @@
                 "160:7:0"
               ],
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 1081,
+              "referencedDeclaration": 1413,
               "src": "160:7:0"
             },
             "id": 5,
@@ -304,7 +301,7 @@
         "id": 177,
         "linearizedBaseContracts": [
           177,
-          1081
+          1413
         ],
         "name": "BaseClient",
         "nameLocation": "146:10:0",
@@ -389,7 +386,7 @@
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_ExecutionBroker_$1038",
+              "typeIdentifier": "t_contract$_ExecutionBroker_$1286",
               "typeString": "contract ExecutionBroker"
             },
             "typeName": {
@@ -402,13 +399,13 @@
                   "321:15:0"
                 ],
                 "nodeType": "IdentifierPath",
-                "referencedDeclaration": 1038,
+                "referencedDeclaration": 1286,
                 "src": "321:15:0"
               },
-              "referencedDeclaration": 1038,
+              "referencedDeclaration": 1286,
               "src": "321:15:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_ExecutionBroker_$1038",
+                "typeIdentifier": "t_contract$_ExecutionBroker_$1286",
                 "typeString": "contract ExecutionBroker"
               }
             },
@@ -479,7 +476,7 @@
                       "referencedDeclaration": 13,
                       "src": "499:14:0",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ExecutionBroker_$1038",
+                        "typeIdentifier": "t_contract$_ExecutionBroker_$1286",
                         "typeString": "contract ExecutionBroker"
                       }
                     },
@@ -511,10 +508,10 @@
                         "name": "ExecutionBroker",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1038,
+                        "referencedDeclaration": 1286,
                         "src": "516:15:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_ExecutionBroker_$1038_$",
+                          "typeIdentifier": "t_type$_t_contract$_ExecutionBroker_$1286_$",
                           "typeString": "type(contract ExecutionBroker)"
                         }
                       },
@@ -530,13 +527,13 @@
                       "src": "516:30:0",
                       "tryCall": false,
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ExecutionBroker_$1038",
+                        "typeIdentifier": "t_contract$_ExecutionBroker_$1286",
                         "typeString": "contract ExecutionBroker"
                       }
                     },
                     "src": "499:47:0",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ExecutionBroker_$1038",
+                      "typeIdentifier": "t_contract$_ExecutionBroker_$1286",
                       "typeString": "contract ExecutionBroker"
                     }
                   },
@@ -658,7 +655,7 @@
                               "referencedDeclaration": 13,
                               "src": "621:14:0",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_ExecutionBroker_$1038",
+                                "typeIdentifier": "t_contract$_ExecutionBroker_$1286",
                                 "typeString": "contract ExecutionBroker"
                               }
                             }
@@ -666,7 +663,7 @@
                           "expression": {
                             "argumentTypes": [
                               {
-                                "typeIdentifier": "t_contract$_ExecutionBroker_$1038",
+                                "typeIdentifier": "t_contract$_ExecutionBroker_$1286",
                                 "typeString": "contract ExecutionBroker"
                               }
                             ],
@@ -1397,7 +1394,7 @@
                           "referencedDeclaration": 13,
                           "src": "1278:14:0",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_contract$_ExecutionBroker_$1038",
+                            "typeIdentifier": "t_contract$_ExecutionBroker_$1286",
                             "typeString": "contract ExecutionBroker"
                           }
                         },
@@ -1409,7 +1406,7 @@
                         "memberLocation": "1293:13:0",
                         "memberName": "submitRequest",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 385,
+                        "referencedDeclaration": 652,
                         "src": "1278:28:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_function_external_payable$_t_struct$_ClientInput_$10_memory_ptr_$_t_uint256_$_t_uint256_$_t_uint256_$returns$_t_uint256_$",
@@ -1553,7 +1550,7 @@
                     "1133:9:0"
                   ],
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 1050,
+                  "referencedDeclaration": 1382,
                   "src": "1133:9:0"
                 },
                 "nodeType": "ModifierInvocation",
@@ -1792,7 +1789,7 @@
                         "referencedDeclaration": 13,
                         "src": "1529:14:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ExecutionBroker_$1038",
+                          "typeIdentifier": "t_contract$_ExecutionBroker_$1286",
                           "typeString": "contract ExecutionBroker"
                         }
                       },
@@ -1804,7 +1801,7 @@
                       "memberLocation": "1544:13:0",
                       "memberName": "cancelRequest",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 471,
+                      "referencedDeclaration": 737,
                       "src": "1529:28:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_uint256_$returns$__$",
@@ -1848,7 +1845,7 @@
                     "1509:9:0"
                   ],
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 1050,
+                  "referencedDeclaration": 1382,
                   "src": "1509:9:0"
                 },
                 "nodeType": "ModifierInvocation",
@@ -2399,7 +2396,7 @@
                     "1671:9:0"
                   ],
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 1050,
+                  "referencedDeclaration": 1382,
                   "src": "1671:9:0"
                 },
                 "nodeType": "ModifierInvocation",
@@ -2499,7 +2496,7 @@
       "enabled": true,
       "runs": 200
     },
-    "version": "0.8.17+commit.8df45f5f"
+    "version": "0.8.19+commit.7dd6d404"
   },
   "contractName": "BaseClient",
   "coverageMap": {
