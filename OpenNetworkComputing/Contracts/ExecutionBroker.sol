@@ -42,9 +42,9 @@ struct TaskAssignment {
 
 contract ExecutionBroker is Transferable {
 
-    uint public constant EXECUTION_TIME_FRAME_SECONDS = 3600;
-    uint public constant ESCROW_STAKE_AMOUNT = 1e7;  // El cliente no tiene fondos lockeados salvo los que lockea en escrow por cada request. El executor, si tiene fondos lockeados, tanto para el escrow como para el punishment
-    // TODO ver si el a ESCROW_STAKE_AMOUNT no es mejor ponerle otro nombre, ya que no es solo para escrow, sino que tambien para pagar el gas de la rotacion. Y ver que sea significativamente mayor a lo que pueda llegar a salir la rotacion con muchos executors y un gas particularmente alto. para eso tambien limitar el maximo de executors
+    uint public EXECUTION_TIME_FRAME_SECONDS;// = 3600;
+    uint public BASE_STAKE_AMOUNT;// = 1e7;  // El cliente no tiene fondos lockeados salvo los que lockea en escrow por cada request. El executor, si tiene fondos lockeados, tanto para el escrow como para el punishment
+    // TODO ver que sea significativamente mayor a lo que pueda llegar a salir la rotacion con muchos executors y un gas particularmente alto. para eso tambien limitar el maximo de executors
 
     Request[] public requests;
     mapping (uint => TaskAssignment[]) public taskAssignmentsMap;
@@ -60,8 +60,9 @@ contract ExecutionBroker is Transferable {
 
     // Restricted interaction functions
 
-    constructor() {
-        blockhash(9);
+    constructor(uint executionTimeFrame, uint baseStakeAmount) {
+        EXECUTION_TIME_FRAME_SECONDS = executionTimeFrame;
+        BASE_STAKE_AMOUNT = baseStakeAmount;
         Executor memory executor = Executor({
             executorAddress: address(0x0),
             lockedWei: 0,
@@ -111,7 +112,7 @@ contract ExecutionBroker is Transferable {
     // Open interaction functions
 
     function registerExecutor() public payable {  // TODO podria buscar el primer cero? indexOf? ir subiendo hasta que valga cero o sea igual a size
-        require(msg.value >= ESCROW_STAKE_AMOUNT, "To register an executor you must provide at least the minimum escrow stake amount");
+        require(msg.value >= BASE_STAKE_AMOUNT, "To register an executor you must provide at least the minimum escrow stake amount");
         require(executorsCollection.inactiveExecutors[msg.sender].executorAddress == address(0x0), "The executor is already present, but inactive");
         require(executorsCollection.busyExecutors[msg.sender].executorAddress == address(0x0), "The executor is already present, but busy");
         _registerExecutor(Executor({
@@ -140,7 +141,7 @@ contract ExecutionBroker is Transferable {
     function activateExecutor() public payable {
         // TODO check que tenga suficientes fondos lockeados, tanto para el punishment, como para el escrow
         require(executorsCollection.inactiveExecutors[msg.sender].executorAddress == msg.sender, "This address does not belong to a paused executor");
-        require(executorsCollection.inactiveExecutors[msg.sender].lockedWei + msg.value >= ESCROW_STAKE_AMOUNT, "You must provide some Wei to reach the minimum escrow stake amount");
+        require(executorsCollection.inactiveExecutors[msg.sender].lockedWei + msg.value >= BASE_STAKE_AMOUNT, "You must provide some Wei to reach the minimum escrow stake amount");
         executorsCollection.inactiveExecutors[msg.sender].lockedWei += msg.value;
         _registerExecutor(executorsCollection.inactiveExecutors[msg.sender]);
         delete executorsCollection.inactiveExecutors[msg.sender];
@@ -157,9 +158,10 @@ contract ExecutionBroker is Transferable {
     function submitRequest(string calldata inputStateReference, string calldata codeReference, uint amountOfExecutors, uint executionPowerPaidFor) public payable returns (uint) {
         // TODO podria implementar que el cliente elija un threshold de estadisticas de punisheado o innacurate
         // TODO o poner un limite al amount of executors, o pedir que la paga sea proporcional
+        // TODO tambien poner un limite razonable al executionPowerPaidFor, pa que no me hagan un codigo que tarde una vida.
         require(amountOfExecutors <= executorsCollection.amountOfActiveExecutors, "You exceeded the number of available executors");
         require(amountOfExecutors % 2 == 1, "You must choose an odd amount of executors");
-        require(msg.value == ESCROW_STAKE_AMOUNT + (executionPowerPaidFor * amountOfExecutors), "The value sent in the request must be the ESCROW_STAKE_AMOUNT plus the execution power you intend to pay for evrey executor");
+        require(msg.value == BASE_STAKE_AMOUNT + (executionPowerPaidFor * amountOfExecutors), "The value sent in the request must be the ESCROW_STAKE_AMOUNT plus the execution power you intend to pay for evrey executor");
         Request memory request = Request({
             id: requests.length,
             clientAddress: msg.sender,
@@ -183,28 +185,34 @@ contract ExecutionBroker is Transferable {
         return request.id;
     }
 
-    function rotateExecutors(uint requestID) public {
+    function rotateExecutors(uint requestID) public returns (bool) {
         require(requests[requestID].clientAddress == msg.sender, "You cant rotate a request that was not made by you");
         uint amountOfPunishedExecutors = 0;
         address[] memory punishedExecutors = new address[](taskAssignmentsMap[requestID].length);  // Me van a quedar algunos en cero capaz, no importa
         for (uint i = 0; i < taskAssignmentsMap[requestID].length; i++) {
             if (!taskAssignmentsMap[requestID][i].submitted && block.timestamp >= (taskAssignmentsMap[requestID][i].timestamp + EXECUTION_TIME_FRAME_SECONDS)) {
-                // get address of punished executor and at the end, distribute the cost of the gas between all punished executors and return to sender,  TODO
+                // get address of punished executor and at the end, distribute the cost of the gas between all punished executors and return to sender, TODO
                 punishedExecutors[amountOfPunishedExecutors++] = taskAssignmentsMap[requestID][i].executorAddress;
             }
         }
-        // TODO maybe que el gas de ejecutar esto sea devuelto de el los fondos lockeados del ejecutor, aparentemente se puede saber tx.gas es gas price
-        // TODO aca calcular el numero de wei que cada ejecutor castigado tiene que pagarle
-        uint refundPerExecutor = 0; // total gas spended by this call * gas price / min(amountOfPunishedExecutors, availabeExecutors)
+        uint scarcityMultiplier = amountOfPunishedExecutors < executorsCollection.amountOfActiveExecutors ? 1 : 3;  // si hay pocos ejecutores, estar inactivo pagas el triple TODO ver si lo puedo hacer un numero dinamico como la proporcion entre ambos, o (1 + diferencia)
+        uint punishAmount = 12345 * tx.gasprice * scarcityMultiplier; // TODO el numero constante sacarlo por formula probando varias veces
+        
+        // el gas va a ser mayor entre mas executores haya que iterar, pero a la tasa fija, se la multiplica por la cantidad de ejecutores inactivos. Si hay muy pocos ejecutores inactivos, rinde mas forzar la resolucion del request
+        // ahora, si hay muchos inactivos, pero pocos activos, entonces se multiplica la pena, para que el cliente reciba mas. Y solo algunos de los inactivos la van a comer, y bueno, mala suerte
+        // en cuanto al min(amountOfPunishedExecutors, availabeExecutors), si no te hay suficientes ejecutores, el cliente puede ejecutar la rotacion mas tarde, o si ya entrego mas de la mitad, y se vencio el plazo, puede forzar la resolucion, punisheando al resto sin rotarlos TODO
+        uint effectiveAmountOfPunishedExecutors = amountOfPunishedExecutors < executorsCollection.amountOfActiveExecutors ? amountOfPunishedExecutors : executorsCollection.amountOfActiveExecutors;
         for (uint i = 0; i < amountOfPunishedExecutors; i++) {
             if (executorsCollection.amountOfActiveExecutors > 0) {
-                _punishExecutor(taskAssignmentsMap[requestID][i].executorAddress, refundPerExecutor);
+                _punishExecutor(taskAssignmentsMap[requestID][i].executorAddress, punishAmount);
                 address newExecutorAddress = getExecutor(getRandomNumber(0, executorsCollection.amountOfActiveExecutors, i)).executorAddress;
                 taskAssignmentsMap[requestID][i].executorAddress = newExecutorAddress;
                 taskAssignmentsMap[requestID][i].timestamp = block.timestamp;
                 _lockExecutor(newExecutorAddress);
             }
         }
+        bool transferSuccess = _internalTransferFunds(punishAmount * effectiveAmountOfPunishedExecutors, msg.sender);
+        return transferSuccess;
     }
 
 /*
@@ -238,7 +246,7 @@ contract ExecutionBroker is Transferable {
         emit requestSolidified(requestID);
         address payable payee = payable(requests[requestID].submission.issuer);
         uint payAmount = requests[requestID].payment + requests[requestID].challengeInsurance;
-        bool transferSuccess = internalTransferFunds(payAmount, payee);
+        bool transferSuccess = _internalTransferFunds(payAmount, payee);
         
         bytes memory data = abi.encodeWithSelector(requests[requestID].client.processResult.selector, requests[requestID].submission.result);
         (bool callSuccess, ) = address(requests[requestID].client).call{gas: requests[requestID].postProcessingGas}(data);  // el delegate para que me aparezca el sender como el broker. cuidado si esto no me hace una vulnerabilidad, puedo vaciar fondos desde client? no deberia pasar nada, ni el broker ni el client puede extraer fondos
@@ -247,12 +255,12 @@ contract ExecutionBroker is Transferable {
         return transferSuccess;
     }
 */
-    function _punishExecutor(address executorAddress, uint punishAmount) private {
-        // TODO decidir si ejecuto mal, si lo punisheo o solamente le bajo la rep
-        require(executorsCollection.busyExecutors[executorAddress].executorAddress == executorAddress, "You can only punsih a locked executor");
+    function _punishExecutor(address executorAddress, uint punishAmount) private {  // TODO ver tema de si ejecuta mal tambien es punishment, onda no le pago al que ejecuto mal, pero quizas tambien le hago pagar algo de gas? mergeo times punished con inacurate? separo la suspencion del castigo al gas y reputacion? ya que solo quiero suspender inactivos, no inacurate
+        // TODO quizas que el punish sea solo reputacion y gas, y la suspencion uso el pauseExecutor
+        // TODO quizas en vez de andar calculando el gas, solo pongo una tarifa fija * tx.gasprice por ejecutor y le devuelvo al cliente
+        require(executorsCollection.busyExecutors[executorAddress].executorAddress == executorAddress, "You can only punish a locked executor");
         Executor memory executor = executorsCollection.busyExecutors[executorAddress];
         executor.lockedWei -= punishAmount;
-        // TODO aca hago la transfer refund al client por el punishAmount
         executor.timesPunished += 1;
         executorsCollection.inactiveExecutors[msg.sender] = executor;
         delete executorsCollection.busyExecutors[executorAddress];
