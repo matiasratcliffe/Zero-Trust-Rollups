@@ -2,6 +2,7 @@ from scripts.classes.utils.contractProvider import ClientFactory, BrokerFactory
 from scripts.classes.utils.logger import Logger
 import time
 
+# TODO TODO TODO TODO TODO se puede castear las tuplas que me devuelve brownie a diccionariooooo
 
 @Logger.LogClassMethods()
 class Executor:

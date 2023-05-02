@@ -7,6 +7,7 @@ import "./Transferable.sol";
 
 struct Executor {
     address executorAddress;
+    uint assignedRequestID;
     uint lockedWei;
     uint accurateSolvings;
     uint inaccurateSolvings;
@@ -15,9 +16,9 @@ struct Executor {
 
 struct ExecutorsCollection {
     Executor[] activeExecutors;  // Not in a mapping because I need to be able to index them by uint
+    mapping (address => uint) activeIndexOf;
     mapping (address => Executor) inactiveExecutors;
     mapping (address => Executor) busyExecutors;
-    mapping (address => uint) indexOf;
     uint amountOfActiveExecutors;
 }
 
@@ -29,7 +30,7 @@ struct Request {
     uint payment; // In Wei; deberia tener en cuenta el computo y el gas de las operaciones de submit; y se divide entre los executors
     // TODO ver tema entorno de ejecucion restringido y capaz hacer payment fijo???
     //uint postProcessingGas;  TODO no hay post processing gas, ya que es el cliente quien deberia colectar los resultados y resolver los escrows
-    bool cancelled; // TODO o closed?
+    bool closed;
 }
 
 struct TaskAssignment {
@@ -43,8 +44,9 @@ struct TaskAssignment {
 contract ExecutionBroker is Transferable {
 
     uint public EXECUTION_TIME_FRAME_SECONDS;// = 3600;
-    uint public BASE_STAKE_AMOUNT;// = 1e7;  // El cliente no tiene fondos lockeados salvo los que lockea en escrow por cada request. El executor, si tiene fondos lockeados, tanto para el escrow como para el punishment
-    // TODO ver que sea significativamente mayor a lo que pueda llegar a salir la rotacion con muchos executors y un gas particularmente alto. para eso tambien limitar el maximo de executors
+    uint public BASE_STAKE_AMOUNT;// = 1e7;  // El cliente no tiene fondos lockeados salvo los que lockea en escrow por cada request. El executor, si tiene fondos lockeados, tanto para el escrow como para el punishment TODO ver que sea significativamente mayor a lo que pueda llegar a salir la rotacion con muchos executors y un gas particularmente alto. para eso tambien limitar el maximo de executors
+    uint public MAXIMUM_EXECUTION_POWER;
+    uint public MAXIMUM_EXECUTORS_PER_REQUEST;
 
     Request[] public requests;
     mapping (uint => TaskAssignment[]) public taskAssignmentsMap;
@@ -60,17 +62,29 @@ contract ExecutionBroker is Transferable {
 
     // Restricted interaction functions
 
-    constructor(uint executionTimeFrame, uint baseStakeAmount) {
+    constructor(uint executionTimeFrame, uint baseStakeAmount, uint maximumPower, uint maximumExecutors) {
         EXECUTION_TIME_FRAME_SECONDS = executionTimeFrame;
         BASE_STAKE_AMOUNT = baseStakeAmount;
+        MAXIMUM_EXECUTION_POWER = maximumPower;
+        MAXIMUM_EXECUTORS_PER_REQUEST = maximumExecutors;
         Executor memory executor = Executor({
             executorAddress: address(0x0),
+            assignedRequestID: 0,
             lockedWei: 0,
             accurateSolvings: 0,
             inaccurateSolvings: 0,
             timesPunished: 0
         });
+        Request memory request = Request({
+            id: 0,
+            clientAddress: address(0x0),
+            inputStateReference: '',
+            codeReference: '',
+            payment: 0,
+            closed: true
+        });
         executorsCollection.activeExecutors.push(executor);  // This is to reserve the index 0, because when you delete an entry in the address => uint map, it gets set to 0
+        requests.push(request);
     }
 
     // Public views
@@ -95,7 +109,31 @@ contract ExecutionBroker is Transferable {
         return executorsCollection.amountOfActiveExecutors;
     }
 
-    function getExecutor(uint position) public view returns (Executor memory executor) {
+    function getExecutorStateByAddress(address executorAddress) public view returns (string memory executorState) {
+        if (executorsCollection.activeIndexOf[executorAddress] != 0) {
+            return "active";
+        } else if (executorsCollection.inactiveExecutors[executorAddress].executorAddress == executorAddress) {
+            return "inactive";
+        } else if (executorsCollection.busyExecutors[executorAddress].executorAddress == executorAddress) {
+            return "locked";
+        } else {
+            revert("This address does not belong to a registered executor");
+        }
+    } 
+
+    function getExecutorByAddress(address executorAddress) public view returns (Executor memory executor) {  
+        if (executorsCollection.activeIndexOf[executorAddress] != 0) {
+            return executorsCollection.activeExecutors[executorsCollection.activeIndexOf[executorAddress]];
+        } else if (executorsCollection.inactiveExecutors[executorAddress].executorAddress == executorAddress) {
+            return executorsCollection.inactiveExecutors[executorAddress];
+        } else if (executorsCollection.busyExecutors[executorAddress].executorAddress == executorAddress) {
+            return executorsCollection.busyExecutors[executorAddress];
+        } else {
+            revert("This address does not belong to a registered executor");
+        }
+    }
+
+    function getActiveExecutorByPosition(uint position) public view returns (Executor memory executor) {  // Position starts from zero and is not equal to index
         require(position < executorsCollection.amountOfActiveExecutors, "You are selecting a position outside the existing executors");
         uint j = 0;
         for (uint i = 0; i < executorsCollection.activeExecutors.length; i++) {
@@ -115,8 +153,9 @@ contract ExecutionBroker is Transferable {
         require(msg.value >= BASE_STAKE_AMOUNT, "To register an executor you must provide at least the minimum escrow stake amount");
         require(executorsCollection.inactiveExecutors[msg.sender].executorAddress == address(0x0), "The executor is already present, but inactive");
         require(executorsCollection.busyExecutors[msg.sender].executorAddress == address(0x0), "The executor is already present, but busy");
-        _registerExecutor(Executor({
+        _activateExecutor(Executor({
             executorAddress: msg.sender,
+            assignedRequestID: 0,
             lockedWei: msg.value,
             accurateSolvings: 0,
             inaccurateSolvings: 0,
@@ -125,9 +164,9 @@ contract ExecutionBroker is Transferable {
     }
 
     function pauseExecutor(bool withrawLockedFunds) public returns (bool) {
-        require(executorsCollection.indexOf[msg.sender] != 0, "This address does not belong to an active executor");
+        require(executorsCollection.activeIndexOf[msg.sender] != 0, "This address does not belong to an active executor");
         bool transferSuccess = true;
-        uint executorIndex = executorsCollection.indexOf[msg.sender];
+        uint executorIndex = executorsCollection.activeIndexOf[msg.sender];
         Executor memory executor = executorsCollection.activeExecutors[executorIndex];
         if (withrawLockedFunds) {
             transferSuccess = _internalTransferFunds(executor.lockedWei, msg.sender);
@@ -135,17 +174,16 @@ contract ExecutionBroker is Transferable {
         }
         executorsCollection.inactiveExecutors[msg.sender] = executor;
         delete executorsCollection.activeExecutors[executorIndex];
-        delete executorsCollection.indexOf[msg.sender];
+        delete executorsCollection.activeIndexOf[msg.sender];
         executorsCollection.amountOfActiveExecutors--;
         return transferSuccess;
     }
 
     function activateExecutor() public payable {
-        // TODO check que tenga suficientes fondos lockeados, tanto para el punishment, como para el escrow
         require(executorsCollection.inactiveExecutors[msg.sender].executorAddress == msg.sender, "This address does not belong to a paused executor");
         require(executorsCollection.inactiveExecutors[msg.sender].lockedWei + msg.value >= BASE_STAKE_AMOUNT, "You must provide some Wei to reach the minimum escrow stake amount");
         executorsCollection.inactiveExecutors[msg.sender].lockedWei += msg.value;
-        _registerExecutor(executorsCollection.inactiveExecutors[msg.sender]);
+        _activateExecutor(executorsCollection.inactiveExecutors[msg.sender]);
         delete executorsCollection.inactiveExecutors[msg.sender];
     }
 
@@ -159,8 +197,8 @@ contract ExecutionBroker is Transferable {
 
     function submitRequest(string calldata inputStateReference, string calldata codeReference, uint amountOfExecutors, uint executionPowerPaidFor) public payable returns (uint) {
         // TODO podria implementar que el cliente elija un threshold de estadisticas de punisheado o innacurate
-        // TODO o poner un limite al amount of executors, o pedir que la paga sea proporcional
-        // TODO tambien poner un limite razonable al executionPowerPaidFor, pa que no me hagan un codigo que tarde una vida.
+        require(executionPowerPaidFor <= MAXIMUM_EXECUTION_POWER, "You exceeded the maximum allowed exeution power per request");
+        require(amountOfExecutors <= MAXIMUM_EXECUTORS_PER_REQUEST, "You exceeded the maximum number of allowed executors per request");
         require(amountOfExecutors <= executorsCollection.amountOfActiveExecutors, "You exceeded the number of available executors");
         require(amountOfExecutors % 2 == 1, "You must choose an odd amount of executors");
         require(msg.value == BASE_STAKE_AMOUNT + (executionPowerPaidFor * amountOfExecutors), "The value sent in the request must be the ESCROW_STAKE_AMOUNT plus the execution power you intend to pay for evrey executor");
@@ -170,19 +208,19 @@ contract ExecutionBroker is Transferable {
             inputStateReference: inputStateReference,
             codeReference: codeReference,
             payment: executionPowerPaidFor,
-            cancelled: false  // TODO o closed?
+            closed: false
         });
         requests.push(request);
         TaskAssignment[] storage taskAssignments = taskAssignmentsMap[request.id];
         for (uint i = 0; i < amountOfExecutors; i++) {
-            address executorAddress = getExecutor(getRandomNumber(0, executorsCollection.amountOfActiveExecutors, i)).executorAddress;
+            address executorAddress = getActiveExecutorByPosition(getRandomNumber(0, executorsCollection.amountOfActiveExecutors, i)).executorAddress;
             taskAssignments.push(TaskAssignment({
                 executorAddress: executorAddress,
                 timestamp: block.timestamp,
                 result: abi.encode(0),
                 submitted: false
             }));
-            _lockExecutor(executorAddress);
+            _lockExecutor(executorAddress, request.id);
         }
         return request.id;
     }
@@ -202,10 +240,10 @@ contract ExecutionBroker is Transferable {
             if (executorsCollection.amountOfActiveExecutors > 0) {
                 uint taskIndex = punishedExecutorsTaskIDs[i];
                 punishedExecutorsAddresses[i] = taskAssignmentsMap[requestID][taskIndex].executorAddress;
-                address newExecutorAddress = getExecutor(getRandomNumber(0, executorsCollection.amountOfActiveExecutors, i)).executorAddress;
+                address newExecutorAddress = getActiveExecutorByPosition(getRandomNumber(0, executorsCollection.amountOfActiveExecutors, i)).executorAddress;
                 taskAssignmentsMap[requestID][taskIndex].executorAddress = newExecutorAddress;
                 taskAssignmentsMap[requestID][taskIndex].timestamp = block.timestamp;
-                _lockExecutor(newExecutorAddress);
+                _lockExecutor(newExecutorAddress, requestID);
             }
         }
 
@@ -270,28 +308,30 @@ contract ExecutionBroker is Transferable {
         delete executorsCollection.busyExecutors[executorAddress];
     }
 
-    function _lockExecutor(address executorAddress) private {
-        require(executorsCollection.indexOf[executorAddress] != 0, "This address does not belong to an active executor");
-        uint executorIndex = executorsCollection.indexOf[executorAddress];
+    function _lockExecutor(address executorAddress, uint requestID) private {
+        require(executorsCollection.activeIndexOf[executorAddress] != 0, "This address does not belong to an active executor");
+        uint executorIndex = executorsCollection.activeIndexOf[executorAddress];
         Executor memory executor = executorsCollection.activeExecutors[executorIndex];
+        executor.assignedRequestID = requestID;
         executorsCollection.busyExecutors[executorAddress] = executor;
         delete executorsCollection.activeExecutors[executorIndex];
-        delete executorsCollection.indexOf[executorAddress];
+        delete executorsCollection.activeIndexOf[executorAddress];
         executorsCollection.amountOfActiveExecutors--;
         emit executorLocked(executorAddress);
     }
 
     function _unlockExecutor(address executorAddress) private {
         require(executorsCollection.busyExecutors[executorAddress].executorAddress == executorAddress, "This address does not belong to a locked executor");
-        _registerExecutor(executorsCollection.busyExecutors[executorAddress]);
+        executorsCollection.busyExecutors[executorAddress].assignedRequestID = 0;
+        _activateExecutor(executorsCollection.busyExecutors[executorAddress]);
         delete executorsCollection.busyExecutors[executorAddress];
     }
 
-    function _registerExecutor(Executor memory executor) private {
-        require(executorsCollection.indexOf[msg.sender] == 0, "This address is already registered as an active executor");
+    function _activateExecutor(Executor memory executor) private { // TODO podria buscar el primer cero? indexOf? ir subiendo hasta que valga cero o sea igual a size
+        require(executorsCollection.activeIndexOf[msg.sender] == 0, "This address is already registered as an active executor");
         executorsCollection.activeExecutors.push(executor);
         uint executorIndex = executorsCollection.activeExecutors.length - 1;
-        executorsCollection.indexOf[msg.sender] = executorIndex;
+        executorsCollection.activeIndexOf[msg.sender] = executorIndex;
         executorsCollection.amountOfActiveExecutors++;
     }
 
