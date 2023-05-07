@@ -27,7 +27,7 @@ struct Request {
     address clientAddress; // TODO ver si lo hago con address o con BaseClient para incluir postprocessing
     string inputStateReference;  // Tambien aca esta el point of insertion
     string codeReference;  // Tambien aca esta la data sobre la version y compilador y otras specs que pueden afectar el resultado
-    uint payment; // In Wei; deberia tener en cuenta el computo y el gas de las operaciones de submit; y se divide entre los executors
+    uint executionPowerPaidFor; // In Wei; deberia tener en cuenta el computo y el gas de las operaciones de submit; y se divide entre los executors
     // TODO ver tema entorno de ejecucion restringido y capaz hacer payment fijo???
     //uint postProcessingGas;  TODO no hay post processing gas, ya que es el cliente quien deberia colectar los resultados y resolver los escrows
     bool closed;
@@ -80,7 +80,7 @@ contract ExecutionBroker is Transferable {
             clientAddress: address(0x0),
             inputStateReference: '',
             codeReference: '',
-            payment: 0,
+            executionPowerPaidFor: 0,
             closed: true
         });
         executorsCollection.activeExecutors.push(executor);  // This is to reserve the index 0, because when you delete an entry in the address => uint map, it gets set to 0
@@ -90,7 +90,7 @@ contract ExecutionBroker is Transferable {
     // Public views
 
     function requestCount() public view returns (uint) {
-        return requests.length;
+        return requests.length - 1;  // The request number 0 is blank
     }
 
     function getActiveExecutorsList() public view returns (address[] memory) {
@@ -197,17 +197,17 @@ contract ExecutionBroker is Transferable {
 
     function submitRequest(string calldata inputStateReference, string calldata codeReference, uint amountOfExecutors, uint executionPowerPaidFor) public payable returns (uint) {
         // TODO podria implementar que el cliente elija un threshold de estadisticas de punisheado o innacurate
-        require(executionPowerPaidFor <= MAXIMUM_EXECUTION_POWER, "You exceeded the maximum allowed exeution power per request");
-        require(amountOfExecutors <= MAXIMUM_EXECUTORS_PER_REQUEST, "You exceeded the maximum number of allowed executors per request");
-        require(amountOfExecutors <= executorsCollection.amountOfActiveExecutors, "You exceeded the number of available executors");
         require(amountOfExecutors % 2 == 1, "You must choose an odd amount of executors");
+        require(amountOfExecutors <= MAXIMUM_EXECUTORS_PER_REQUEST, "You exceeded the maximum number of allowed executors per request");
+        require(executionPowerPaidFor <= MAXIMUM_EXECUTION_POWER, "You exceeded the maximum allowed execution power per request");
+        require(amountOfExecutors <= executorsCollection.amountOfActiveExecutors, "You exceeded the number of available executors");
         require(msg.value == BASE_STAKE_AMOUNT + (executionPowerPaidFor * amountOfExecutors), "The value sent in the request must be the ESCROW_STAKE_AMOUNT plus the execution power you intend to pay for evrey executor");
         Request memory request = Request({
             id: requests.length,
             clientAddress: msg.sender,
             inputStateReference: inputStateReference,
             codeReference: codeReference,
-            payment: executionPowerPaidFor,
+            executionPowerPaidFor: executionPowerPaidFor,
             closed: false
         });
         requests.push(request);
