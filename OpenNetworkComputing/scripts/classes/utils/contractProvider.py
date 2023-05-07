@@ -18,7 +18,9 @@ class BrokerFactory:
         else:
             return BrokerFactory.create(Accounts.getAccount())
 
-    def create(account):
+    def create(account=None):
+        if account == None:
+            account = Accounts.getAccount()
         ExecutionBroker.deploy(
             BrokerFactory.DEFAULT_EXECUTION_TIME_FRAME,
             BrokerFactory.BASE_STAKE_AMOUNT,

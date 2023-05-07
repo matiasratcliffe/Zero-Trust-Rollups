@@ -13,7 +13,9 @@ class BrokerFactory:
         else:
             return BrokerFactory.create(Accounts.getAccount())
 
-    def create(account):
+    def create(account=None):
+        if account == None:
+            account = Accounts.getAccount()
         ExecutionBroker.deploy(
             {"from": account},
             publish_source=config["networks"][network.show_active()]["verify"]
@@ -40,7 +42,9 @@ class ClientFactory:
         else:
             return ClientFactory.create(owner=Accounts.getAccount(), broker=BrokerFactory.getInstance())
 
-    def create(owner, broker):
+    def create(broker, owner=None):
+        if owner == None:
+            owner = Accounts.getAccount()
         ClientImplementation.deploy(
             broker.address,
             {"from": owner},
