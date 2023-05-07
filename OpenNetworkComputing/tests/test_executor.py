@@ -91,16 +91,28 @@ class TestExecutor:
         executor = Executor(broker, account, True)
         executor.pauseExecutor()
         assert executor.broker.getExecutorStateByAddress(executor.account) == "inactive"
+        executor.activateExecutor()
+        assert executor.broker.getExecutorStateByAddress(executor.account) == "active"
 
     def test_activate_non_paused_executor(self):
-        raise "implement this"
+        executor = Executor(BrokerFactory.getInstance(), Accounts.getAccount(), True)
+        with pytest.raises(Exception, match="This address does not belong to a paused executor"):
+            executor.activateExecutor()
 
     def test_activate_executor_without_enough_stake(self):
-        raise "implement this"
+        executor = Executor(BrokerFactory.getInstance(), Accounts.getAccount(), True)
+        executor.pauseExecutor(True)
+        with pytest.raises(Exception, match="You must provide some Wei to reach the minimum escrow stake amount"):
+            executor.activateExecutor()
 
     def test_activate_executor_providing_stake(self):
-        raise "implement this"
+        executor = Executor(BrokerFactory.getInstance(), Accounts.getAccount(), True)
+        executor.pauseExecutor(True)
+        with pytest.raises(Exception, match="You must provide some Wei to reach the minimum escrow stake amount"):
+            executor.activateExecutor(executor.broker.BASE_STAKE_AMOUNT())
 
     def test_register_already_present_busy_executor(self):
         raise "implement this"
 
+    def test_submit_trivial_result(self):
+        raise "implement this"

@@ -18,7 +18,7 @@ class Executor:
         return self.broker.pauseExecutor(withdraw, {"from": self.account})
     
     def activateExecutor(self, funds=0):
-        pass
+        return self.broker.activateExecutor({"from": self.account, "value": funds})
 
     def solveRound(self):
         if self.broker.getExecutorStateByAddress(self.account) == "locked":
