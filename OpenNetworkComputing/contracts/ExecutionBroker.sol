@@ -109,6 +109,14 @@ contract ExecutionBroker is Transferable {
         return executorsCollection.amountOfActiveExecutors;
     }
 
+    function getInactiveExecutorByAddress(address executorAddress) public view returns (Executor memory) {
+        return executorsCollection.inactiveExecutors[executorAddress];
+    }
+
+    function getBusyExecutorByAddress(address executorAddress) public view returns (Executor memory) {
+        return executorsCollection.busyExecutors[executorAddress];
+    }
+
     function getExecutorStateByAddress(address executorAddress) public view returns (string memory executorState) {
         if (executorsCollection.activeIndexOf[executorAddress] != 0) {
             return "active";
@@ -236,6 +244,7 @@ contract ExecutionBroker is Transferable {
             }
         }
         address[] memory punishedExecutorsAddresses = new address[](amountOfPunishedExecutors);
+        uint effectiveAmountOfPunishedExecutors = 0;
         for (uint i = 0; i < amountOfPunishedExecutors; i++) {
             if (executorsCollection.amountOfActiveExecutors > 0) {
                 uint taskIndex = punishedExecutorsTaskIDs[i];
@@ -244,12 +253,12 @@ contract ExecutionBroker is Transferable {
                 taskAssignmentsMap[requestID][taskIndex].executorAddress = newExecutorAddress;
                 taskAssignmentsMap[requestID][taskIndex].timestamp = block.timestamp;
                 _lockExecutor(newExecutorAddress, requestID);
+                effectiveAmountOfPunishedExecutors++;
             }
         }
 
         uint punishGas = 12345;
         uint constantGasOverHead = 12345;
-        uint effectiveAmountOfPunishedExecutors = amountOfPunishedExecutors < executorsCollection.amountOfActiveExecutors ? amountOfPunishedExecutors : executorsCollection.amountOfActiveExecutors;
         uint estimatedGasSpent = ((initialGas - gasleft()) + (punishGas * effectiveAmountOfPunishedExecutors) + constantGasOverHead) * tx.gasprice;  // This is just an aproximation, make it generous to favor the client
         uint punishAmount = estimatedGasSpent / effectiveAmountOfPunishedExecutors;
         for (uint i = 0; i < effectiveAmountOfPunishedExecutors; i++) {
@@ -304,7 +313,8 @@ contract ExecutionBroker is Transferable {
         Executor memory executor = executorsCollection.busyExecutors[executorAddress];
         executor.lockedWei -= punishAmount;
         executor.timesPunished += 1;
-        executorsCollection.inactiveExecutors[msg.sender] = executor;
+        executor.assignedRequestID = 0;
+        executorsCollection.inactiveExecutors[executorAddress] = executor;
         delete executorsCollection.busyExecutors[executorAddress];
     }
 
@@ -320,7 +330,7 @@ contract ExecutionBroker is Transferable {
         emit executorLocked(executorAddress);
     }
 
-    function _unlockExecutor(address executorAddress) private {
+    function _unlockExecutor(address executorAddress) private { // TODO cuando usaria esto?? solo cuando se termina bien la ejecucion? o en algun caso triste?
         require(executorsCollection.busyExecutors[executorAddress].executorAddress == executorAddress, "This address does not belong to a locked executor");
         executorsCollection.busyExecutors[executorAddress].assignedRequestID = 0;
         _activateExecutor(executorsCollection.busyExecutors[executorAddress]);

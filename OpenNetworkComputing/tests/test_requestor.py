@@ -4,6 +4,7 @@ from scripts.classes.utils.logger import Logger
 from scripts.classes.requestor import Requestor
 from scripts.classes.executor import Executor
 import pytest
+import time
 
 
 class TestRequestor:
@@ -44,6 +45,9 @@ class TestRequestor:
         assert request["inputStateReference"] == "input reference"
         assert request["executionPowerPaidFor"] == 1000
         assignedExecutors = [dict(requestor.broker.taskAssignmentsMap(reqID, i))["executorAddress"] for i in range(3)]
+        assert broker.getExecutorStateByAddress(account1) == "locked"
+        assert broker.getExecutorStateByAddress(account2) == "locked"
+        assert broker.getExecutorStateByAddress(account3) == "locked"
         assert account1 in assignedExecutors
         assert account2 in assignedExecutors
         assert account3 in assignedExecutors
@@ -79,7 +83,42 @@ class TestRequestor:
             broker.submitRequest("", "", 1, 1000, {"from": Accounts.getAccount()})
 
     def test_rotate_all_executors(self):
-        raise "implement this"
+        broker = BrokerFactory.create()
+        account1 = Accounts.getFromIndex(0)
+        account2 = Accounts.getFromIndex(1)
+        account3 = Accounts.getFromIndex(2)
+        Executor(broker, account1, True)
+        Executor(broker, account2, True)
+        Executor(broker, account3, True)
+        assert broker.getExecutorStateByAddress(account1) == "active"
+        assert broker.getExecutorStateByAddress(account2) == "active"
+        assert broker.getExecutorStateByAddress(account3) == "active"
+        requestor = Requestor(broker, Accounts.getAccount())
+        reqID = requestor.createRequest("input reference", "code reference", amountOfExecutors=3, executionPower=1000)
+        
+        account4 = Accounts.getFromIndex(3)
+        account5 = Accounts.getFromIndex(4)
+        account6 = Accounts.getFromIndex(5)
+        Executor(broker, account4, True)
+        Executor(broker, account5, True)
+        Executor(broker, account6, True)
+        time.sleep(broker.EXECUTION_TIME_FRAME_SECONDS())
+
+        requestor.rotateExecutors(reqID)
+        assignedExecutors = [dict(requestor.broker.taskAssignmentsMap(reqID, i))["executorAddress"] for i in range(3)]        
+        assert account1 not in assignedExecutors
+        assert account2 not in assignedExecutors
+        assert account3 not in assignedExecutors
+        assert broker.getExecutorStateByAddress(account1) == "inactive"
+        assert broker.getExecutorStateByAddress(account2) == "inactive"
+        assert broker.getExecutorStateByAddress(account3) == "inactive"
+        assert account4 in assignedExecutors
+        assert account5 in assignedExecutors
+        assert account6 in assignedExecutors
+        assert broker.getExecutorStateByAddress(account4) == "locked"
+        assert broker.getExecutorStateByAddress(account5) == "locked"
+        assert broker.getExecutorStateByAddress(account6) == "locked"
+        raise "asd"
 
     def test_rotate_one_executor(self):
         raise "implement this"
@@ -90,5 +129,17 @@ class TestRequestor:
     def test_rotate_no_executors_premature(self):
         raise "implement this"
 
-    def test_rotate_foreign_request(self):
+    def test_rotate_executors_all_exceeded_but_none_available(self):
         raise "implement this"
+
+    def test_rotate_executors_all_exceeded_but_only_some_available(self):
+        raise "implement this"
+
+    def test_rotate_foreign_request(self):
+        broker = BrokerFactory.create()
+        Executor(broker, Accounts.getAccount(), True)
+        requestor1 = Requestor(broker, Accounts.getFromIndex(0))
+        requestor2 = Requestor(broker, Accounts.getFromIndex(1))
+        reqID = requestor1.createRequest(amountOfExecutors=1)
+        with pytest.raises(Exception, match="You cant rotate a request that was not made by you"):
+            requestor2.rotateExecutors(reqID)
