@@ -8,6 +8,7 @@ import "./Transferable.sol";
 struct Executor {
     address executorAddress;
     uint assignedRequestID;
+    uint taskAssignmentIndex; //TODO test in python
     uint lockedWei;
     uint accurateSolvings;
     uint inaccurateSolvings;
@@ -30,14 +31,17 @@ struct Request {
     uint executionPowerPaidFor; // In Wei; deberia tener en cuenta el computo y el gas de las operaciones de submit; y se divide entre los executors
     // TODO ver tema entorno de ejecucion restringido y capaz hacer payment fijo???
     //uint postProcessingGas;  TODO no hay post processing gas, ya que es el cliente quien deberia colectar los resultados y resolver los escrows
+    string result; //TODO start empty, gets populated after escrow
+    bool submissionsLocked; //TODO test in python?
     bool closed;
 }
 
 struct TaskAssignment {
     address executorAddress;
     uint timestamp;
-    bytes result;
+    bytes signedResultHash;
     bool submitted;
+    bool solidified;  // after escrow
 }
 
 
@@ -52,7 +56,7 @@ contract ExecutionBroker is Transferable {
     mapping (uint => TaskAssignment[]) public taskAssignmentsMap;
     ExecutorsCollection public executorsCollection;
     
-    event resultSubmitted(uint requestID, bytes result, address submitter);
+    event resultSubmitted(uint requestID, address submitter);
     event requestSolidified(uint requestID);
 
     event executorLocked(address executorAddress);
@@ -70,6 +74,7 @@ contract ExecutionBroker is Transferable {
         Executor memory executor = Executor({
             executorAddress: address(0x0),
             assignedRequestID: 0,
+            taskAssignmentIndex: 0,
             lockedWei: 0,
             accurateSolvings: 0,
             inaccurateSolvings: 0,
@@ -81,6 +86,8 @@ contract ExecutionBroker is Transferable {
             inputStateReference: '',
             codeReference: '',
             executionPowerPaidFor: 0,
+            result: '',
+            submissionsLocked: false,
             closed: true
         });
         executorsCollection.activeExecutors.push(executor);  // This is to reserve the index 0, because when you delete an entry in the address => uint map, it gets set to 0
@@ -164,6 +171,7 @@ contract ExecutionBroker is Transferable {
         _activateExecutor(Executor({
             executorAddress: msg.sender,
             assignedRequestID: 0,
+            taskAssignmentIndex: 0,
             lockedWei: msg.value,
             accurateSolvings: 0,
             inaccurateSolvings: 0,
@@ -216,6 +224,8 @@ contract ExecutionBroker is Transferable {
             inputStateReference: inputStateReference,
             codeReference: codeReference,
             executionPowerPaidFor: executionPowerPaidFor,
+            result: '',
+            submissionsLocked: false,
             closed: false
         });
         requests.push(request);
@@ -225,8 +235,9 @@ contract ExecutionBroker is Transferable {
             taskAssignments.push(TaskAssignment({
                 executorAddress: executorAddress,
                 timestamp: block.timestamp,
-                result: abi.encode(0),
-                submitted: false
+                signedResultHash: abi.encode(0),
+                submitted: false,
+                solidified: false
             }));
             _lockExecutor(executorAddress, request.id);
         }
@@ -235,6 +246,7 @@ contract ExecutionBroker is Transferable {
 
     function rotateExecutors(uint requestID) public returns (bool) {
         require(requests[requestID].clientAddress == msg.sender, "You cant rotate a request that was not made by you");
+        require(requests[requestID].submissionsLocked == false, ""); //TODO test in python
         uint initialGas = gasleft();
         uint amountOfPunishedExecutors = 0;
         uint[] memory punishedExecutorsTaskIDs = new uint[](taskAssignmentsMap[requestID].length);  // Me van a quedar algunos en cero capaz, no importa
@@ -268,21 +280,43 @@ contract ExecutionBroker is Transferable {
         return transferSuccess;
     }
 
-/*
-    function submitResult(uint requestID, bytes calldata result) public {
-        require(requests[requestID].acceptor != address(0x0), "You need to accept the request first");
-        require(requests[requestID].submission.issuer == address(0x0), "There is already a submission for this request");
-        require(requests[requestID].acceptor == msg.sender, "Someone else has accepted the Request");
-        Submission memory submission = Submission({
-            issuer: msg.sender,
-            timestamp: block.timestamp,
-            result: result,
-            solidified: false
-        });
-        requests[requestID].submission = submission;
-        emit resultSubmitted(requestID, result, msg.sender);
+    function truncateExecutors(uint requestID) public {
+        //TODO tiene que haber pasado el tiempo, y es como rotate pero no los rota, solo los elimina y castiga. por ende, tiene que haber al menos un submit
     }
 
+    function submitSignedResultHash(uint requestID, bytes calldata signedResultHash) public {
+        Executor memory executor = getExecutorByAddress(msg.sender);
+        require(executor.assignedRequestID == requestID, "You must be assigned to the provided request to submit a result hash");
+        require(taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].executorAddress == msg.sender, "You have an invalid assignment");
+        require(taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].submitted == false, "The result for this request has already been submitted");
+
+        taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].signedResultHash = signedResultHash;
+        taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].submitted = true;
+        emit resultSubmitted(requestID, msg.sender);
+
+        // TODO if last one, mark request as submitted? do something else like start the escrow? SI ES EL ULTIMO SOLO MARCO COMO SUBMITED, REQUISITO PARA LIBERATE RESULT. POR LO QUE IMPLICITAMENTE ARRANCA EL ESCROW, Y AHI VAN POSTULANDO LOS RESULTADOS. Y EN EL LIBERATE RESULTS, SI ES EL ULTIMO, SE GENERA LA PAGA Y LIBERAN LOS STAKES CLIENT&EXECUTOR, O SI PASA CIERTO TIEMPO, EL CLIENTE PUEDE TRUNCAR LA LIBERACION PARA RETIRAR SU STAKE, Y LOS QUE NO HAYAN LIBERADO LA COMEN
+        bool lastOne = true;
+        for (uint i = 0; i < taskAssignmentsMap[requestID].length; i++) {
+            if (!taskAssignmentsMap[requestID][i].submitted) {
+                lastOne = false;
+            }
+        }
+        if (lastOne) {
+            requests[requestID].submissionsLocked = true;
+        }
+
+    }
+
+    function liberateResult(uint requestID, string calldata result) public {
+        // Si hay empate, que gane el primero???
+        // CHECK IF REQUEST IS ALL SUBMITTED
+    }
+
+    function truncateResultLiberation(uint requestID) public {
+
+    }
+
+/*
     function claimPayment(uint requestID) public returns (bool) {
         require(requests[requestID].submission.issuer != address(0x0), "There are no submissions for the provided request");
         require(requests[requestID].submission.issuer == msg.sender, "This payment does not belong to you");

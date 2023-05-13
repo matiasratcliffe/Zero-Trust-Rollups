@@ -84,44 +84,61 @@ class TestRequestor:
 
     def test_rotate_all_executors(self):
         broker = BrokerFactory.create()
-        account1 = Accounts.getFromIndex(0)
-        account2 = Accounts.getFromIndex(1)
-        account3 = Accounts.getFromIndex(2)
-        Executor(broker, account1, True)
-        Executor(broker, account2, True)
-        Executor(broker, account3, True)
-        assert broker.getExecutorStateByAddress(account1) == "active"
-        assert broker.getExecutorStateByAddress(account2) == "active"
-        assert broker.getExecutorStateByAddress(account3) == "active"
+        executor1 = Executor(broker, Accounts.getFromIndex(0), True)
+        executor2 = Executor(broker, Accounts.getFromIndex(1), True)
+        executor3 = Executor(broker, Accounts.getFromIndex(2), True)
+        assert broker.getExecutorStateByAddress(executor1.account) == "active"
+        assert broker.getExecutorStateByAddress(executor2.account) == "active"
+        assert broker.getExecutorStateByAddress(executor3.account) == "active"
         requestor = Requestor(broker, Accounts.getAccount())
         reqID = requestor.createRequest("input reference", "code reference", amountOfExecutors=3, executionPower=1000)
-        
-        account4 = Accounts.getFromIndex(3)
-        account5 = Accounts.getFromIndex(4)
-        account6 = Accounts.getFromIndex(5)
-        Executor(broker, account4, True)
-        Executor(broker, account5, True)
-        Executor(broker, account6, True)
+
+        executor4 = Executor(broker, Accounts.getFromIndex(3), True)
+        executor5 = Executor(broker, Accounts.getFromIndex(4), True)
+        executor6 = Executor(broker, Accounts.getFromIndex(5), True)
         time.sleep(broker.EXECUTION_TIME_FRAME_SECONDS())
 
-        requestor.rotateExecutors(reqID)
+        originalBalance = requestor.account.balance()
+        customGasPrice = 10
+        transaction = requestor.rotateExecutors(reqID, customGasPrice=customGasPrice)
         assignedExecutors = [dict(requestor.broker.taskAssignmentsMap(reqID, i))["executorAddress"] for i in range(3)]        
-        assert account1 not in assignedExecutors
-        assert account2 not in assignedExecutors
-        assert account3 not in assignedExecutors
-        assert broker.getExecutorStateByAddress(account1) == "inactive"
-        assert broker.getExecutorStateByAddress(account2) == "inactive"
-        assert broker.getExecutorStateByAddress(account3) == "inactive"
-        assert account4 in assignedExecutors
-        assert account5 in assignedExecutors
-        assert account6 in assignedExecutors
-        assert broker.getExecutorStateByAddress(account4) == "locked"
-        assert broker.getExecutorStateByAddress(account5) == "locked"
-        assert broker.getExecutorStateByAddress(account6) == "locked"
-        raise "asd"
+        assert executor1.account not in assignedExecutors
+        assert executor2.account not in assignedExecutors
+        assert executor3.account not in assignedExecutors
+        assert executor1.getState() == "inactive"
+        assert executor2.getState() == "inactive"
+        assert executor3.getState() == "inactive"
+        assert executor4.account in assignedExecutors
+        assert executor5.account in assignedExecutors
+        assert executor6.account in assignedExecutors
+        assert executor4.getState() == "locked"
+        assert executor5.getState() == "locked"
+        assert executor6.getState() == "locked"
+        assert transaction.gas_price == customGasPrice
+        assert requestor.account.balance() > originalBalance - (transaction.gas_used * transaction.gas_price)
+        executor1PunishAmount = broker.BASE_STAKE_AMOUNT() - executor1.getData()["lockedWei"]
+        executor2PunishAmount = broker.BASE_STAKE_AMOUNT() - executor2.getData()["lockedWei"]
+        executor3PunishAmount = broker.BASE_STAKE_AMOUNT() - executor3.getData()["lockedWei"]
+        assert executor1PunishAmount > 0
+        assert executor1PunishAmount == executor2PunishAmount
+        assert executor2PunishAmount == executor3PunishAmount
+        assert requestor.account.balance() == originalBalance - (transaction.gas_used * transaction.gas_price) + (executor1PunishAmount + executor2PunishAmount + executor3PunishAmount)
 
     def test_rotate_one_executor(self):
-        raise "implement this"
+        broker = BrokerFactory.create()
+        executor1 = Executor(broker, Accounts.getFromIndex(0), True)
+        executor2 = Executor(broker, Accounts.getFromIndex(1), True)
+        executor3 = Executor(broker, Accounts.getFromIndex(2), True)
+        assert broker.getExecutorStateByAddress(executor1.account) == "active"
+        assert broker.getExecutorStateByAddress(executor2.account) == "active"
+        assert broker.getExecutorStateByAddress(executor3.account) == "active"
+        requestor = Requestor(broker, Accounts.getAccount())
+        reqID = requestor.createRequest("input reference", "code reference", amountOfExecutors=3, executionPower=1000)
+        executor1._submitResult(reqID, "asd")
+        executor2._submitResult(reqID, "asd")
+        executor4 = Executor(broker, Accounts.getFromIndex(3), True)
+        time.sleep(broker.EXECUTION_TIME_FRAME_SECONDS())
+        raise 123
 
     def test_rotate_no_executors_completion(self):
         raise "implement this"

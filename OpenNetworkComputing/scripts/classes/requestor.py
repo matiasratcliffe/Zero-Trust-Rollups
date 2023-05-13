@@ -12,5 +12,8 @@ class Requestor:
         value = (executionPower * amountOfExecutors) + self.broker.BASE_STAKE_AMOUNT()
         return self.broker.submitRequest(inputStateReference, codeReference, amountOfExecutors, executionPower, {"from": self.account, "value": value}).return_value
 
-    def rotateExecutors(self, requestID):
-        return self.broker.rotateExecutors(requestID, {"from": self.account, "gas_price": "1 wei"}) #TODO gas_price???
+    def rotateExecutors(self, requestID, customGasPrice=None):
+        chainData = {"from": self.account}
+        if customGasPrice != None:
+            chainData["gas_price"] = f"{customGasPrice} wei"
+        return self.broker.rotateExecutors(requestID, chainData)

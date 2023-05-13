@@ -13,18 +13,15 @@ class Executor:
     
     def getData(self):
         return dict(self.broker.getExecutorByAddress(self.account))
+    
+    def getState(self):
+        return self.broker.getExecutorStateByAddress(self.account)
 
     def pauseExecutor(self, withdraw=False):
-        if self.broker.getExecutorStateByAddress(self.account) == "active":
-            return self.broker.pauseExecutor(withdraw, {"from": self.account})
-        else:
-            raise Exception("asdsadsadsadsad")
+        return self.broker.pauseExecutor(withdraw, {"from": self.account})
     
     def activateExecutor(self, funds=0):
-        if self.broker.getExecutorStateByAddress(self.account) == "inactive":
-            return self.broker.activateExecutor({"from": self.account, "value": funds})
-        else:
-            raise Exception("asdsadsadsad")
+        return self.broker.activateExecutor({"from": self.account, "value": funds})
 
     def solveRound(self):
         if self.broker.getExecutorStateByAddress(self.account) == "locked":
