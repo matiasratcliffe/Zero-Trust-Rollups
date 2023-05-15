@@ -10,10 +10,14 @@ class Requestor:
     
     def createRequest(self, inputStateReference="", codeReference="", amountOfExecutors=3, executionPower=1000):
         value = (executionPower * amountOfExecutors) + self.broker.BASE_STAKE_AMOUNT()
-        return self.broker.submitRequest(inputStateReference, codeReference, amountOfExecutors, executionPower, {"from": self.account, "value": value}).return_value
+        transaction = self.broker.submitRequest(inputStateReference, codeReference, amountOfExecutors, executionPower, {"from": self.account, "value": value})
+        transaction.wait(1)
+        return transaction.return_value
 
     def rotateExecutors(self, requestID, customGasPrice=None):
         chainData = {"from": self.account}
         if customGasPrice != None:
             chainData["gas_price"] = f"{customGasPrice} wei"
-        return self.broker.rotateExecutors(requestID, chainData)
+        transaction = self.broker.rotateExecutors(requestID, chainData)
+        transaction.wait(1)
+        return transaction # TODO transaction wait for all projects

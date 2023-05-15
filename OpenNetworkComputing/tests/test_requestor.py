@@ -53,7 +53,7 @@ class TestRequestor:
         assert account3 in assignedExecutors
         for i in range(3):
             taskAssignment = dict(requestor.broker.taskAssignmentsMap(reqID, i))
-            assert int(taskAssignment["result"].hex(), 16) == 0
+            assert int(taskAssignment["signedResultHash"].hex(), 16) == 0
             assert taskAssignment["submitted"] == False
 
     def test_submit_request_even_amount_of_executors(self):
@@ -98,10 +98,10 @@ class TestRequestor:
         executor6 = Executor(broker, Accounts.getFromIndex(5), True)
         time.sleep(broker.EXECUTION_TIME_FRAME_SECONDS())
 
-        originalBalance = requestor.account.balance()
         customGasPrice = 10
+        originalBalance = requestor.account.balance()
         transaction = requestor.rotateExecutors(reqID, customGasPrice=customGasPrice)
-        assignedExecutors = [dict(requestor.broker.taskAssignmentsMap(reqID, i))["executorAddress"] for i in range(3)]        
+        assignedExecutors = [dict(requestor.broker.taskAssignmentsMap(reqID, i))["executorAddress"] for i in range(3)]
         assert executor1.account not in assignedExecutors
         assert executor2.account not in assignedExecutors
         assert executor3.account not in assignedExecutors
@@ -123,28 +123,142 @@ class TestRequestor:
         assert executor1PunishAmount == executor2PunishAmount
         assert executor2PunishAmount == executor3PunishAmount
         assert requestor.account.balance() == originalBalance - (transaction.gas_used * transaction.gas_price) + (executor1PunishAmount + executor2PunishAmount + executor3PunishAmount)
+        assert executor4.getData()["lockedWei"] == broker.BASE_STAKE_AMOUNT()
+        assert executor5.getData()["lockedWei"] == broker.BASE_STAKE_AMOUNT()
+        assert executor6.getData()["lockedWei"] == broker.BASE_STAKE_AMOUNT()
 
     def test_rotate_one_executor(self):
         broker = BrokerFactory.create()
         executor1 = Executor(broker, Accounts.getFromIndex(0), True)
         executor2 = Executor(broker, Accounts.getFromIndex(1), True)
         executor3 = Executor(broker, Accounts.getFromIndex(2), True)
-        assert broker.getExecutorStateByAddress(executor1.account) == "active"
-        assert broker.getExecutorStateByAddress(executor2.account) == "active"
-        assert broker.getExecutorStateByAddress(executor3.account) == "active"
+        assert executor1.getState() == "active"
+        assert executor2.getState() == "active"
+        assert executor3.getState() == "active"
         requestor = Requestor(broker, Accounts.getAccount())
-        reqID = requestor.createRequest("input reference", "code reference", amountOfExecutors=3, executionPower=1000)
-        executor1._submitResult(reqID, "asd")
-        executor2._submitResult(reqID, "asd")
+        inputReference = "input reference"
+        codeReference = "code reference"
+        reqID = requestor.createRequest(inputReference, codeReference, amountOfExecutors=3, executionPower=1000)
+        result1 = executor1._getFinalState(inputReference, codeReference, 1000)
+        result2 = executor2._getFinalState(inputReference, codeReference, 1000)
+        assert result1 == result2
+        executor1._submitSignedHash(reqID, result1)
+        executor2._submitSignedHash(reqID, result2)
+        assert dict(broker.taskAssignmentsMap(reqID, executor1.getData()["taskAssignmentIndex"]))["submitted"] == True
+        assert dict(broker.taskAssignmentsMap(reqID, executor1.getData()["taskAssignmentIndex"]))["solidified"] == False
+        assert dict(broker.taskAssignmentsMap(reqID, executor2.getData()["taskAssignmentIndex"]))["submitted"] == True
+        assert dict(broker.taskAssignmentsMap(reqID, executor2.getData()["taskAssignmentIndex"]))["solidified"] == False
+        assert dict(broker.taskAssignmentsMap(reqID, executor1.getData()["taskAssignmentIndex"]))["signedResultHash"] != dict(broker.taskAssignmentsMap(reqID, executor2.getData()["taskAssignmentIndex"]))["signedResultHash"]
+        assert dict(broker.taskAssignmentsMap(reqID, executor3.getData()["taskAssignmentIndex"]))["submitted"] == False
+        assert dict(broker.taskAssignmentsMap(reqID, executor3.getData()["taskAssignmentIndex"]))["solidified"] == False
+        assert int(dict(broker.taskAssignmentsMap(reqID, executor3.getData()["taskAssignmentIndex"]))["signedResultHash"].hex(), 16) == 0
+        
         executor4 = Executor(broker, Accounts.getFromIndex(3), True)
+        executor5 = Executor(broker, Accounts.getFromIndex(4), True)
+        executor6 = Executor(broker, Accounts.getFromIndex(5), True)
         time.sleep(broker.EXECUTION_TIME_FRAME_SECONDS())
-        raise 123
+        assert executor1.getState() == "locked"
+        assert executor2.getState() == "locked"
+        assert executor3.getState() == "locked"
+        
+        customGasPrice = 10
+        originalBalance = requestor.account.balance()
+        transaction = requestor.rotateExecutors(reqID, customGasPrice)
+        assignedExecutors = [dict(requestor.broker.taskAssignmentsMap(reqID, i))["executorAddress"] for i in range(3)]
+        if (executor5.account in assignedExecutors):
+            aux = executor5
+            executor5 = executor4
+            executor4 = aux
+        elif (executor6.account in assignedExecutors):
+            aux = executor6
+            executor6 = executor4
+            executor4 = aux
+
+        assert executor3.account not in assignedExecutors
+        assert executor5.account not in assignedExecutors
+        assert executor6.account not in assignedExecutors
+        assert executor3.getState() == "inactive"
+        assert executor5.getState() == "active"
+        assert executor6.getState() == "active"
+        assert executor1.account in assignedExecutors
+        assert executor2.account in assignedExecutors
+        assert executor4.account in assignedExecutors
+        assert executor1.getState() == "locked"
+        assert executor2.getState() == "locked"
+        assert executor4.getState() == "locked"
+        assert transaction.gas_price == customGasPrice
+        assert requestor.account.balance() > originalBalance - (transaction.gas_used * transaction.gas_price)
+        executor3PunishAmount = broker.BASE_STAKE_AMOUNT() - executor3.getData()["lockedWei"]
+        assert executor3PunishAmount > 0
+        assert requestor.account.balance() == originalBalance - (transaction.gas_used * transaction.gas_price) + executor3PunishAmount
+        assert executor1.getData()["lockedWei"] == broker.BASE_STAKE_AMOUNT()
+        assert executor2.getData()["lockedWei"] == broker.BASE_STAKE_AMOUNT()
+        assert executor4.getData()["lockedWei"] == broker.BASE_STAKE_AMOUNT()
+        assert executor5.getData()["lockedWei"] == broker.BASE_STAKE_AMOUNT()
+        assert executor6.getData()["lockedWei"] == broker.BASE_STAKE_AMOUNT()
 
     def test_rotate_no_executors_completion(self):
-        raise "implement this"
+        broker = BrokerFactory.create()
+        executor1 = Executor(broker, Accounts.getFromIndex(0), True)
+        executor2 = Executor(broker, Accounts.getFromIndex(1), True)
+        executor3 = Executor(broker, Accounts.getFromIndex(2), True)
+        requestor = Requestor(broker, Accounts.getAccount())
+        inputReference = "input reference"
+        codeReference = "code reference"
+        reqID = requestor.createRequest(inputReference, codeReference, amountOfExecutors=3, executionPower=1000)
+        executor4 = Executor(broker, Accounts.getFromIndex(3), True)
+        executor5 = Executor(broker, Accounts.getFromIndex(4), True)
+        executor6 = Executor(broker, Accounts.getFromIndex(5), True)
+        result1 = executor1._getFinalState(inputReference, codeReference, 1000)
+        result2 = executor2._getFinalState(inputReference, codeReference, 1000)
+        result3 = executor3._getFinalState(inputReference, codeReference, 1000)
+        executor1._submitSignedHash(reqID, result1)
+        executor2._submitSignedHash(reqID, result2)
+        executor3._submitSignedHash(reqID, result3)
+        assert executor1.getState() == "locked"
+        assert executor2.getState() == "locked"
+        assert executor3.getState() == "locked"
+        assert executor4.getState() == "active"
+        assert executor5.getState() == "active"
+        assert executor6.getState() == "active"
+        assert dict(broker.taskAssignmentsMap(reqID, executor1.getData()["taskAssignmentIndex"]))["submitted"] == True
+        assert dict(broker.taskAssignmentsMap(reqID, executor2.getData()["taskAssignmentIndex"]))["submitted"] == True
+        assert dict(broker.taskAssignmentsMap(reqID, executor3.getData()["taskAssignmentIndex"]))["submitted"] == True
+        time.sleep(broker.EXECUTION_TIME_FRAME_SECONDS())
+        with pytest.raises(Exception, match="All executors for this request have already delivered"):
+            requestor.rotateExecutors(reqID)
+        assert executor1.getState() == "locked"
+        assert executor2.getState() == "locked"
+        assert executor3.getState() == "locked"
+        assert executor4.getState() == "active"
+        assert executor5.getState() == "active"
+        assert executor6.getState() == "active"
 
     def test_rotate_no_executors_premature(self):
-        raise "implement this"
+        broker = BrokerFactory.create()
+        executor1 = Executor(broker, Accounts.getFromIndex(0), True)
+        executor2 = Executor(broker, Accounts.getFromIndex(1), True)
+        executor3 = Executor(broker, Accounts.getFromIndex(2), True)
+        requestor = Requestor(broker, Accounts.getAccount())
+        inputReference = "input reference"
+        codeReference = "code reference"
+        reqID = requestor.createRequest(inputReference, codeReference, amountOfExecutors=3, executionPower=1000)
+        executor4 = Executor(broker, Accounts.getFromIndex(3), True)
+        executor5 = Executor(broker, Accounts.getFromIndex(4), True)
+        executor6 = Executor(broker, Accounts.getFromIndex(5), True)
+        assert executor1.getState() == "locked"
+        assert executor2.getState() == "locked"
+        assert executor3.getState() == "locked"
+        assert executor4.getState() == "active"
+        assert executor5.getState() == "active"
+        assert executor6.getState() == "active"
+        requestor.rotateExecutors(reqID)
+        assert executor1.getState() == "locked"
+        assert executor2.getState() == "locked"
+        assert executor3.getState() == "locked"
+        assert executor4.getState() == "active"
+        assert executor5.getState() == "active"
+        assert executor6.getState() == "active"
 
     def test_rotate_executors_all_exceeded_but_none_available(self):
         raise "implement this"

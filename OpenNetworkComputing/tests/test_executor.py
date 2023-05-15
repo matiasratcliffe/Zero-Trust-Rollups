@@ -1,6 +1,7 @@
 from scripts.classes.utils.contractProvider import BrokerFactory
 from scripts.classes.utils.accountsManager import Accounts
 from scripts.classes.utils.logger import Logger
+from scripts.classes.requestor import Requestor
 from scripts.classes.executor import Executor
 import pytest
 
@@ -133,7 +134,24 @@ class TestExecutor:
         assert executor.broker.getExecutorStateByAddress(executor.account) == "active"
 
     def test_register_already_present_busy_executor(self):
-        raise "implement this"
+        broker = BrokerFactory.create()
+        executor1 = Executor(broker, Accounts.getFromIndex(0), True)
+        requestor = Requestor(broker, Accounts.getAccount())
+        requestor.createRequest("input reference", "code reference", amountOfExecutors=1, executionPower=1000)
+        assert executor1.getState() == "locked"
+        with pytest.raises(Exception, match="The executor is already present, but busy"):
+            Executor(broker, Accounts.getFromIndex(0), True)
 
     def test_submit_trivial_result(self):
-        raise "implement this"
+        broker = BrokerFactory.create()
+        executor1 = Executor(broker, Accounts.getFromIndex(0), True)
+        requestor = Requestor(broker, Accounts.getAccount())
+        inputReference = "input reference"
+        codeReference = "code reference"
+        reqID = requestor.createRequest(inputReference, codeReference, amountOfExecutors=1, executionPower=1000)
+        result1 = executor1._getFinalState(inputReference, codeReference, 1000)
+        executor1._submitSignedHash(reqID, result1)
+        assert dict(broker.taskAssignmentsMap(reqID, executor1.getData()["taskAssignmentIndex"]))["submitted"] == True
+        assert dict(broker.taskAssignmentsMap(reqID, executor1.getData()["taskAssignmentIndex"]))["solidified"] == False
+        assert int(dict(broker.taskAssignmentsMap(reqID, executor1.getData()["taskAssignmentIndex"]))["signedResultHash"].hex(), 16) != 0
+        assert dict(broker.requests(reqID))["submissionsLocked"] == True

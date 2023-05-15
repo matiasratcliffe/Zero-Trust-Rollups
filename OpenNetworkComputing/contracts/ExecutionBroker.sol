@@ -57,11 +57,12 @@ contract ExecutionBroker is Transferable {
     ExecutorsCollection public executorsCollection;
     
     event resultSubmitted(uint requestID, address submitter);
-    event requestSolidified(uint requestID);
+    event requestSubmissionsLocked(uint requestID);
+    event requestClosed(uint requestID);
 
     event executorLocked(address executorAddress);
     event executorUnlocked(address executorAddress);
-    event executorPunished(address executorAddress); // TODO que masss???
+    event executorPunished(address executorAddress);
     
 
     // Restricted interaction functions
@@ -239,14 +240,14 @@ contract ExecutionBroker is Transferable {
                 submitted: false,
                 solidified: false
             }));
-            _lockExecutor(executorAddress, request.id);
+            _lockExecutor(executorAddress, request.id, i);
         }
         return request.id;
     }
 
     function rotateExecutors(uint requestID) public returns (bool) {
         require(requests[requestID].clientAddress == msg.sender, "You cant rotate a request that was not made by you");
-        require(requests[requestID].submissionsLocked == false, ""); //TODO test in python
+        require(requests[requestID].submissionsLocked == false, "All executors for this request have already delivered");
         uint initialGas = gasleft();
         uint amountOfPunishedExecutors = 0;
         uint[] memory punishedExecutorsTaskIDs = new uint[](taskAssignmentsMap[requestID].length);  // Me van a quedar algunos en cero capaz, no importa
@@ -254,6 +255,9 @@ contract ExecutionBroker is Transferable {
             if (!taskAssignmentsMap[requestID][i].submitted && block.timestamp >= (taskAssignmentsMap[requestID][i].timestamp + EXECUTION_TIME_FRAME_SECONDS)) {
                 punishedExecutorsTaskIDs[amountOfPunishedExecutors++] = i;
             }
+        }
+        if (amountOfPunishedExecutors == 0) {
+            return false;
         }
         address[] memory punishedExecutorsAddresses = new address[](amountOfPunishedExecutors);
         uint effectiveAmountOfPunishedExecutors = 0;
@@ -264,13 +268,16 @@ contract ExecutionBroker is Transferable {
                 address newExecutorAddress = getActiveExecutorByPosition(getRandomNumber(0, executorsCollection.amountOfActiveExecutors, i)).executorAddress;
                 taskAssignmentsMap[requestID][taskIndex].executorAddress = newExecutorAddress;
                 taskAssignmentsMap[requestID][taskIndex].timestamp = block.timestamp;
-                _lockExecutor(newExecutorAddress, requestID);
+                _lockExecutor(newExecutorAddress, requestID, i);
                 effectiveAmountOfPunishedExecutors++;
             }
         }
+        if (effectiveAmountOfPunishedExecutors == 0) {
+            return false;
+        }
 
-        uint punishGas = 12345;
-        uint constantGasOverHead = 12345;
+        uint punishGas = 12345; //TODO
+        uint constantGasOverHead = 12345; //TODO
         uint estimatedGasSpent = ((initialGas - gasleft()) + (punishGas * effectiveAmountOfPunishedExecutors) + constantGasOverHead) * tx.gasprice;  // This is just an aproximation, make it generous to favor the client
         uint punishAmount = estimatedGasSpent / effectiveAmountOfPunishedExecutors;
         for (uint i = 0; i < effectiveAmountOfPunishedExecutors; i++) {
@@ -287,8 +294,8 @@ contract ExecutionBroker is Transferable {
     function submitSignedResultHash(uint requestID, bytes calldata signedResultHash) public {
         Executor memory executor = getExecutorByAddress(msg.sender);
         require(executor.assignedRequestID == requestID, "You must be assigned to the provided request to submit a result hash");
-        require(taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].executorAddress == msg.sender, "You have an invalid assignment");
-        require(taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].submitted == false, "The result for this request has already been submitted");
+        require(taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].executorAddress == msg.sender, "There is an address missmatch in the assignment");
+        require(taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].submitted == false, "The result for this request, for this executor, has already been submitted");
 
         taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].signedResultHash = signedResultHash;
         taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].submitted = true;
@@ -303,6 +310,7 @@ contract ExecutionBroker is Transferable {
         }
         if (lastOne) {
             requests[requestID].submissionsLocked = true;
+            emit requestSubmissionsLocked(requestID);
         }
 
     }
@@ -316,32 +324,6 @@ contract ExecutionBroker is Transferable {
 
     }
 
-/*
-    function claimPayment(uint requestID) public returns (bool) {
-        require(requests[requestID].submission.issuer != address(0x0), "There are no submissions for the provided request");
-        require(requests[requestID].submission.issuer == msg.sender, "This payment does not belong to you");
-        require(!requests[requestID].submission.solidified, "The provided request has already solidified");
-        require(requests[requestID].submission.timestamp + requests[requestID].claimDelay < block.timestamp, "The claim delay hasn't passed yet");
-        bool transferSuccess = solidify(requestID);
-        return transferSuccess;
-    }
-
-    // Private functions
-    function solidify(uint requestID) private returns (bool) {
-        // first solidify, then pay, for reentrancy issues
-        requests[requestID].submission.solidified = true;
-        emit requestSolidified(requestID);
-        address payable payee = payable(requests[requestID].submission.issuer);
-        uint payAmount = requests[requestID].payment + requests[requestID].challengeInsurance;
-        bool transferSuccess = _internalTransferFunds(payAmount, payee);
-        
-        bytes memory data = abi.encodeWithSelector(requests[requestID].client.processResult.selector, requests[requestID].submission.result);
-        (bool callSuccess, ) = address(requests[requestID].client).call{gas: requests[requestID].postProcessingGas}(data);  // el delegate para que me aparezca el sender como el broker. cuidado si esto no me hace una vulnerabilidad, puedo vaciar fondos desde client? no deberia pasar nada, ni el broker ni el client puede extraer fondos
-        emit resultPostProcessed(requestID, callSuccess);
-
-        return transferSuccess;
-    }
-*/
     function _punishExecutor(address executorAddress, uint punishAmount) private {
         require(executorsCollection.busyExecutors[executorAddress].executorAddress == executorAddress, "You can only punish a locked executor");
         Executor memory executor = executorsCollection.busyExecutors[executorAddress];
@@ -352,11 +334,12 @@ contract ExecutionBroker is Transferable {
         delete executorsCollection.busyExecutors[executorAddress];
     }
 
-    function _lockExecutor(address executorAddress, uint requestID) private {
+    function _lockExecutor(address executorAddress, uint requestID, uint taskAssignmentIndex) private {
         require(executorsCollection.activeIndexOf[executorAddress] != 0, "This address does not belong to an active executor");
         uint executorIndex = executorsCollection.activeIndexOf[executorAddress];
         Executor memory executor = executorsCollection.activeExecutors[executorIndex];
         executor.assignedRequestID = requestID;
+        executor.taskAssignmentIndex = taskAssignmentIndex;
         executorsCollection.busyExecutors[executorAddress] = executor;
         delete executorsCollection.activeExecutors[executorIndex];
         delete executorsCollection.activeIndexOf[executorAddress];
