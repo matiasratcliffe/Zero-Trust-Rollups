@@ -219,6 +219,7 @@ class TestRequestor:
         time.sleep(broker.EXECUTION_TIME_FRAME_SECONDS())
         with pytest.raises(Exception, match="All executors for this request have already delivered"):
             requestor.rotateExecutors(reqID)
+        assert dict(broker.requests(reqID))["submissionsLocked"] == True
         assert executor1.getState() == "locked"
         assert executor2.getState() == "locked"
         assert executor3.getState() == "locked"
@@ -297,15 +298,54 @@ class TestRequestor:
         executor4 = Executor(broker, Accounts.getFromIndex(3), True)
         executor4.pauseExecutor()
         requestor = Requestor(broker, Accounts.getAccount())
-        reqID = requestor.createRequest("input reference", "code reference", amountOfExecutors=3, executionPower=1000)
+        inputReference = "input reference"
+        codeReference = "code reference"
+        reqID = requestor.createRequest(inputReference, codeReference, amountOfExecutors=3, executionPower=1000)
         executor4.activateExecutor()
         assert executor1.getState() == "locked"
         assert executor2.getState() == "locked"
         assert executor3.getState() == "locked"
         assert executor4.getState() == "active"
         time.sleep(broker.EXECUTION_TIME_FRAME_SECONDS())
-        requestor.rotateExecutors(reqID)
-        raise "test"
+        originalBalance = requestor.account.balance()
+        transaction = requestor.rotateExecutors(reqID, 10)
+        activeExecutors = [executor2, executor3, executor4]
+        inactiveExecutor = executor1
+        if executor1.getState() == "locked":
+            if executor2.getState() == "locked":
+                inactiveExecutor = executor3
+                activeExecutors = [executor1, executor2, executor4]
+            else:
+                inactiveExecutor = executor2
+                activeExecutors = [executor1, executor3, executor4]
+        for i in range(3):
+            assert activeExecutors[i].getState() == "locked"
+            assert activeExecutors[i].getData()["lockedWei"] == broker.BASE_STAKE_AMOUNT()
+            assert activeExecutors[i].getData()["accurateSolvings"] == 0
+            assert activeExecutors[i].getData()["inaccurateSolvings"] == 0
+            assert activeExecutors[i].getData()["timesPunished"] == 0
+            
+        punishAmount = broker.BASE_STAKE_AMOUNT() - inactiveExecutor.getData()["lockedWei"]
+        assert requestor.account.balance() == originalBalance - (transaction.gas_used * transaction.gas_price) + punishAmount
+        assert inactiveExecutor.getState() == "inactive"
+        assert inactiveExecutor.getData()["accurateSolvings"] == 0
+        assert inactiveExecutor.getData()["inaccurateSolvings"] == 0
+        assert inactiveExecutor.getData()["timesPunished"] == 1
+        
+        for i in range(len(activeExecutors)):
+            activeExecutors[i]._submitSignedHash(reqID, activeExecutors[i]._getFinalState(inputReference, codeReference, 1000))
+        with pytest.raises(Exception, match="All executors for this request have already delivered"):
+            requestor.rotateExecutors(reqID)
+        assert dict(broker.requests(reqID))["submissionsLocked"] == True
+        assert dict(broker.taskAssignmentsMap(reqID, 0))["submitted"] == True
+        assert dict(broker.taskAssignmentsMap(reqID, 0))["solidified"] == False
+        assert dict(broker.taskAssignmentsMap(reqID, 1))["submitted"] == True
+        assert dict(broker.taskAssignmentsMap(reqID, 1))["solidified"] == False
+        assert dict(broker.taskAssignmentsMap(reqID, 2))["submitted"] == True
+        assert dict(broker.taskAssignmentsMap(reqID, 2))["solidified"] == False
+        assert dict(broker.taskAssignmentsMap(reqID, 0))["signedResultHash"] != dict(broker.taskAssignmentsMap(reqID, 1))["signedResultHash"]
+        assert dict(broker.taskAssignmentsMap(reqID, 1))["signedResultHash"] != dict(broker.taskAssignmentsMap(reqID, 2))["signedResultHash"]
+        assert dict(broker.taskAssignmentsMap(reqID, 2))["signedResultHash"] != dict(broker.taskAssignmentsMap(reqID, 0))["signedResultHash"]
 
     def test_rotate_foreign_request(self):
         broker = BrokerFactory.create()

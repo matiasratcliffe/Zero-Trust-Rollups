@@ -1,5 +1,5 @@
 from eth_utils import keccak
-from eth_abi import encode_abi
+from eth_abi import encode
 
 
 class ExecutionState:
@@ -10,7 +10,7 @@ class ExecutionState:
 
     def getSignedHash(self, signingAddress):
         self.signingAddress = signingAddress
-        return keccak(encode_abi(['string'], [str(self)])).hex()
+        return keccak(encode(['string'], [str(self)])).hex()
 
     def __str__(self) -> str:
         return f'{{"data":"{str(self.data)}","signingAddress":"{str(self.signingAddress)}"}}'
