@@ -26,7 +26,7 @@ struct ExecutorsCollection {
 struct Request {
     uint id;
     address clientAddress; // TODO ver si lo hago con address o con BaseClient para incluir postprocessing
-    string inputStateReference;  // Tambien aca esta el point of insertion
+    string inputState;  // Tambien aca esta el point of insertion
     string codeReference;  // Tambien aca esta la data sobre la version y compilador y otras specs que pueden afectar el resultado
     uint executionPowerPaidFor; // In Wei; deberia tener en cuenta el computo y el gas de las operaciones de submit; y se divide entre los executors
     // TODO ver tema entorno de ejecucion restringido y capaz hacer payment fijo???
@@ -84,7 +84,7 @@ contract ExecutionBroker is Transferable {
         Request memory request = Request({
             id: 0,
             clientAddress: address(0x0),
-            inputStateReference: '',
+            inputState: '',
             codeReference: '',
             executionPowerPaidFor: 0,
             result: '',
@@ -212,7 +212,7 @@ contract ExecutionBroker is Transferable {
         return number;
     }
 
-    function submitRequest(string calldata inputStateReference, string calldata codeReference, uint amountOfExecutors, uint executionPowerPaidFor) public payable returns (uint) {
+    function submitRequest(string calldata inputState, string calldata codeReference, uint amountOfExecutors, uint executionPowerPaidFor) public payable returns (uint) {
         // TODO podria implementar que el cliente elija un threshold de estadisticas de punisheado o innacurate
         require(amountOfExecutors % 2 == 1, "You must choose an odd amount of executors");
         require(amountOfExecutors <= MAXIMUM_EXECUTORS_PER_REQUEST, "You exceeded the maximum number of allowed executors per request");
@@ -222,7 +222,7 @@ contract ExecutionBroker is Transferable {
         Request memory request = Request({
             id: requests.length,
             clientAddress: msg.sender,
-            inputStateReference: inputStateReference,
+            inputState: inputState,
             codeReference: codeReference,
             executionPowerPaidFor: executionPowerPaidFor,
             result: '',
@@ -288,7 +288,7 @@ contract ExecutionBroker is Transferable {
     }
 
     function truncateExecutors(uint requestID) public {
-        //TODO tiene que haber pasado el tiempo, y es como rotate pero no los rota, solo los elimina y castiga. por ende, tiene que haber al menos un submit
+        //TODO tiene que haber pasado el tiempo, y es como rotate pero no los rota, solo los elimina y castiga. por ende, tiene que haber al menos un numero impar de submit
     }
 
     function submitSignedResultHash(uint requestID, bytes calldata signedResultHash) public {

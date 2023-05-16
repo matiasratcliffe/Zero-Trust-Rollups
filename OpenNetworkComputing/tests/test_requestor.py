@@ -33,14 +33,18 @@ class TestRequestor:
         executor2 = Executor(broker, Accounts.getFromIndex(1), True)
         executor3 = Executor(broker, Accounts.getFromIndex(2), True)
         requestor = Requestor(broker, Accounts.getAccount())
-        reqID = requestor.createRequest("input reference", "code reference", amountOfExecutors=3, executionPower=1000)
+        codeReference = "code reference"
+        inputState = "input state"
+        reqID = requestor.createRequest(inputState, codeReference, amountOfExecutors=3, executionPower=1000)
         request = dict(requestor.broker.requests(reqID))
         assert request["clientAddress"] == requestor.account
         assert request["closed"] == False
-        assert request["codeReference"] == "code reference"
+        assert request["codeReference"] == codeReference
         assert request["id"] == reqID
-        assert request["inputStateReference"] == "input reference"
+        assert request["inputState"] == inputState
         assert request["executionPowerPaidFor"] == 1000
+        assert request["submissionsLocked"] == False
+        assert request["result"] == ""
         assignedExecutors = [dict(requestor.broker.taskAssignmentsMap(reqID, i))["executorAddress"] for i in range(3)]
         assert executor1.getState() == "locked"
         assert executor2.getState() == "locked"
@@ -88,7 +92,7 @@ class TestRequestor:
         assert executor2.getState() == "active"
         assert executor3.getState() == "active"
         requestor = Requestor(broker, Accounts.getAccount())
-        reqID = requestor.createRequest("input reference", "code reference", amountOfExecutors=3, executionPower=1000)
+        reqID = requestor.createRequest("input state", "code reference", amountOfExecutors=3, executionPower=1000)
 
         executor4 = Executor(broker, Accounts.getFromIndex(3), True)
         executor5 = Executor(broker, Accounts.getFromIndex(4), True)
@@ -133,11 +137,11 @@ class TestRequestor:
         assert executor2.getState() == "active"
         assert executor3.getState() == "active"
         requestor = Requestor(broker, Accounts.getAccount())
-        inputReference = "input reference"
+        inputState = "input state"
         codeReference = "code reference"
-        reqID = requestor.createRequest(inputReference, codeReference, amountOfExecutors=3, executionPower=1000)
-        result1 = executor1._getFinalState(inputReference, codeReference, 1000)
-        result2 = executor2._getFinalState(inputReference, codeReference, 1000)
+        reqID = requestor.createRequest(inputState, codeReference, amountOfExecutors=3, executionPower=1000)
+        result1 = executor1._getFinalState(inputState, codeReference, 1000)
+        result2 = executor2._getFinalState(inputState, codeReference, 1000)
         assert result1 == result2
         executor1._submitSignedHash(reqID, result1)
         executor2._submitSignedHash(reqID, result2)
@@ -195,15 +199,15 @@ class TestRequestor:
         executor2 = Executor(broker, Accounts.getFromIndex(1), True)
         executor3 = Executor(broker, Accounts.getFromIndex(2), True)
         requestor = Requestor(broker, Accounts.getAccount())
-        inputReference = "input reference"
+        inputState = "input state"
         codeReference = "code reference"
-        reqID = requestor.createRequest(inputReference, codeReference, amountOfExecutors=3, executionPower=1000)
+        reqID = requestor.createRequest(inputState, codeReference, amountOfExecutors=3, executionPower=1000)
         executor4 = Executor(broker, Accounts.getFromIndex(3), True)
         executor5 = Executor(broker, Accounts.getFromIndex(4), True)
         executor6 = Executor(broker, Accounts.getFromIndex(5), True)
-        result1 = executor1._getFinalState(inputReference, codeReference, 1000)
-        result2 = executor2._getFinalState(inputReference, codeReference, 1000)
-        result3 = executor3._getFinalState(inputReference, codeReference, 1000)
+        result1 = executor1._getFinalState(inputState, codeReference, 1000)
+        result2 = executor2._getFinalState(inputState, codeReference, 1000)
+        result3 = executor3._getFinalState(inputState, codeReference, 1000)
         executor1._submitSignedHash(reqID, result1)
         executor2._submitSignedHash(reqID, result2)
         executor3._submitSignedHash(reqID, result3)
@@ -233,9 +237,9 @@ class TestRequestor:
         executor2 = Executor(broker, Accounts.getFromIndex(1), True)
         executor3 = Executor(broker, Accounts.getFromIndex(2), True)
         requestor = Requestor(broker, Accounts.getAccount())
-        inputReference = "input reference"
+        inputState = "input state"
         codeReference = "code reference"
-        reqID = requestor.createRequest(inputReference, codeReference, amountOfExecutors=3, executionPower=1000)
+        reqID = requestor.createRequest(inputState, codeReference, amountOfExecutors=3, executionPower=1000)
         executor4 = Executor(broker, Accounts.getFromIndex(3), True)
         executor5 = Executor(broker, Accounts.getFromIndex(4), True)
         executor6 = Executor(broker, Accounts.getFromIndex(5), True)
@@ -271,7 +275,7 @@ class TestRequestor:
         assert executor5.getState() == "inactive"
         assert executor6.getState() == "inactive"
         requestor = Requestor(broker, Accounts.getAccount())
-        reqID = requestor.createRequest("input reference", "code reference", amountOfExecutors=3, executionPower=1000)
+        reqID = requestor.createRequest("input state", "code reference", amountOfExecutors=3, executionPower=1000)
         assert executor1.getState() == "locked"
         assert executor2.getState() == "locked"
         assert executor3.getState() == "locked"
@@ -298,9 +302,9 @@ class TestRequestor:
         executor4 = Executor(broker, Accounts.getFromIndex(3), True)
         executor4.pauseExecutor()
         requestor = Requestor(broker, Accounts.getAccount())
-        inputReference = "input reference"
+        inputState = "input state"
         codeReference = "code reference"
-        reqID = requestor.createRequest(inputReference, codeReference, amountOfExecutors=3, executionPower=1000)
+        reqID = requestor.createRequest(inputState, codeReference, amountOfExecutors=3, executionPower=1000)
         executor4.activateExecutor()
         assert executor1.getState() == "locked"
         assert executor2.getState() == "locked"
@@ -333,7 +337,7 @@ class TestRequestor:
         assert inactiveExecutor.getData()["timesPunished"] == 1
         
         for i in range(len(activeExecutors)):
-            activeExecutors[i]._submitSignedHash(reqID, activeExecutors[i]._getFinalState(inputReference, codeReference, 1000))
+            activeExecutors[i]._submitSignedHash(reqID, activeExecutors[i]._getFinalState(inputState, codeReference, 1000))
         with pytest.raises(Exception, match="All executors for this request have already delivered"):
             requestor.rotateExecutors(reqID)
         assert dict(broker.requests(reqID))["submissionsLocked"] == True
