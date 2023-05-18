@@ -41,7 +41,7 @@ struct TaskAssignment {
     uint timestamp;
     bytes signedResultHash;
     bool submitted;
-    bool solidified;  // after escrow
+    bool liberated;  // after escrow
 }
 
 
@@ -238,7 +238,7 @@ contract ExecutionBroker is Transferable {
                 timestamp: block.timestamp,
                 signedResultHash: abi.encode(0),
                 submitted: false,
-                solidified: false
+                liberated: false
             }));
             _lockExecutor(executorAddress, request.id, i);
         }
@@ -294,7 +294,7 @@ contract ExecutionBroker is Transferable {
     function submitSignedResultHash(uint requestID, bytes calldata signedResultHash) public {
         Executor memory executor = getExecutorByAddress(msg.sender);
         require(executor.assignedRequestID == requestID, "You must be assigned to the provided request to submit a result hash");
-        require(taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].executorAddress == msg.sender, "There is an address missmatch in the assignment");
+        require(taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].executorAddress == msg.sender, "There is an address missmatch in the assignment");  // This should never happen
         require(taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].submitted == false, "The result for this request, for this executor, has already been submitted");
 
         taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].signedResultHash = signedResultHash;
@@ -316,8 +316,15 @@ contract ExecutionBroker is Transferable {
     }
 
     function liberateResult(uint requestID, string calldata result) public {
+        Executor memory executor = getExecutorByAddress(msg.sender);
+        require(executor.assignedRequestID == requestID, "You must be assigned to the provided request to liberate the result");
+        require(taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].submitted == true, "You must first submit a signed result hash before you can liberate it");
+        require(requests[requestID].submissionsLocked == true, "You must wait until all submissions for this request have been locked");
+        require(taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].liberated == false, "The result for this request, for this executor, has already been liberated");
+        
         // Si hay empate, que gane el primero???
         // CHECK IF REQUEST IS ALL SUBMITTED
+        // TODO preguntarme si es necesario un escrow, y que el cliente tenga fondos lockeados? capaz el cliente tiene la paga y los unicos con fondos lockeados son los ejecutores
     }
 
     function truncateResultLiberation(uint requestID) public {

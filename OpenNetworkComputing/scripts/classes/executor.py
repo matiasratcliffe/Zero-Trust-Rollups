@@ -30,6 +30,7 @@ class Executor:
             executor = dict(self.broker.getExecutorByAddress(self.account))
             request = dict(self.broker.requests(executor["assignedRequestID"]))
             #TODO deberia chequear que la request no este closed? si ese es el caso explota todo
+            #TODO una vez ejecuto, deberia chequear hasta que se lockeen todas las sub?
 
     def _getFinalState(self, inputStateReference, codeReference, executionPower): #TODO
         return ExecutionState(123)

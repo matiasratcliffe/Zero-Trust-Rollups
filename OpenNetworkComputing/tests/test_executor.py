@@ -142,7 +142,67 @@ class TestExecutor:
         with pytest.raises(Exception, match="The executor is already present, but busy"):
             Executor(broker, Accounts.getFromIndex(0), True)
 
-    def test_submit_trivial_result(self):
+    def test_submit_trivial_result_hash(self):
+        broker = BrokerFactory.create()
+        Executor(broker, Accounts.getFromIndex(0), True)
+        Executor(broker, Accounts.getFromIndex(1), True)
+        Executor(broker, Accounts.getFromIndex(2), True)
+        requestor = Requestor(broker, Accounts.getAccount())
+        inputReference = "input reference"
+        codeReference = "code reference"
+        reqID = requestor.createRequest(inputReference, codeReference, amountOfExecutors=3, executionPower=1000)
+        executor1 = Executor(broker, Accounts.getFromKey(dict(broker.taskAssignmentsMap(reqID, 0))["executorAddress"]), False)
+        executor2 = Executor(broker, Accounts.getFromKey(dict(broker.taskAssignmentsMap(reqID, 1))["executorAddress"]), False)
+        executor3 = Executor(broker, Accounts.getFromKey(dict(broker.taskAssignmentsMap(reqID, 2))["executorAddress"]), False)
+        result1 = executor1._getFinalState(inputReference, codeReference, 1000)
+        result2 = executor2._getFinalState(inputReference, codeReference, 1000)
+        executor1._submitSignedHash(reqID, result1)
+        executor2._submitSignedHash(reqID, result2)
+        assert dict(broker.taskAssignmentsMap(reqID, executor1.getData()["taskAssignmentIndex"]))["submitted"] == True
+        assert dict(broker.taskAssignmentsMap(reqID, executor1.getData()["taskAssignmentIndex"]))["liberated"] == False
+        assert int(dict(broker.taskAssignmentsMap(reqID, executor1.getData()["taskAssignmentIndex"]))["signedResultHash"].hex(), 16) != 0
+        assert dict(broker.taskAssignmentsMap(reqID, executor2.getData()["taskAssignmentIndex"]))["submitted"] == True
+        assert dict(broker.taskAssignmentsMap(reqID, executor2.getData()["taskAssignmentIndex"]))["liberated"] == False
+        assert int(dict(broker.taskAssignmentsMap(reqID, executor2.getData()["taskAssignmentIndex"]))["signedResultHash"].hex(), 16) != 0
+        assert dict(broker.taskAssignmentsMap(reqID, executor3.getData()["taskAssignmentIndex"]))["submitted"] == False
+        assert dict(broker.taskAssignmentsMap(reqID, executor3.getData()["taskAssignmentIndex"]))["liberated"] == False
+        assert int(dict(broker.taskAssignmentsMap(reqID, executor3.getData()["taskAssignmentIndex"]))["signedResultHash"].hex(), 16) == 0
+        assert dict(broker.requests(reqID))["submissionsLocked"] == False
+
+    def test_submit_last_result_hash(self):
+        broker = BrokerFactory.create()
+        Executor(broker, Accounts.getFromIndex(0), True)
+        Executor(broker, Accounts.getFromIndex(1), True)
+        Executor(broker, Accounts.getFromIndex(2), True)
+        requestor = Requestor(broker, Accounts.getAccount())
+        inputReference = "input reference"
+        codeReference = "code reference"
+        reqID = requestor.createRequest(inputReference, codeReference, amountOfExecutors=3, executionPower=1000)
+        executor1 = Executor(broker, Accounts.getFromKey(dict(broker.taskAssignmentsMap(reqID, 0))["executorAddress"]), False)
+        executor2 = Executor(broker, Accounts.getFromKey(dict(broker.taskAssignmentsMap(reqID, 1))["executorAddress"]), False)
+        executor3 = Executor(broker, Accounts.getFromKey(dict(broker.taskAssignmentsMap(reqID, 2))["executorAddress"]), False)
+        result1 = executor1._getFinalState(inputReference, codeReference, 1000)
+        result2 = executor2._getFinalState(inputReference, codeReference, 1000)
+        executor1._submitSignedHash(reqID, result1)
+        executor2._submitSignedHash(reqID, result2)
+        assert dict(broker.taskAssignmentsMap(reqID, executor1.getData()["taskAssignmentIndex"]))["submitted"] == True
+        assert dict(broker.taskAssignmentsMap(reqID, executor1.getData()["taskAssignmentIndex"]))["liberated"] == False
+        assert int(dict(broker.taskAssignmentsMap(reqID, executor1.getData()["taskAssignmentIndex"]))["signedResultHash"].hex(), 16) != 0
+        assert dict(broker.taskAssignmentsMap(reqID, executor2.getData()["taskAssignmentIndex"]))["submitted"] == True
+        assert dict(broker.taskAssignmentsMap(reqID, executor2.getData()["taskAssignmentIndex"]))["liberated"] == False
+        assert int(dict(broker.taskAssignmentsMap(reqID, executor2.getData()["taskAssignmentIndex"]))["signedResultHash"].hex(), 16) != 0
+        assert dict(broker.taskAssignmentsMap(reqID, executor3.getData()["taskAssignmentIndex"]))["submitted"] == False
+        assert dict(broker.taskAssignmentsMap(reqID, executor3.getData()["taskAssignmentIndex"]))["liberated"] == False
+        assert int(dict(broker.taskAssignmentsMap(reqID, executor3.getData()["taskAssignmentIndex"]))["signedResultHash"].hex(), 16) == 0
+        assert dict(broker.requests(reqID))["submissionsLocked"] == False
+        result3 = executor3._getFinalState(inputReference, codeReference, 1000)
+        executor3._submitSignedHash(reqID, result3)
+        assert dict(broker.taskAssignmentsMap(reqID, executor3.getData()["taskAssignmentIndex"]))["submitted"] == True
+        assert dict(broker.taskAssignmentsMap(reqID, executor3.getData()["taskAssignmentIndex"]))["liberated"] == False
+        assert int(dict(broker.taskAssignmentsMap(reqID, executor3.getData()["taskAssignmentIndex"]))["signedResultHash"].hex(), 16) != 0
+        assert dict(broker.requests(reqID))["submissionsLocked"] == True
+    
+    def test_submit_result_hash_from_unregistered_executor(self):
         broker = BrokerFactory.create()
         executor1 = Executor(broker, Accounts.getFromIndex(0), True)
         requestor = Requestor(broker, Accounts.getAccount())
@@ -151,7 +211,57 @@ class TestExecutor:
         reqID = requestor.createRequest(inputReference, codeReference, amountOfExecutors=1, executionPower=1000)
         result1 = executor1._getFinalState(inputReference, codeReference, 1000)
         executor1._submitSignedHash(reqID, result1)
-        assert dict(broker.taskAssignmentsMap(reqID, executor1.getData()["taskAssignmentIndex"]))["submitted"] == True
-        assert dict(broker.taskAssignmentsMap(reqID, executor1.getData()["taskAssignmentIndex"]))["solidified"] == False
-        assert int(dict(broker.taskAssignmentsMap(reqID, executor1.getData()["taskAssignmentIndex"]))["signedResultHash"].hex(), 16) != 0
         assert dict(broker.requests(reqID))["submissionsLocked"] == True
+        with pytest.raises(Exception, match="This address does not belong to a registered executor"):
+            executor2 = Executor(broker, Accounts.getFromIndex(1), False)
+            result2 = executor2._getFinalState(inputReference, codeReference, 1000)
+            executor2._submitSignedHash(reqID, result2)
+
+    def test_submit_result_hash_to_foreign_request(self):
+        broker = BrokerFactory.create()
+        executor1 = Executor(broker, Accounts.getFromIndex(0), True)
+        executor2 = Executor(broker, Accounts.getFromIndex(1), True)
+        requestor = Requestor(broker, Accounts.getAccount())
+        inputReference = "input reference"
+        codeReference = "code reference"
+        reqID = requestor.createRequest(inputReference, codeReference, amountOfExecutors=1, executionPower=1000)
+        result1 = executor1._getFinalState(inputReference, codeReference, 1000)
+        executor1._submitSignedHash(reqID, result1)
+        assert dict(broker.requests(reqID))["submissionsLocked"] == True
+        with pytest.raises(Exception, match="You must be assigned to the provided request to submit a result hash"):
+            result2 = executor2._getFinalState(inputReference, codeReference, 1000)
+            executor2._submitSignedHash(reqID, result2)
+
+    def test_submit_an_already_submitted_result_hash(self):
+        broker = BrokerFactory.create()
+        executor1 = Executor(broker, Accounts.getFromIndex(0), True)
+        requestor = Requestor(broker, Accounts.getAccount())
+        inputReference = "input reference"
+        codeReference = "code reference"
+        reqID = requestor.createRequest(inputReference, codeReference, amountOfExecutors=1, executionPower=1000)
+        result1 = executor1._getFinalState(inputReference, codeReference, 1000)
+        executor1._submitSignedHash(reqID, result1)
+        assert dict(broker.requests(reqID))["submissionsLocked"] == True
+        with pytest.raises(Exception, match="The result for this request, for this executor, has already been submitted"):
+            executor1._submitSignedHash(reqID, result1)
+    
+    def test_liberate_first_result(self):
+        pass
+
+    def test_liberate_last_result(self):
+        pass
+
+    def test_liberate_result_from_unregistered_executor(self):
+        pass
+
+    def test_liberate_result_to_foreign_request(self):
+        pass
+
+    def test_liberate_an_already_liberated_result(self):
+        pass
+
+    def test_liberate_an_unsubmitted_result(self):
+        pass
+
+    def test_liberate_result_to_unlocked_request(self):
+        pass
