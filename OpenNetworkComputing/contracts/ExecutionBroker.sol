@@ -31,7 +31,7 @@ struct Request {
     uint executionPowerPaidFor; // In Wei; deberia tener en cuenta el computo y el gas de las operaciones de submit; y se divide entre los executors
     // TODO ver tema entorno de ejecucion restringido y capaz hacer payment fijo???
     //uint postProcessingGas;  TODO no hay post processing gas, ya que es el cliente quien deberia colectar los resultados y resolver los escrows
-    string result; //TODO start empty, gets populated after escrow
+    Result result; //TODO start empty, gets populated after escrow
     bool submissionsLocked; //TODO test in python?
     bool closed;
 }
@@ -39,9 +39,16 @@ struct Request {
 struct TaskAssignment {
     address executorAddress;
     uint timestamp;
-    bytes signedResultHash;
+    bytes32 signedResultHash;
+    bytes32 unsignedResultHash;
+    Result result;
     bool submitted;
-    bool liberated;  // after escrow
+    bool liberated;  // after escrow TODO??
+}
+
+struct Result {
+    string data;
+    address issuer;
 }
 
 
@@ -87,7 +94,10 @@ contract ExecutionBroker is Transferable {
             inputState: '',
             codeReference: '',
             executionPowerPaidFor: 0,
-            result: '',
+            result: Result({
+                data: '',
+                issuer: address(0x0)
+            }),
             submissionsLocked: false,
             closed: true
         });
@@ -225,7 +235,10 @@ contract ExecutionBroker is Transferable {
             inputState: inputState,
             codeReference: codeReference,
             executionPowerPaidFor: executionPowerPaidFor,
-            result: '',
+            result: Result({
+                data: '',
+                issuer: address(0x0)
+            }),
             submissionsLocked: false,
             closed: false
         });
@@ -236,7 +249,12 @@ contract ExecutionBroker is Transferable {
             taskAssignments.push(TaskAssignment({
                 executorAddress: executorAddress,
                 timestamp: block.timestamp,
-                signedResultHash: abi.encode(0),
+                signedResultHash: bytes32(abi.encode(0)),
+                unsignedResultHash: bytes32(abi.encode(0)),
+                result: Result({
+                    data: '',
+                    issuer: address(0x0)
+                }),
                 submitted: false,
                 liberated: false
             }));
@@ -291,7 +309,7 @@ contract ExecutionBroker is Transferable {
         //TODO tiene que haber pasado el tiempo, y es como rotate pero no los rota, solo los elimina y castiga. por ende, tiene que haber al menos un numero impar de submit
     }
 
-    function submitSignedResultHash(uint requestID, bytes calldata signedResultHash) public {
+    function submitSignedResultHash(uint requestID, bytes32 signedResultHash) public {
         Executor memory executor = getExecutorByAddress(msg.sender);
         require(executor.assignedRequestID == requestID, "You must be assigned to the provided request to submit a result hash");
         require(taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].executorAddress == msg.sender, "There is an address missmatch in the assignment");  // This should never happen
@@ -315,21 +333,51 @@ contract ExecutionBroker is Transferable {
 
     }
 
-    function liberateResult(uint requestID, string calldata result) public {
+    function liberateResult(uint requestID, Result memory result) public {
         Executor memory executor = getExecutorByAddress(msg.sender);
         require(executor.assignedRequestID == requestID, "You must be assigned to the provided request to liberate the result");
         require(taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].submitted == true, "You must first submit a signed result hash before you can liberate it");
         require(requests[requestID].submissionsLocked == true, "You must wait until all submissions for this request have been locked");
         require(taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].liberated == false, "The result for this request, for this executor, has already been liberated");
         
+
+
+
+        //TODO aca tengo un problema, porque uno es result con signature y el otro no. Podria hacer que result sea un struct y el sin signature lo pongo el address en cero
+        require(result.issuer == msg.sender, "The issuer of the sent result does not match the transaction sender");
+        require(keccak256(abi.encode(result)) == taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].signedResultHash, "Your result does not match your submitted hash");
+        
+        //TODO aca, si uso struct, seteo el address en cero o al address y guardo el resultado        
+        result.issuer = address(this);
+        
+        //TODO store result and UNSIGNED hash somewhere to later compare with the majority
+        taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].unsignedResultHash = keccak256(abi.encode(result));
+        taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].result = result;
+        taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].liberated = true;
+
+
+
         // Si hay empate, que gane el primero???
         // CHECK IF REQUEST IS ALL SUBMITTED
+        // siempre esperar al ultimo para hacer las cosas
+        bool lastOne = true;
+        for (uint i = 0; i < taskAssignmentsMap[requestID].length; i++) {
+            if (!taskAssignmentsMap[requestID][i].liberated) {
+                lastOne = false;
+            }
+        }
+        if (lastOne) {
+            //requests[requestID].submissionsLocked = true;
+            //emit requestSubmissionsLocked(requestID);
+        }
         // TODO preguntarme si es necesario un escrow, y que el cliente tenga fondos lockeados? capaz el cliente tiene la paga y los unicos con fondos lockeados son los ejecutores
     }
 
     function truncateResultLiberation(uint requestID) public {
 
     }
+
+    // Private Functions
 
     function _punishExecutor(address executorAddress, uint punishAmount) private {
         require(executorsCollection.busyExecutors[executorAddress].executorAddress == executorAddress, "You can only punish a locked executor");

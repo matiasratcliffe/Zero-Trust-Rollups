@@ -4,7 +4,7 @@ from scripts.classes.executionState import ExecutionState
 class Executor:
 
     def __init__(self, broker, account, register=False, stake=None):
-        self.resultBuffer = ""
+        self.resultsBuffer = {}
         self.broker = broker
         self.account = account
         if register:
@@ -32,9 +32,21 @@ class Executor:
             #TODO deberia chequear que la request no este closed? si ese es el caso explota todo
             #TODO una vez ejecuto, deberia chequear hasta que se lockeen todas las sub?
 
-    def _getFinalState(self, inputStateReference, codeReference, executionPower): #TODO
-        return ExecutionState(123)
+    def _calculateFinalState(self, requestID): #TODO
+        assert self.getData()["assignedRequestID"] == requestID, "You are not assigned to this request"
+        if requestID in self.resultsBuffer:
+            return self.resultsBuffer[requestID]
+        request = dict(self.broker.requests(requestID))
+        inputState = request["inputState"]
+        codeReference = request["codeReference"]
+        executionPower = request["executionPowerPaidFor"]
+        self.resultsBuffer[requestID] = ExecutionState(123)
+        return self.resultsBuffer[requestID]
 
-    def _submitSignedHash(self, requestID, resultState: ExecutionState):
-        #TODO check resultstate is exetutionState
+    def _submitSignedHash(self, requestID, resultState=None):
+        if resultState == None:
+            resultState = self.resultsBuffer[requestID]
         return self.broker.submitSignedResultHash(requestID, resultState.getSignedHash(self.account.address), {"from": self.account})
+    
+    def _liberateResult(self, requestID):
+        return self.broker.liberateResult(requestID, str(self.resultsBuffer[requestID]), {"from": self.account}) #TODO tx.wait(1)?
