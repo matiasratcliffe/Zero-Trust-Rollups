@@ -251,7 +251,7 @@ class TestExecutor:
         assert dict(broker.requests(reqID))["submissionsLocked"] == True
         with pytest.raises(Exception, match="This address does not belong to a registered executor"):
             executor2 = Executor(broker, Accounts.getFromIndex(1), False)
-            executor2.broker.liberateResult(reqID, str(result1), {"from": executor2.account})
+            executor2.broker.liberateResult(reqID, result1.toTuple(), {"from": executor2.account})
 
     def test_liberate_result_to_foreign_request(self):
         broker = BrokerFactory.create()
@@ -263,7 +263,7 @@ class TestExecutor:
         assert dict(broker.requests(reqID))["submissionsLocked"] == True
         with pytest.raises(Exception, match="You must be assigned to the provided request to liberate the result"):
             executor2 = Executor(broker, Accounts.getFromIndex(1), True)
-            executor2.broker.liberateResult(reqID, str(result1), {"from": executor2.account})
+            executor2.broker.liberateResult(reqID, result1.toTuple(), {"from": executor2.account})
 
     def test_liberate_an_already_liberated_result(self):
         pass

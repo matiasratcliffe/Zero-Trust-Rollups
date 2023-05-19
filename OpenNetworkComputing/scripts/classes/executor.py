@@ -40,13 +40,14 @@ class Executor:
         inputState = request["inputState"]
         codeReference = request["codeReference"]
         executionPower = request["executionPowerPaidFor"]
-        self.resultsBuffer[requestID] = ExecutionState(123)
+        self.resultsBuffer[requestID] = ExecutionState(123, self.account.address) #TODO
         return self.resultsBuffer[requestID]
 
     def _submitSignedHash(self, requestID, resultState=None):
         if resultState == None:
             resultState = self.resultsBuffer[requestID]
-        return self.broker.submitSignedResultHash(requestID, resultState.getSignedHash(self.account.address), {"from": self.account})
+        signedHash = self.broker.getResultHash(resultState.toTuple())
+        return self.broker.submitSignedResultHash(requestID, signedHash, {"from": self.account})
     
     def _liberateResult(self, requestID):
-        return self.broker.liberateResult(requestID, str(self.resultsBuffer[requestID]), {"from": self.account}) #TODO tx.wait(1)?
+        return self.broker.liberateResult(requestID, self.resultsBuffer[requestID].toTuple(), {"from": self.account}) #TODO tx.wait(1)?

@@ -105,6 +105,12 @@ contract ExecutionBroker is Transferable {
         requests.push(request);
     }
 
+    // Public pures
+
+    function getResultHash(Result memory result) public pure returns (bytes32) {
+        return keccak256(abi.encode(result));
+    }
+
     // Public views
 
     function requestCount() public view returns (uint) {
@@ -345,7 +351,7 @@ contract ExecutionBroker is Transferable {
 
         //TODO aca tengo un problema, porque uno es result con signature y el otro no. Podria hacer que result sea un struct y el sin signature lo pongo el address en cero
         require(result.issuer == msg.sender, "The issuer of the sent result does not match the transaction sender");
-        require(keccak256(abi.encode(result)) == taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].signedResultHash, "Your result does not match your submitted hash");
+        require(getResultHash(result) == taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].signedResultHash, "Your result does not match your submitted hash");
         
         //TODO aca, si uso struct, seteo el address en cero o al address y guardo el resultado        
         result.issuer = address(this);
