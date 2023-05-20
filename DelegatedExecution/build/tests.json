@@ -2,25 +2,749 @@
   "contracts": {
     "ClientImplementation": "b12d4fc1f2a109edfc5a6c3c4fc6ac215f696c9b",
     "DelegatedExecution": "73df0a6f5d0123eb2b2db0faf62b602aa77c123a",
-    "ExecutionBroker": "4a3a5ca9c37bea5238abf63475226a3a00d78a36",
+    "ExecutionBroker": "5eaf6f19324b16bb65c4df2ce7ff6486862498b5",
     "Ownable": "672f70f06f11b1d7dfeb0f73ad0bb11d0c9972ad",
     "Transferable": "46d8302b7b373057f7bb873d07b598531307e853"
   },
   "tests": {
-    "tests/test_deployment.py": {
-      "coverage": false,
-      "isolated": false,
-      "results": "...",
-      "sha1": "95f004941e4594fff0821b04e3f701e7b954ab99",
-      "txhash": []
-    },
     "tests/test_executor.py": {
       "coverage": false,
       "isolated": false,
-      "results": "sssssssssssssssssssssssssssssssssss.",
-      "sha1": "aa60ae1583123c271f15686c176bec0c3eccc113",
-      "txhash": []
+      "results": "....................................",
+      "sha1": "2ca97b7123a15b5ca6302b2211f8182626bd8c72",
+      "txhash": [
+        "0574d1b6c358ab183ab5c589de1d7b419c95a4f4",
+        "1b4383b4d7690fabbf8c7b8f8ee5cef66721e9ef",
+        "1e5e45bdd23b41adf72d5a56789e17f39add5cd6",
+        "23ba47c54ba647efe797d829a2ceffd70a51ee84",
+        "284b9a68d6e41c11e2bc6205536f1d949714ce1f",
+        "2998f642125f19b3ec105a3be552cba66a35956d",
+        "2c575a8dc533e1713ea73c11eb968af2cbb85ca3",
+        "3c6bc359fb8b4623a745950c051b2386b34262c2",
+        "43cffe5386f4e0cde4f0644f0816fb836b0ce447",
+        "5c0d0b03de81150946ae8acaec592bfd146ddbb6",
+        "7baf88ee04a5fe32c2fb7a8f4d0af3b6af3bf5d4",
+        "b04120c35df2910e6915009abd94d00a4749e72b",
+        "c47e20350ee8c7a6ddb052cd7b7786b8accff64e",
+        "c55f2ec3262f23995045c255b06417c4a076811d",
+        "c60067d553272c32de7575b10aa7a56a6ba82848",
+        "d17db9ef3e94a1e079766cea6c2fe8ca23489cc0",
+        "decb63684d9e234fa0ea0f2e85d333f66a6072cf",
+        "ee7f6e39d4d19640d61ab6809bd6ff56df317099"
+      ]
+    },
+    "tests/test_requestor.py": {
+      "coverage": false,
+      "isolated": false,
+      "results": ".......................",
+      "sha1": "5018e51e484b6e6e58def40cbf050747f71b3769",
+      "txhash": [
+        "08a83d537dd525926d974d05419bd791ec46339d",
+        "1de21e8ec37a5ff1ba9af0d369db2d62f344d54b",
+        "24c4413ff2d7c6c8bef8cb8bdeb258b2cf8a0535",
+        "4f6e53a7eb6219cbb11c549d628501e24a2ee465",
+        "71e734315b6761e82093fa0aa7f7d2da202b52bd",
+        "877bc30404a3021e5ce6e013576ac46b5b87ddd9",
+        "929b414da7524d3332d206a1707dd1e7d67a0231",
+        "9c1ec568f99fe6693e1af658fe1ed6a5b3c004ed",
+        "b07fa91f338a6a28a29f6c18d4f92a06e2007d15",
+        "b45613b12a9c07eea1098bfaf2747ae85bb0d589",
+        "d2991c7640f034167bfcfca1e3f3cb6254a273ab"
+      ]
     }
   },
-  "tx": {}
+  "tx": {
+    "0574d1b6c358ab183ab5c589de1d7b419c95a4f4": {
+      "ExecutionBroker": {
+        "1": [
+          [
+            11,
+            12,
+            13
+          ],
+          [
+            56
+          ],
+          [
+            54,
+            55
+          ]
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "08a83d537dd525926d974d05419bd791ec46339d": {
+      "ClientImplementation": {
+        "0": [
+          [
+            2
+          ],
+          [
+            33
+          ],
+          []
+        ],
+        "1": [
+          [],
+          [],
+          []
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "1b4383b4d7690fabbf8c7b8f8ee5cef66721e9ef": {
+      "ExecutionBroker": {
+        "1": [
+          [
+            23
+          ],
+          [],
+          []
+        ]
+      }
+    },
+    "1de21e8ec37a5ff1ba9af0d369db2d62f344d54b": {
+      "ClientImplementation": {
+        "0": [
+          [
+            6
+          ],
+          [],
+          []
+        ],
+        "1": [
+          [],
+          [],
+          []
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      },
+      "ExecutionBroker": {
+        "1": [
+          [
+            5,
+            6,
+            7
+          ],
+          [
+            52
+          ],
+          [
+            50,
+            51
+          ]
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "1e5e45bdd23b41adf72d5a56789e17f39add5cd6": {
+      "ExecutionBroker": {
+        "1": [
+          [
+            36
+          ],
+          [
+            67
+          ],
+          []
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "23ba47c54ba647efe797d829a2ceffd70a51ee84": {
+      "ExecutionBroker": {
+        "1": [
+          [
+            23
+          ],
+          [
+            61
+          ],
+          []
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "24c4413ff2d7c6c8bef8cb8bdeb258b2cf8a0535": {
+      "ClientImplementation": {
+        "0": [
+          [],
+          [],
+          []
+        ],
+        "1": [
+          [],
+          [],
+          []
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "284b9a68d6e41c11e2bc6205536f1d949714ce1f": {
+      "ExecutionBroker": {
+        "1": [
+          [
+            36,
+            37,
+            38
+          ],
+          [
+            69
+          ],
+          [
+            67,
+            68
+          ]
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "2998f642125f19b3ec105a3be552cba66a35956d": {
+      "ExecutionBroker": {
+        "1": [
+          [
+            16,
+            17,
+            18
+          ],
+          [
+            59
+          ],
+          [
+            57,
+            58
+          ]
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "2c575a8dc533e1713ea73c11eb968af2cbb85ca3": {
+      "ExecutionBroker": {
+        "1": [
+          [
+            29,
+            30
+          ],
+          [
+            65
+          ],
+          [
+            64
+          ]
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "3c6bc359fb8b4623a745950c051b2386b34262c2": {
+      "ExecutionBroker": {
+        "1": [
+          [
+            16,
+            17
+          ],
+          [
+            58
+          ],
+          [
+            57
+          ]
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "43cffe5386f4e0cde4f0644f0816fb836b0ce447": {
+      "ExecutionBroker": {
+        "1": [
+          [
+            11,
+            12
+          ],
+          [
+            55
+          ],
+          [
+            54
+          ]
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "4f6e53a7eb6219cbb11c549d628501e24a2ee465": {
+      "ClientImplementation": {
+        "0": [
+          [
+            3
+          ],
+          [],
+          [
+            34
+          ]
+        ],
+        "1": [
+          [
+            14
+          ],
+          [],
+          []
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      },
+      "ExecutionBroker": {
+        "1": [
+          [
+            40
+          ],
+          [
+            71
+          ],
+          []
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "5c0d0b03de81150946ae8acaec592bfd146ddbb6": {
+      "ExecutionBroker": {
+        "1": [
+          [
+            36,
+            37
+          ],
+          [
+            68
+          ],
+          [
+            67
+          ]
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "71e734315b6761e82093fa0aa7f7d2da202b52bd": {
+      "ClientImplementation": {
+        "0": [
+          [
+            6
+          ],
+          [],
+          []
+        ],
+        "1": [
+          [],
+          [],
+          []
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      },
+      "ExecutionBroker": {
+        "1": [
+          [
+            5
+          ],
+          [
+            50
+          ],
+          []
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "7baf88ee04a5fe32c2fb7a8f4d0af3b6af3bf5d4": {
+      "ExecutionBroker": {
+        "1": [
+          [
+            16,
+            17,
+            18
+          ],
+          [
+            59
+          ],
+          [
+            57,
+            58
+          ]
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "877bc30404a3021e5ce6e013576ac46b5b87ddd9": {
+      "ClientImplementation": {
+        "0": [
+          [
+            3
+          ],
+          [
+            34
+          ],
+          []
+        ],
+        "1": [
+          [
+            14
+          ],
+          [],
+          []
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "929b414da7524d3332d206a1707dd1e7d67a0231": {
+      "ClientImplementation": {
+        "0": [
+          [
+            6
+          ],
+          [],
+          []
+        ],
+        "1": [
+          [],
+          [],
+          []
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      },
+      "ExecutionBroker": {
+        "1": [
+          [
+            5,
+            6
+          ],
+          [
+            51
+          ],
+          [
+            50
+          ]
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "9c1ec568f99fe6693e1af658fe1ed6a5b3c004ed": {
+      "ClientImplementation": {
+        "0": [
+          [
+            6
+          ],
+          [],
+          []
+        ],
+        "1": [
+          [],
+          [],
+          []
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      },
+      "ExecutionBroker": {
+        "1": [
+          [
+            5,
+            6,
+            7,
+            8
+          ],
+          [
+            53
+          ],
+          [
+            50,
+            51,
+            52
+          ]
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "b04120c35df2910e6915009abd94d00a4749e72b": {
+      "ExecutionBroker": {
+        "1": [
+          [
+            29
+          ],
+          [
+            64
+          ],
+          []
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "b07fa91f338a6a28a29f6c18d4f92a06e2007d15": {
+      "ClientImplementation": {
+        "0": [
+          [],
+          [],
+          []
+        ],
+        "1": [
+          [],
+          [],
+          []
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "b45613b12a9c07eea1098bfaf2747ae85bb0d589": {
+      "ClientImplementation": {
+        "0": [
+          [],
+          [],
+          []
+        ],
+        "1": [
+          [],
+          [],
+          []
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "c47e20350ee8c7a6ddb052cd7b7786b8accff64e": {
+      "ExecutionBroker": {
+        "1": [
+          [
+            16
+          ],
+          [
+            57
+          ],
+          []
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "c55f2ec3262f23995045c255b06417c4a076811d": {
+      "ExecutionBroker": {
+        "1": [
+          [
+            36,
+            37,
+            38,
+            39
+          ],
+          [
+            70
+          ],
+          [
+            67,
+            68,
+            69
+          ]
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "c60067d553272c32de7575b10aa7a56a6ba82848": {
+      "ExecutionBroker": {
+        "1": [
+          [
+            23,
+            24,
+            25
+          ],
+          [
+            63
+          ],
+          [
+            61,
+            62
+          ]
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "d17db9ef3e94a1e079766cea6c2fe8ca23489cc0": {
+      "ExecutionBroker": {
+        "1": [
+          [
+            23,
+            24
+          ],
+          [
+            62
+          ],
+          [
+            61
+          ]
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "d2991c7640f034167bfcfca1e3f3cb6254a273ab": {
+      "ClientImplementation": {
+        "0": [
+          [],
+          [],
+          []
+        ],
+        "1": [
+          [],
+          [],
+          []
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "decb63684d9e234fa0ea0f2e85d333f66a6072cf": {
+      "ExecutionBroker": {
+        "1": [
+          [
+            11
+          ],
+          [
+            54
+          ],
+          []
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    "ee7f6e39d4d19640d61ab6809bd6ff56df317099": {
+      "ExecutionBroker": {
+        "1": [
+          [
+            29
+          ],
+          [
+            64
+          ],
+          []
+        ],
+        "3": [
+          [],
+          [],
+          []
+        ]
+      }
+    }
+  }
 }

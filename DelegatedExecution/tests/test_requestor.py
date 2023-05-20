@@ -28,7 +28,7 @@ class TestRequestor:
         if network.show_active() == "development":
             account = Accounts.getAccount()
             broker = BrokerFactory.getInstance()
-            client = ClientFactory.create(account, broker)
+            client = ClientFactory.create(broker, account)
         else:
             client = ClientFactory.getInstance()
             account = Accounts.getFromKey(client.owner())
@@ -92,18 +92,18 @@ class TestRequestor:
         claimDelay = 100
         reqID = requestor.createRequest(functionToRun, dataArray, payment, postProcessingGas, requestedInsurance, claimDelay)
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
-        request = broker.requests(reqID)
-        assert request[0] == reqID
-        assert request[1][0] == functionToRun
-        assert decode(requestor._getFunctionTypes(functionToRun), request[1][1]) == tuple(dataArray)
-        assert request[2] == payment
-        assert request[3] == postProcessingGas
-        assert request[4] == requestedInsurance
-        assert request[5] == claimDelay
-        assert request[6] == requestor.client.address
-        assert int(request[7][0], 16) == 0
-        assert int(request[8][0], 16) == 0
-        assert request[9] == False
+        request = dict(broker.requests(reqID))
+        assert request["id"] == reqID
+        assert dict(request["input"])["functionToRun"] == functionToRun
+        assert decode(requestor._getFunctionTypes(functionToRun), dict(request["input"])["data"]) == tuple(dataArray)
+        assert request["payment"] == payment
+        assert request["postProcessingGas"] == postProcessingGas
+        assert request["challengeInsurance"] == requestedInsurance
+        assert request["claimDelay"] == claimDelay
+        assert request["client"] == requestor.client.address
+        assert int(request["acceptor"], 16) == 0
+        assert int(dict(request["submission"])["issuer"], 16) == 0
+        assert request["cancelled"] == False
     
     def test_get_non_existing_request(self):
         broker = BrokerFactory.getInstance()
@@ -115,8 +115,8 @@ class TestRequestor:
         requestor.withdrawFunds(requestor.getFunds())  # This is just in case there are funds left from another test
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e+18)
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
-        request = broker.requests(reqID)
-        assert request[6] == requestor.client.address
+        request = dict(broker.requests(reqID))
+        assert request["client"] == requestor.client.address
 
     def test_create_request_without_funds(self):
         requestor = Requestor(ClientFactory.getInstance())
@@ -139,10 +139,10 @@ class TestRequestor:
         requestor = Requestor(ClientFactory.getInstance())
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
-        assert broker.requests(reqID)[9] == False
+        assert dict(broker.requests(reqID))["cancelled"] == False
         requestor.cancelRequest(reqID)
         time.sleep(2)
-        assert broker.requests(reqID)[9] == True
+        assert dict(broker.requests(reqID))["cancelled"] == True
 
     def test_cancel_non_existing_request(self):
         requestor = Requestor(ClientFactory.getInstance())
@@ -172,11 +172,11 @@ class TestRequestor:
         requestor = Requestor(ClientFactory.getInstance())
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
-        assert broker.requests(reqID)[9] == False
+        assert dict(broker.requests(reqID))["cancelled"] == False
         executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
         executor._acceptRequest(reqID)
         time.sleep(2)
-        assert broker.requests(reqID)[7] == executor.account
+        assert dict(broker.requests(reqID))["acceptor"] == executor.account
         with pytest.raises(Exception, match="You cant cancel an accepted request"):
             requestor.cancelRequest(reqID)
 
@@ -185,17 +185,17 @@ class TestRequestor:
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
         time.sleep(2)
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
-        assert broker.requests(reqID)[9] == False
+        assert dict(broker.requests(reqID))["cancelled"] == False
         executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
         executor._acceptRequest(reqID)
         time.sleep(3)
-        assert broker.requests(reqID)[7] == executor.account
+        assert dict(broker.requests(reqID))["acceptor"] == executor.account
         executor._cancelAcceptance(reqID)
         time.sleep(4)
-        assert int(broker.requests(reqID)[7], 16) == 0
+        assert int(dict(broker.requests(reqID))["acceptor"], 16) == 0
         requestor.cancelRequest(reqID)
         time.sleep(3)
-        assert broker.requests(reqID)[9] == True
+        assert dict(broker.requests(reqID))["cancelled"] == True
 
     def test_publicize_request(self):
         requestor = Requestor(ClientFactory.getInstance())
