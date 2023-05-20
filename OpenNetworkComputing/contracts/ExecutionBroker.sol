@@ -8,7 +8,7 @@ import "./Transferable.sol";
 struct Executor {
     address executorAddress;
     uint assignedRequestID;
-    uint taskAssignmentIndex; //TODO test in python
+    uint taskAssignmentIndex;
     uint lockedWei;
     uint accurateSolvings;
     uint inaccurateSolvings;
@@ -31,8 +31,8 @@ struct Request {
     uint executionPowerPaidFor; // In Wei; deberia tener en cuenta el computo y el gas de las operaciones de submit; y se divide entre los executors
     // TODO ver tema entorno de ejecucion restringido y capaz hacer payment fijo???
     //uint postProcessingGas;  TODO no hay post processing gas, ya que es el cliente quien deberia colectar los resultados y resolver los escrows
-    Result result; //TODO start empty, gets populated after escrow
-    bool submissionsLocked; //TODO test in python?
+    Result result; // start empty, gets populated after escrow
+    bool submissionsLocked;
     bool closed;
 }
 
@@ -43,7 +43,7 @@ struct TaskAssignment {
     bytes32 unsignedResultHash;
     Result result;
     bool submitted;
-    bool liberated;  // after escrow TODO??
+    bool liberated;
 }
 
 struct Result {

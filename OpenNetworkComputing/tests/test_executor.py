@@ -156,15 +156,15 @@ class TestExecutor:
         result2 = executor2._calculateFinalState(reqID)
         executor1._submitSignedHash(reqID, result1)
         executor2._submitSignedHash(reqID, result2)
-        assert dict(broker.taskAssignmentsMap(reqID, executor1.getData()["taskAssignmentIndex"]))["submitted"] == True
-        assert dict(broker.taskAssignmentsMap(reqID, executor1.getData()["taskAssignmentIndex"]))["liberated"] == False
-        assert int(dict(broker.taskAssignmentsMap(reqID, executor1.getData()["taskAssignmentIndex"]))["signedResultHash"].hex(), 16) != 0
-        assert dict(broker.taskAssignmentsMap(reqID, executor2.getData()["taskAssignmentIndex"]))["submitted"] == True
-        assert dict(broker.taskAssignmentsMap(reqID, executor2.getData()["taskAssignmentIndex"]))["liberated"] == False
-        assert int(dict(broker.taskAssignmentsMap(reqID, executor2.getData()["taskAssignmentIndex"]))["signedResultHash"].hex(), 16) != 0
-        assert dict(broker.taskAssignmentsMap(reqID, executor3.getData()["taskAssignmentIndex"]))["submitted"] == False
-        assert dict(broker.taskAssignmentsMap(reqID, executor3.getData()["taskAssignmentIndex"]))["liberated"] == False
-        assert int(dict(broker.taskAssignmentsMap(reqID, executor3.getData()["taskAssignmentIndex"]))["signedResultHash"].hex(), 16) == 0
+        assert executor1.getAssignment()["submitted"] == True
+        assert executor1.getAssignment()["liberated"] == False
+        assert int(executor1.getAssignment()["signedResultHash"].hex(), 16) != 0
+        assert executor2.getAssignment()["submitted"] == True
+        assert executor2.getAssignment()["liberated"] == False
+        assert int(executor2.getAssignment()["signedResultHash"].hex(), 16) != 0
+        assert executor3.getAssignment()["submitted"] == False
+        assert executor3.getAssignment()["liberated"] == False
+        assert int(executor3.getAssignment()["signedResultHash"].hex(), 16) == 0
         assert dict(broker.requests(reqID))["submissionsLocked"] == False
 
     def test_submit_last_result_hash(self):
@@ -181,21 +181,21 @@ class TestExecutor:
         result2 = executor2._calculateFinalState(reqID)
         executor1._submitSignedHash(reqID, result1)
         executor2._submitSignedHash(reqID, result2)
-        assert dict(broker.taskAssignmentsMap(reqID, executor1.getData()["taskAssignmentIndex"]))["submitted"] == True
-        assert dict(broker.taskAssignmentsMap(reqID, executor1.getData()["taskAssignmentIndex"]))["liberated"] == False
-        assert int(dict(broker.taskAssignmentsMap(reqID, executor1.getData()["taskAssignmentIndex"]))["signedResultHash"].hex(), 16) != 0
-        assert dict(broker.taskAssignmentsMap(reqID, executor2.getData()["taskAssignmentIndex"]))["submitted"] == True
-        assert dict(broker.taskAssignmentsMap(reqID, executor2.getData()["taskAssignmentIndex"]))["liberated"] == False
-        assert int(dict(broker.taskAssignmentsMap(reqID, executor2.getData()["taskAssignmentIndex"]))["signedResultHash"].hex(), 16) != 0
-        assert dict(broker.taskAssignmentsMap(reqID, executor3.getData()["taskAssignmentIndex"]))["submitted"] == False
-        assert dict(broker.taskAssignmentsMap(reqID, executor3.getData()["taskAssignmentIndex"]))["liberated"] == False
-        assert int(dict(broker.taskAssignmentsMap(reqID, executor3.getData()["taskAssignmentIndex"]))["signedResultHash"].hex(), 16) == 0
+        assert executor1.getAssignment()["submitted"] == True
+        assert executor1.getAssignment()["liberated"] == False
+        assert int(executor1.getAssignment()["signedResultHash"].hex(), 16) != 0
+        assert executor2.getAssignment()["submitted"] == True
+        assert executor2.getAssignment()["liberated"] == False
+        assert int(executor2.getAssignment()["signedResultHash"].hex(), 16) != 0
+        assert executor3.getAssignment()["submitted"] == False
+        assert executor3.getAssignment()["liberated"] == False
+        assert int(executor3.getAssignment()["signedResultHash"].hex(), 16) == 0
         assert dict(broker.requests(reqID))["submissionsLocked"] == False
         result3 = executor3._calculateFinalState(reqID)
         executor3._submitSignedHash(reqID, result3)
-        assert dict(broker.taskAssignmentsMap(reqID, executor3.getData()["taskAssignmentIndex"]))["submitted"] == True
-        assert dict(broker.taskAssignmentsMap(reqID, executor3.getData()["taskAssignmentIndex"]))["liberated"] == False
-        assert int(dict(broker.taskAssignmentsMap(reqID, executor3.getData()["taskAssignmentIndex"]))["signedResultHash"].hex(), 16) != 0
+        assert executor3.getAssignment()["submitted"] == True
+        assert executor3.getAssignment()["liberated"] == False
+        assert int(executor3.getAssignment()["signedResultHash"].hex(), 16) != 0
         assert dict(broker.requests(reqID))["submissionsLocked"] == True
     
     def test_submit_result_hash_from_unregistered_executor(self):
@@ -235,11 +235,54 @@ class TestExecutor:
             executor1._submitSignedHash(reqID, result1)
     
     def test_liberate_first_result(self):
-        pass
+        broker = BrokerFactory.create()
+        executor1 = Executor(broker, Accounts.getFromIndex(0), True)
+        executor2 = Executor(broker, Accounts.getFromIndex(1), True)
+        executor3 = Executor(broker, Accounts.getFromIndex(2), True)
+        requestor = Requestor(broker, Accounts.getAccount())
+        reqID = requestor.createRequest("input state", "code reference", amountOfExecutors=3, executionPower=1000)
+        result1 = executor1._calculateFinalState(reqID)
+        executor1._submitSignedHash(reqID, result1)
+        result2 = executor2._calculateFinalState(reqID)
+        executor2._submitSignedHash(reqID, result2)
+        result3 = executor3._calculateFinalState(reqID)
+        executor3._submitSignedHash(reqID, result3)
+        assert dict(broker.requests(reqID))["submissionsLocked"] == True
+        assert executor1.getAssignment()["submitted"] == True
+        assert executor1.getAssignment()["liberated"] == False
+        assert executor1.getAssignment()["executorAddress"] == executor1.account.address
+        executor1._liberateResult(reqID)
+        assert executor1.getAssignment()["liberated"] == True
+        assert executor1.getAssignment()["signedResultHash"] == broker.getResultHash(result1.toTuple())
+        result1.signingAddress = broker.address
+        assert executor1.getAssignment()["unsignedResultHash"] == broker.getResultHash(result1.toTuple())
+        assert executor1.getAssignment()["result"] == result1.toTuple()
+        assert dict(broker.requests(reqID))["closed"] == False
 
-    def test_liberate_last_result(self):
-        #asd
-        pass
+    def test_liberate_last_result_all_correct(self):
+        broker = BrokerFactory.create()
+        executor1 = Executor(broker, Accounts.getFromIndex(0), True)
+        executor2 = Executor(broker, Accounts.getFromIndex(1), True)
+        executor3 = Executor(broker, Accounts.getFromIndex(2), True)
+        requestor = Requestor(broker, Accounts.getAccount())
+        reqID = requestor.createRequest("input state", "code reference", amountOfExecutors=3, executionPower=1000)
+        result1 = executor1._calculateFinalState(reqID)
+        executor1._submitSignedHash(reqID, result1)
+        result2 = executor2._calculateFinalState(reqID)
+        executor2._submitSignedHash(reqID, result2)
+        result3 = executor3._calculateFinalState(reqID)
+        executor3._submitSignedHash(reqID, result3)
+        assert dict(broker.requests(reqID))["submissionsLocked"] == True
+        executor1._liberateResult(reqID)
+        executor2._liberateResult(reqID)
+        assert dict(broker.requests(reqID))["closed"] == False
+        assert dict(broker.requests(reqID))["result"] == (0, 0)
+        executor3._liberateResult(reqID)
+        result1.signingAddress = broker.address
+        assert dict(broker.requests(reqID))["closed"] == True
+        assert dict(broker.requests(reqID))["result"] == result1.toTuple()
+        #TODO ver tema GAS
+
 
     def test_liberate_result_from_unregistered_executor(self):
         broker = BrokerFactory.create()
@@ -266,7 +309,15 @@ class TestExecutor:
             executor2.broker.liberateResult(reqID, result1.toTuple(), {"from": executor2.account})
 
     def test_liberate_an_already_liberated_result(self):
-        pass
+        broker = BrokerFactory.create()
+        executor1 = Executor(broker, Accounts.getFromIndex(0), True)
+        requestor = Requestor(broker, Accounts.getAccount())
+        reqID = requestor.createRequest("input state", "code reference", amountOfExecutors=1, executionPower=1000)
+        result1 = executor1._calculateFinalState(reqID)
+        executor1._submitSignedHash(reqID, result1)
+        executor1._liberateResult(reqID)
+        with pytest.raises(Exception, match="The result for this request, for this executor, has already been liberated"):
+            executor1._liberateResult(reqID)    
 
     def test_liberate_an_unsubmitted_result(self):
         broker = BrokerFactory.create()

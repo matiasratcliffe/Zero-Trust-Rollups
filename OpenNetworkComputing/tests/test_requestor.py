@@ -98,11 +98,17 @@ class TestRequestor:
         executor5 = Executor(broker, Accounts.getFromIndex(4), True)
         executor6 = Executor(broker, Accounts.getFromIndex(5), True)
         time.sleep(broker.EXECUTION_TIME_FRAME_SECONDS())
+        assert executor1.getAssignment()["executorAddress"] == executor1.account.address
+        assert executor2.getAssignment()["executorAddress"] == executor2.account.address
+        assert executor3.getAssignment()["executorAddress"] == executor3.account.address
 
         customGasPrice = 10
         originalBalance = requestor.account.balance()
         transaction = requestor.rotateExecutors(reqID, customGasPrice=customGasPrice)
         assignedExecutors = [dict(requestor.broker.taskAssignmentsMap(reqID, i))["executorAddress"] for i in range(3)]
+        assert executor4.getAssignment()["executorAddress"] == executor4.account.address
+        assert executor5.getAssignment()["executorAddress"] == executor5.account.address
+        assert executor6.getAssignment()["executorAddress"] == executor6.account.address
         assert executor1.account not in assignedExecutors
         assert executor2.account not in assignedExecutors
         assert executor3.account not in assignedExecutors

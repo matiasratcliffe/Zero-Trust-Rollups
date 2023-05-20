@@ -15,6 +15,10 @@ class Executor:
     def getData(self):
         return dict(self.broker.getExecutorByAddress(self.account))
     
+    def getAssignment(self):
+        data = self.getData()
+        return dict(self.broker.taskAssignmentsMap(data["assignedRequestID"], data["taskAssignmentIndex"]))
+    
     def getState(self):
         return self.broker.getExecutorStateByAddress(self.account)
 
