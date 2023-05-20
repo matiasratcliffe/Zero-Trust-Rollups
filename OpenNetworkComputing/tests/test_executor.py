@@ -281,7 +281,7 @@ class TestExecutor:
         result1.signingAddress = broker.address
         assert dict(broker.requests(reqID))["closed"] == True
         assert dict(broker.requests(reqID))["result"] == result1.toTuple()
-        #TODO ver tema GAS
+        #TODO ver tema GAS y STAKES
 
 
     def test_liberate_result_from_unregistered_executor(self):

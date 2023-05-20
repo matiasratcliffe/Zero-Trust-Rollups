@@ -65,7 +65,7 @@ contract ExecutionBroker is Transferable {
     
     event resultSubmitted(uint requestID, address submitter);
     event requestSubmissionsLocked(uint requestID);
-    event requestClosed(uint requestID);
+    event requestClosed(uint requestID, uint coincidences);
 
     event executorLocked(address executorAddress);
     event executorUnlocked(address executorAddress);
@@ -119,8 +119,8 @@ contract ExecutionBroker is Transferable {
 
     function getActiveExecutorsList() public view returns (address[] memory) {
         address[] memory addresses = new address[](executorsCollection.amountOfActiveExecutors);
-        uint j = 0;
-        for (uint i = 0; i < executorsCollection.activeExecutors.length; i++) {
+        uint32 j = 0;
+        for (uint32 i = 0; i < executorsCollection.activeExecutors.length; i++) {
             if (executorsCollection.activeExecutors[i].executorAddress != address(0x0)) {
                 addresses[j] = executorsCollection.activeExecutors[i].executorAddress;
                 j++;
@@ -167,8 +167,8 @@ contract ExecutionBroker is Transferable {
 
     function getActiveExecutorByPosition(uint position) public view returns (Executor memory executor) {  // Position starts from zero and is not equal to index
         require(position < executorsCollection.amountOfActiveExecutors, "You are selecting a position outside the existing executors");
-        uint j = 0;
-        for (uint i = 0; i < executorsCollection.activeExecutors.length; i++) {
+        uint32 j = 0;
+        for (uint32 i = 0; i < executorsCollection.activeExecutors.length; i++) {
             if (executorsCollection.activeExecutors[i].executorAddress == address(0x0)) {
                 continue;
             }
@@ -250,7 +250,7 @@ contract ExecutionBroker is Transferable {
         });
         requests.push(request);
         TaskAssignment[] storage taskAssignments = taskAssignmentsMap[request.id];
-        for (uint i = 0; i < amountOfExecutors; i++) {
+        for (uint32 i = 0; i < amountOfExecutors; i++) {
             address executorAddress = getActiveExecutorByPosition(getRandomNumber(0, executorsCollection.amountOfActiveExecutors, i)).executorAddress;
             taskAssignments.push(TaskAssignment({
                 executorAddress: executorAddress,
@@ -275,7 +275,7 @@ contract ExecutionBroker is Transferable {
         uint initialGas = gasleft();
         uint amountOfPunishedExecutors = 0;
         uint[] memory punishedExecutorsTaskIDs = new uint[](taskAssignmentsMap[requestID].length);  // Me van a quedar algunos en cero capaz, no importa
-        for (uint i = 0; i < taskAssignmentsMap[requestID].length; i++) {
+        for (uint8 i = 0; i < taskAssignmentsMap[requestID].length; i++) {
             if (!taskAssignmentsMap[requestID][i].submitted && block.timestamp >= (taskAssignmentsMap[requestID][i].timestamp + EXECUTION_TIME_FRAME_SECONDS)) {
                 punishedExecutorsTaskIDs[amountOfPunishedExecutors++] = i;
             }
@@ -285,7 +285,7 @@ contract ExecutionBroker is Transferable {
         }
         address[] memory punishedExecutorsAddresses = new address[](amountOfPunishedExecutors);
         uint effectiveAmountOfPunishedExecutors = 0;
-        for (uint i = 0; i < amountOfPunishedExecutors; i++) {
+        for (uint8 i = 0; i < amountOfPunishedExecutors; i++) {
             if (executorsCollection.amountOfActiveExecutors > 0) {
                 uint taskIndex = punishedExecutorsTaskIDs[i];
                 punishedExecutorsAddresses[i] = taskAssignmentsMap[requestID][taskIndex].executorAddress;
@@ -304,7 +304,7 @@ contract ExecutionBroker is Transferable {
         uint constantGasOverHead = 12345; //TODO
         uint estimatedGasSpent = ((initialGas - gasleft()) + (punishGas * effectiveAmountOfPunishedExecutors) + constantGasOverHead) * tx.gasprice;  // This is just an aproximation, make it generous to favor the client
         uint punishAmount = estimatedGasSpent / effectiveAmountOfPunishedExecutors;
-        for (uint i = 0; i < effectiveAmountOfPunishedExecutors; i++) {
+        for (uint8 i = 0; i < effectiveAmountOfPunishedExecutors; i++) {
             _punishExecutor(punishedExecutorsAddresses[i], punishAmount);
         }            
         bool transferSuccess = _internalTransferFunds(punishAmount * effectiveAmountOfPunishedExecutors, msg.sender);
@@ -327,7 +327,7 @@ contract ExecutionBroker is Transferable {
 
         // if last one, mark request as submitted? do something else like start the escrow? SI ES EL ULTIMO SOLO MARCO COMO SUBMITED, REQUISITO PARA LIBERATE RESULT. POR LO QUE IMPLICITAMENTE ARRANCA EL ESCROW, Y AHI VAN POSTULANDO LOS RESULTADOS. Y EN EL LIBERATE RESULTS, SI ES EL ULTIMO, SE GENERA LA PAGA Y LIBERAN LOS STAKES CLIENT&EXECUTOR, O SI PASA CIERTO TIEMPO, EL CLIENTE PUEDE TRUNCAR LA LIBERACION PARA RETIRAR SU STAKE, Y LOS QUE NO HAYAN LIBERADO LA COMEN
         bool lastOne = true;
-        for (uint i = 0; i < taskAssignmentsMap[requestID].length; i++) {
+        for (uint8 i = 0; i < taskAssignmentsMap[requestID].length; i++) {
             if (!taskAssignmentsMap[requestID][i].submitted) {
                 lastOne = false;
             }
@@ -346,35 +346,72 @@ contract ExecutionBroker is Transferable {
         require(requests[requestID].submissionsLocked == true, "You must wait until all submissions for this request have been locked");
         require(taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].liberated == false, "The result for this request, for this executor, has already been liberated");
         
-
-
-
-        //TODO aca tengo un problema, porque uno es result con signature y el otro no. Podria hacer que result sea un struct y el sin signature lo pongo el address en cero
+        // TODO test in python
         require(result.issuer == msg.sender, "The issuer of the sent result does not match the transaction sender");
         require(getResultHash(result) == taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].signedResultHash, "Your result does not match your submitted hash");
         
-        //TODO aca, si uso struct, seteo el address en cero o al address y guardo el resultado        
         result.issuer = address(this);
         
-        //TODO store result and UNSIGNED hash somewhere to later compare with the majority
         taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].unsignedResultHash = keccak256(abi.encode(result));
         taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].result = result;
         taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].liberated = true;
 
-
-
-        // Si hay empate, que gane el primero???
-        // CHECK IF REQUEST IS ALL SUBMITTED
-        // siempre esperar al ultimo para hacer las cosas
         bool lastOne = true;
-        for (uint i = 0; i < taskAssignmentsMap[requestID].length; i++) {
+        for (uint8 i = 0; i < taskAssignmentsMap[requestID].length; i++) {
             if (!taskAssignmentsMap[requestID][i].liberated) {
                 lastOne = false;
             }
         }
         if (lastOne) {
-            //requests[requestID].submissionsLocked = true;
-            //emit requestSubmissionsLocked(requestID);
+            bytes32[] memory hashes = new bytes32[](taskAssignmentsMap[requestID].length);
+            uint8[] memory indexes = new uint8[](taskAssignmentsMap[requestID].length);
+            uint8[] memory appearences = new uint8[](taskAssignmentsMap[requestID].length);
+            for (uint8 i = 0; i < taskAssignmentsMap[requestID].length; i++) {
+                for (uint8 j = 0; j <= i; j++) {
+                    if (hashes[j] == bytes32(0x0)) {
+                        hashes[j] = taskAssignmentsMap[requestID][i].unsignedResultHash;
+                        indexes[j] = i;
+                        appearences[j] = 1;
+                        break;
+                    } else if (hashes[j] == taskAssignmentsMap[requestID][i].unsignedResultHash) {
+                        appearences[j]++;
+                        break;
+                    }
+                }
+            }
+            uint8 assignmentIndexOfMaximum = 0;
+            uint8 appearenceIndexOfMaximum = 0;
+            for (uint8 i = 0; i < taskAssignmentsMap[requestID].length; i++) {
+                if (appearences[i] > appearences[appearenceIndexOfMaximum]) {  // Si hay empate, que gane el primero
+                    appearenceIndexOfMaximum = i;
+                    assignmentIndexOfMaximum = indexes[i];
+                }
+            }
+            
+            // Result posting
+            // TODO emit amount of appearences for result in event
+            requests[requestID].result = taskAssignmentsMap[requestID][assignmentIndexOfMaximum].result;
+            requests[requestID].closed = true;
+            emit requestClosed(requestID, appearences[appearenceIndexOfMaximum]);
+
+            // Punishments and payments
+            address[] memory executorsToBeRewarded = new address[](appearences[appearenceIndexOfMaximum]);
+            uint8 rewardedIndex = 0;
+            address[] memory executorsToBePunished = new address[](taskAssignmentsMap[requestID].length - appearences[appearenceIndexOfMaximum]);
+            uint8 punishedIndex = 0;
+            for (uint8 i = 0; i < taskAssignmentsMap[requestID].length; i++) {
+                if (taskAssignmentsMap[requestID][i].unsignedResultHash == hashes[appearenceIndexOfMaximum]) {
+                    executorsToBeRewarded[rewardedIndex++] = taskAssignmentsMap[requestID][i].executorAddress;
+                } else {
+                    executorsToBePunished[punishedIndex++] = taskAssignmentsMap[requestID][i].executorAddress;
+                }
+            }
+            for (uint8 i = 0; i < rewardedIndex; i++) {
+
+            }
+            for (uint8 i = 0; i < punishedIndex; i++) {
+                
+            }
         }
         // TODO preguntarme si es necesario un escrow, y que el cliente tenga fondos lockeados? capaz el cliente tiene la paga y los unicos con fondos lockeados son los ejecutores
     }
