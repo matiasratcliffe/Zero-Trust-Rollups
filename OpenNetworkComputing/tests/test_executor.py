@@ -253,9 +253,9 @@ class TestExecutor:
         assert executor1.getAssignment()["executorAddress"] == executor1.account.address
         executor1._liberateResult(reqID)
         assert executor1.getAssignment()["liberated"] == True
-        assert executor1.getAssignment()["signedResultHash"] == broker.getResultHash(result1.toTuple())
+        assert executor1.getAssignment()["signedResultHash"].hex() == result1.getHash().hex()
         result1.signingAddress = broker.address
-        assert executor1.getAssignment()["unsignedResultHash"] == broker.getResultHash(result1.toTuple())
+        assert executor1.getAssignment()["unsignedResultHash"].hex() == result1.getHash().hex()
         assert executor1.getAssignment()["result"] == result1.toTuple()
         assert dict(broker.requests(reqID))["closed"] == False
 
@@ -276,7 +276,7 @@ class TestExecutor:
         executor1._liberateResult(reqID)
         executor2._liberateResult(reqID)
         assert dict(broker.requests(reqID))["closed"] == False
-        assert dict(broker.requests(reqID))["result"] == (0, 0)
+        assert dict(broker.requests(reqID))["result"] == ('', '0x0000000000000000000000000000000000000000')
         executor3._liberateResult(reqID)
         result1.signingAddress = broker.address
         assert dict(broker.requests(reqID))["closed"] == True

@@ -50,8 +50,7 @@ class Executor:
     def _submitSignedHash(self, requestID, resultState=None):
         if resultState == None:
             resultState = self.resultsBuffer[requestID]
-        signedHash = self.broker.getResultHash(resultState.toTuple())
-        return self.broker.submitSignedResultHash(requestID, signedHash, {"from": self.account})
+        return self.broker.submitSignedResultHash(requestID, resultState.getHash(), {"from": self.account})
     
     def _liberateResult(self, requestID):
         return self.broker.liberateResult(requestID, self.resultsBuffer[requestID].toTuple(), {"from": self.account}) #TODO tx.wait(1)?

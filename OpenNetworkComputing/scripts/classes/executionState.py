@@ -10,6 +10,9 @@ class ExecutionState:
     
     def toTuple(self):
         return (self.data, self.signingAddress)
+    
+    def getHash(self):
+        return keccak(encode(['(string,address)'], [self.toTuple()]))
 
     def __eq__(self, other) -> bool:
         return self.__class__ == other.__class__ and self.data == other.data

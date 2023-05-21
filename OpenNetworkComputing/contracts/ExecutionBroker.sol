@@ -105,12 +105,6 @@ contract ExecutionBroker is Transferable {
         requests.push(request);
     }
 
-    // Public pures
-
-    function getResultHash(Result memory result) public pure returns (bytes32) {
-        return keccak256(abi.encode(result));
-    }
-
     // Public views
 
     function requestCount() public view returns (uint) {
@@ -347,8 +341,9 @@ contract ExecutionBroker is Transferable {
         require(taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].liberated == false, "The result for this request, for this executor, has already been liberated");
         
         // TODO test in python
+        // TODO ver que pasa si alguno submiteo el hash mal, lo castigo al toque? porque si lo hizo mal, no lo va a poder hacer bien jamas, y me trabaria toda la request para siempre. otro TODO seria ver que pasa si todos se mandan una cagada asi, y por ende, si no queda nadie. Se resetea la request con nuevos assignments? se le devuelve la guita al cliente???
         require(result.issuer == msg.sender, "The issuer of the sent result does not match the transaction sender");
-        require(getResultHash(result) == taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].signedResultHash, "Your result does not match your submitted hash");
+        require(keccak256(abi.encode(result)) == taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].signedResultHash, "Your result does not match your submitted hash");
         
         result.issuer = address(this);
         
@@ -363,55 +358,7 @@ contract ExecutionBroker is Transferable {
             }
         }
         if (lastOne) {
-            bytes32[] memory hashes = new bytes32[](taskAssignmentsMap[requestID].length);
-            uint8[] memory indexes = new uint8[](taskAssignmentsMap[requestID].length);
-            uint8[] memory appearences = new uint8[](taskAssignmentsMap[requestID].length);
-            for (uint8 i = 0; i < taskAssignmentsMap[requestID].length; i++) {
-                for (uint8 j = 0; j <= i; j++) {
-                    if (hashes[j] == bytes32(0x0)) {
-                        hashes[j] = taskAssignmentsMap[requestID][i].unsignedResultHash;
-                        indexes[j] = i;
-                        appearences[j] = 1;
-                        break;
-                    } else if (hashes[j] == taskAssignmentsMap[requestID][i].unsignedResultHash) {
-                        appearences[j]++;
-                        break;
-                    }
-                }
-            }
-            uint8 assignmentIndexOfMaximum = 0;
-            uint8 appearenceIndexOfMaximum = 0;
-            for (uint8 i = 0; i < taskAssignmentsMap[requestID].length; i++) {
-                if (appearences[i] > appearences[appearenceIndexOfMaximum]) {  // Si hay empate, que gane el primero
-                    appearenceIndexOfMaximum = i;
-                    assignmentIndexOfMaximum = indexes[i];
-                }
-            }
-            
-            // Result posting
-            // TODO emit amount of appearences for result in event
-            requests[requestID].result = taskAssignmentsMap[requestID][assignmentIndexOfMaximum].result;
-            requests[requestID].closed = true;
-            emit requestClosed(requestID, appearences[appearenceIndexOfMaximum]);
-
-            // Punishments and payments
-            address[] memory executorsToBeRewarded = new address[](appearences[appearenceIndexOfMaximum]);
-            uint8 rewardedIndex = 0;
-            address[] memory executorsToBePunished = new address[](taskAssignmentsMap[requestID].length - appearences[appearenceIndexOfMaximum]);
-            uint8 punishedIndex = 0;
-            for (uint8 i = 0; i < taskAssignmentsMap[requestID].length; i++) {
-                if (taskAssignmentsMap[requestID][i].unsignedResultHash == hashes[appearenceIndexOfMaximum]) {
-                    executorsToBeRewarded[rewardedIndex++] = taskAssignmentsMap[requestID][i].executorAddress;
-                } else {
-                    executorsToBePunished[punishedIndex++] = taskAssignmentsMap[requestID][i].executorAddress;
-                }
-            }
-            for (uint8 i = 0; i < rewardedIndex; i++) {
-
-            }
-            for (uint8 i = 0; i < punishedIndex; i++) {
-                
-            }
+            _closeRequest(requestID);
         }
         // TODO preguntarme si es necesario un escrow, y que el cliente tenga fondos lockeados? capaz el cliente tiene la paga y los unicos con fondos lockeados son los ejecutores
     }
@@ -421,6 +368,58 @@ contract ExecutionBroker is Transferable {
     }
 
     // Private Functions
+
+    function _closeRequest(uint requestID) private {
+        bytes32[] memory hashes = new bytes32[](taskAssignmentsMap[requestID].length);
+        uint8[] memory indexes = new uint8[](taskAssignmentsMap[requestID].length);
+        uint8[] memory appearences = new uint8[](taskAssignmentsMap[requestID].length);
+        for (uint8 i = 0; i < taskAssignmentsMap[requestID].length; i++) {
+            for (uint8 j = 0; j <= i; j++) {
+                if (hashes[j] == bytes32(0x0)) {
+                    hashes[j] = taskAssignmentsMap[requestID][i].unsignedResultHash;
+                    indexes[j] = i;
+                    appearences[j] = 1;
+                    break;
+                } else if (hashes[j] == taskAssignmentsMap[requestID][i].unsignedResultHash) {
+                    appearences[j]++;
+                    break;
+                }
+            }
+        }
+        uint8 assignmentIndexOfMaximum = 0;
+        uint8 appearenceIndexOfMaximum = 0;
+        for (uint8 i = 0; i < taskAssignmentsMap[requestID].length; i++) {
+            if (appearences[i] > appearences[appearenceIndexOfMaximum]) {  // Si hay empate, que gane el primero
+                appearenceIndexOfMaximum = i;
+                assignmentIndexOfMaximum = indexes[i];
+            }
+        }
+        
+        // Result posting
+        // TODO emit amount of appearences for result in event
+        requests[requestID].result = taskAssignmentsMap[requestID][assignmentIndexOfMaximum].result;
+        requests[requestID].closed = true;
+        emit requestClosed(requestID, appearences[appearenceIndexOfMaximum]);
+
+        // Punishments and payments
+        address[] memory executorsToBeRewarded = new address[](appearences[appearenceIndexOfMaximum]);
+        uint8 rewardedIndex = 0;
+        address[] memory executorsToBePunished = new address[](taskAssignmentsMap[requestID].length - appearences[appearenceIndexOfMaximum]);
+        uint8 punishedIndex = 0;
+        for (uint8 i = 0; i < taskAssignmentsMap[requestID].length; i++) {
+            if (taskAssignmentsMap[requestID][i].unsignedResultHash == hashes[appearenceIndexOfMaximum]) {
+                executorsToBeRewarded[rewardedIndex++] = taskAssignmentsMap[requestID][i].executorAddress;
+            } else {
+                executorsToBePunished[punishedIndex++] = taskAssignmentsMap[requestID][i].executorAddress;
+            }
+        }
+        for (uint8 i = 0; i < rewardedIndex; i++) {
+
+        }
+        for (uint8 i = 0; i < punishedIndex; i++) {
+            
+        }
+    }
 
     function _punishExecutor(address executorAddress, uint punishAmount) private {
         require(executorsCollection.busyExecutors[executorAddress].executorAddress == executorAddress, "You can only punish a locked executor");
