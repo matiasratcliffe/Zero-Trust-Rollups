@@ -25,12 +25,11 @@ struct ExecutorsCollection {
 
 struct Request {
     uint id;
-    address clientAddress; // TODO ver si lo hago con address o con BaseClient para incluir postprocessing
+    address clientAddress;
     string inputState;  // Tambien aca esta el point of insertion
     string codeReference;  // Tambien aca esta la data sobre la version y compilador y otras specs que pueden afectar el resultado
     uint executionPowerPaidFor; // In Wei; deberia tener en cuenta el computo y el gas de las operaciones de submit; y se divide entre los executors
     // TODO ver tema entorno de ejecucion restringido y capaz hacer payment fijo???
-    //uint postProcessingGas;  TODO no hay post processing gas, ya que es el cliente quien deberia colectar los resultados y resolver los escrows
     Result result; // start empty, gets populated after escrow
     bool submissionsLocked;
     bool closed;
@@ -55,7 +54,7 @@ struct Result {
 contract ExecutionBroker is Transferable {
 
     uint public EXECUTION_TIME_FRAME_SECONDS;// = 3600;
-    uint public BASE_STAKE_AMOUNT;// = 1e7;  // El cliente no tiene fondos lockeados salvo los que lockea en escrow por cada request. El executor, si tiene fondos lockeados, tanto para el escrow como para el punishment TODO ver que sea significativamente mayor a lo que pueda llegar a salir la rotacion con muchos executors y un gas particularmente alto. para eso tambien limitar el maximo de executors
+    uint public BASE_STAKE_AMOUNT;// = 1e7;  // El cliente no tiene fondos lockeados. El executor, si tiene fondos lockeados para el punishment. ver que sea significativamente mayor a lo que pueda llegar a salir la rotacion con muchos executors y un gas particularmente alto. para eso tambien limitar el maximo de executors
     uint public MAXIMUM_EXECUTION_POWER;
     uint public MAXIMUM_EXECUTORS_PER_REQUEST;
 
@@ -228,7 +227,7 @@ contract ExecutionBroker is Transferable {
         require(amountOfExecutors <= MAXIMUM_EXECUTORS_PER_REQUEST, "You exceeded the maximum number of allowed executors per request");
         require(executionPowerPaidFor <= MAXIMUM_EXECUTION_POWER, "You exceeded the maximum allowed execution power per request");
         require(amountOfExecutors <= executorsCollection.amountOfActiveExecutors, "You exceeded the number of available executors");
-        require(msg.value == BASE_STAKE_AMOUNT + (executionPowerPaidFor * amountOfExecutors), "The value sent in the request must be the ESCROW_STAKE_AMOUNT plus the execution power you intend to pay for evrey executor");
+        require(msg.value == executionPowerPaidFor * amountOfExecutors, "The value sent in the request must be the execution power you intend to pay for multiplied by the amount of executors");
         Request memory request = Request({
             id: requests.length,
             clientAddress: msg.sender,
@@ -360,7 +359,6 @@ contract ExecutionBroker is Transferable {
         if (lastOne) {
             _closeRequest(requestID);
         }
-        // TODO preguntarme si es necesario un escrow, y que el cliente tenga fondos lockeados? capaz el cliente tiene la paga y los unicos con fondos lockeados son los ejecutores
     }
 
     function truncateResultLiberation(uint requestID) public {
@@ -396,7 +394,6 @@ contract ExecutionBroker is Transferable {
         }
         
         // Result posting
-        // TODO emit amount of appearences for result in event
         requests[requestID].result = taskAssignmentsMap[requestID][assignmentIndexOfMaximum].result;
         requests[requestID].closed = true;
         emit requestClosed(requestID, appearences[appearenceIndexOfMaximum]);
@@ -413,11 +410,24 @@ contract ExecutionBroker is Transferable {
                 executorsToBePunished[punishedIndex++] = taskAssignmentsMap[requestID][i].executorAddress;
             }
         }
-        for (uint8 i = 0; i < rewardedIndex; i++) {
-
+        uint individualPayAmount = requests[requestID].executionPowerPaidFor;
+        for (uint8 i = 0; i < executorsToBeRewarded.length; i++) {
+            _internalTransferFunds(individualPayAmount, executorsToBeRewarded[i]);
+            executorsCollection.busyExecutors[executorsToBeRewarded[i]].accurateSolvings++;
+            _unlockExecutor(executorsToBeRewarded[i]);
         }
-        for (uint8 i = 0; i < punishedIndex; i++) {
-            
+        // refund some payment to client if no unanimous answer
+        if (executorsToBePunished.length > 0) { //TODO ver que executionPower y ether no sean necesariamente la misma unidad. quizas hacer otro campo que sea powerPrice que sea negociable. ME PARECE QUE NO VA A SER POSIBLE PORQUE A LOS EJECUTORES LES TOCA POR ASAR, NO POR OFERTA Y DEMANDA. PODRIA USAR EL GAS_PRICE COMO REFERENCIA
+            //TODO Also ver el tema de que pasa si trunco o pre castigo antes. quizas es mejor calcular por diferencia con los rewarded.
+            //TODO also, hacer que el castigo por submitear mal sea mas severo al castigo por ser rotado, y el castigo por no submitear, peor todavia
+            _internalTransferFunds(executorsToBePunished.length * individualPayAmount, requests[requestID].clientAddress);
+        }
+        for (uint8 i = 0; i < executorsToBePunished.length; i++) {
+            // update reputation
+            uint punishAmount = 123; //TODO calculate punish amount???
+            executorsCollection.busyExecutors[executorsToBePunished[i]].inaccurateSolvings++;
+            _punishExecutor(executorsToBePunished[i], punishAmount);
+            //TODO transfers?
         }
     }
 
@@ -427,6 +437,7 @@ contract ExecutionBroker is Transferable {
         executor.lockedWei -= punishAmount;
         executor.timesPunished += 1;
         executor.assignedRequestID = 0;
+        executor.taskAssignmentIndex = 0;
         executorsCollection.inactiveExecutors[executorAddress] = executor;
         delete executorsCollection.busyExecutors[executorAddress];
     }
@@ -444,9 +455,10 @@ contract ExecutionBroker is Transferable {
         emit executorLocked(executorAddress);
     }
 
-    function _unlockExecutor(address executorAddress) private { // TODO cuando usaria esto?? solo cuando se termina bien la ejecucion? o en algun caso triste?
+    function _unlockExecutor(address executorAddress) private {
         require(executorsCollection.busyExecutors[executorAddress].executorAddress == executorAddress, "This address does not belong to a locked executor");
         executorsCollection.busyExecutors[executorAddress].assignedRequestID = 0;
+        executorsCollection.busyExecutors[executorAddress].taskAssignmentIndex = 0;
         _activateExecutor(executorsCollection.busyExecutors[executorAddress]);
         delete executorsCollection.busyExecutors[executorAddress];
     }

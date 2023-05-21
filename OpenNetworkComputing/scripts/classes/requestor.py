@@ -9,7 +9,7 @@ class Requestor:
         self.account = account
     
     def createRequest(self, inputStateReference="", codeReference="", amountOfExecutors=3, executionPower=1000):
-        value = (executionPower * amountOfExecutors) + self.broker.BASE_STAKE_AMOUNT()
+        value = executionPower * amountOfExecutors
         transaction = self.broker.submitRequest(inputStateReference, codeReference, amountOfExecutors, executionPower, {"from": self.account, "value": value})
         transaction.wait(1)
         return transaction.return_value

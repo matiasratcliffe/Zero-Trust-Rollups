@@ -80,7 +80,7 @@ class TestRequestor:
     def test_submit_request_mismatch_value(self):
         broker = BrokerFactory.getInstance()
         Executor(broker, Accounts.getAccount(), True)
-        with pytest.raises(Exception, match="The value sent in the request must be the ESCROW_STAKE_AMOUNT plus the execution power you intend to pay for evrey executor"):
+        with pytest.raises(Exception, match="The value sent in the request must be the execution power you intend to pay for multiplied by the amount of executors"):
             broker.submitRequest("", "", 1, 1000, {"from": Accounts.getAccount()})
 
     def test_rotate_all_executors(self):
