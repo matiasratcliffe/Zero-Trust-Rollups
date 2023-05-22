@@ -263,9 +263,9 @@ contract ExecutionBroker is Transferable {
     }
 
     function rotateExecutors(uint requestID) public returns (bool) {
+        uint initialGas = gasleft();
         require(requests[requestID].clientAddress == msg.sender, "You cant rotate a request that was not made by you");
         require(requests[requestID].submissionsLocked == false, "All executors for this request have already delivered");
-        uint initialGas = gasleft();
         uint amountOfPunishedExecutors = 0;
         uint[] memory punishedExecutorsTaskIDs = new uint[](taskAssignmentsMap[requestID].length);  // Me van a quedar algunos en cero capaz, no importa
         for (uint8 i = 0; i < taskAssignmentsMap[requestID].length; i++) {
@@ -304,8 +304,34 @@ contract ExecutionBroker is Transferable {
         return transferSuccess;
     }
 
-    function truncateExecutors(uint requestID) public {
+    function truncateExecutors(uint requestID) public returns (bool) {
         //TODO tiene que haber pasado el tiempo, y es como rotate pero no los rota, solo los elimina y castiga. por ende, tiene que haber al menos un numero impar de submit
+        uint initialGas = gasleft();
+        require(requests[requestID].clientAddress == msg.sender, "You cant rotate a request that was not made by you");
+        require(requests[requestID].submissionsLocked == false, "All executors for this request have already delivered");
+        uint amountOfPunishedExecutors = 0;
+        uint[] memory punishedExecutorsTaskIDs = new uint[](taskAssignmentsMap[requestID].length);  // Me van a quedar algunos en cero capaz, no importa
+        for (uint8 i = 0; i < taskAssignmentsMap[requestID].length; i++) {
+            if (!taskAssignmentsMap[requestID][i].submitted && block.timestamp >= (taskAssignmentsMap[requestID][i].timestamp + EXECUTION_TIME_FRAME_SECONDS)) {
+                punishedExecutorsTaskIDs[amountOfPunishedExecutors++] = i;
+            }
+        }
+        require(taskAssignmentsMap[requestID].length > amountOfPunishedExecutors, "You can only truncate executors if there has been at least one submission");
+        if (amountOfPunishedExecutors == 0) {
+            return false;
+        }
+
+        TODO mejor solo marcar los truncated como submited y los marco de alguna manera para asegurarme que no van a hacer quorum y porende van a caer en toBePunished. Igual si la cagan con los require en liberate.
+
+        uint punishGas = 12345; //TODO
+        uint constantGasOverHead = 12345; //TODO
+        /*uint estimatedGasSpent = ((initialGas - gasleft()) + (punishGas * effectiveAmountOfPunishedExecutors) + constantGasOverHead) * tx.gasprice;  // This is just an aproximation, make it generous to favor the client
+        uint punishAmount = estimatedGasSpent / effectiveAmountOfPunishedExecutors;
+        for (uint8 i = 0; i < effectiveAmountOfPunishedExecutors; i++) {
+            _punishExecutor(punishedExecutorsAddresses[i], punishAmount);
+        }            
+        bool transferSuccess = _internalTransferFunds(punishAmount * effectiveAmountOfPunishedExecutors, msg.sender);
+        return transferSuccess;*/
     }
 
     function submitSignedResultHash(uint requestID, bytes32 signedResultHash) public {
@@ -321,7 +347,7 @@ contract ExecutionBroker is Transferable {
         // if last one, mark request as submitted? do something else like start the escrow? SI ES EL ULTIMO SOLO MARCO COMO SUBMITED, REQUISITO PARA LIBERATE RESULT. POR LO QUE IMPLICITAMENTE ARRANCA EL ESCROW, Y AHI VAN POSTULANDO LOS RESULTADOS. Y EN EL LIBERATE RESULTS, SI ES EL ULTIMO, SE GENERA LA PAGA Y LIBERAN LOS STAKES CLIENT&EXECUTOR, O SI PASA CIERTO TIEMPO, EL CLIENTE PUEDE TRUNCAR LA LIBERACION PARA RETIRAR SU STAKE, Y LOS QUE NO HAYAN LIBERADO LA COMEN
         bool lastOne = true;
         for (uint8 i = 0; i < taskAssignmentsMap[requestID].length; i++) {
-            if (!taskAssignmentsMap[requestID][i].submitted) {
+            if (!taskAssignmentsMap[requestID][i].submitted && taskAssignmentsMap[requestID][i].executorAddress != address(0x0)) {
                 lastOne = false;
             }
         }
@@ -352,7 +378,7 @@ contract ExecutionBroker is Transferable {
 
         bool lastOne = true;
         for (uint8 i = 0; i < taskAssignmentsMap[requestID].length; i++) {
-            if (!taskAssignmentsMap[requestID][i].liberated) {
+            if (!taskAssignmentsMap[requestID][i].liberated && taskAssignmentsMap[requestID][i].executorAddress != address(0x0)) {
                 lastOne = false;
             }
         }
@@ -372,6 +398,9 @@ contract ExecutionBroker is Transferable {
         uint8[] memory indexes = new uint8[](taskAssignmentsMap[requestID].length);
         uint8[] memory appearences = new uint8[](taskAssignmentsMap[requestID].length);
         for (uint8 i = 0; i < taskAssignmentsMap[requestID].length; i++) {
+            if (taskAssignmentsMap[requestID][i].executorAddress == address(0x0)) {
+                continue;
+            }
             for (uint8 j = 0; j <= i; j++) {
                 if (hashes[j] == bytes32(0x0)) {
                     hashes[j] = taskAssignmentsMap[requestID][i].unsignedResultHash;
@@ -386,7 +415,7 @@ contract ExecutionBroker is Transferable {
         }
         uint8 assignmentIndexOfMaximum = 0;
         uint8 appearenceIndexOfMaximum = 0;
-        for (uint8 i = 0; i < taskAssignmentsMap[requestID].length; i++) {
+        for (uint8 i = 0; i < appearences.length; i++) {
             if (appearences[i] > appearences[appearenceIndexOfMaximum]) {  // Si hay empate, que gane el primero
                 appearenceIndexOfMaximum = i;
                 assignmentIndexOfMaximum = indexes[i];
@@ -410,6 +439,8 @@ contract ExecutionBroker is Transferable {
                 executorsToBePunished[punishedIndex++] = taskAssignmentsMap[requestID][i].executorAddress;
             }
         }
+
+        uint punishAmount;
         uint individualPayAmount = requests[requestID].executionPowerPaidFor;
         for (uint8 i = 0; i < executorsToBeRewarded.length; i++) {
             _internalTransferFunds(individualPayAmount, executorsToBeRewarded[i]);
@@ -424,11 +455,12 @@ contract ExecutionBroker is Transferable {
         }
         for (uint8 i = 0; i < executorsToBePunished.length; i++) {
             // update reputation
-            uint punishAmount = 123; //TODO calculate punish amount???
+            punishAmount = 123; //TODO calculate punish amount???
             executorsCollection.busyExecutors[executorsToBePunished[i]].inaccurateSolvings++;
             _punishExecutor(executorsToBePunished[i], punishAmount);
-            //TODO transfers?
         }
+        //TODO transfers?
+        _internalTransferFunds(punishAmount, address(this));
     }
 
     function _punishExecutor(address executorAddress, uint punishAmount) private {
