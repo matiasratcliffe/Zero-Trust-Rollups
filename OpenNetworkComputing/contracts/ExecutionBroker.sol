@@ -174,7 +174,7 @@ contract ExecutionBroker is Transferable {
 
     // Open interaction functions
 
-    function registerExecutor() public payable {  // TODO podria buscar el primer cero? indexOf? ir subiendo hasta que valga cero o sea igual a size
+    function registerExecutor() public payable {
         require(msg.value >= BASE_STAKE_AMOUNT, "To register an executor you must provide at least the minimum escrow stake amount");
         require(executorsCollection.inactiveExecutors[msg.sender].executorAddress == address(0x0), "The executor is already present, but inactive");
         require(executorsCollection.busyExecutors[msg.sender].executorAddress == address(0x0), "The executor is already present, but busy");
@@ -463,10 +463,19 @@ contract ExecutionBroker is Transferable {
         delete executorsCollection.busyExecutors[executorAddress];
     }
 
-    function _activateExecutor(Executor memory executor) private { // TODO podria buscar el primer cero? indexOf? ir subiendo hasta que valga cero o sea igual a size
+    function _activateExecutor(Executor memory executor) private {
         require(executorsCollection.activeIndexOf[msg.sender] == 0, "This address is already registered as an active executor");
-        executorsCollection.activeExecutors.push(executor);
-        uint executorIndex = executorsCollection.activeExecutors.length - 1;
+        uint16 executorIndex;
+        for (executorIndex = 1; executorIndex < executorsCollection.activeExecutors.length; executorIndex++) {
+            if (executorsCollection.activeExecutors[executorIndex].executorAddress == address(0x0)) {
+                break;
+            }
+        }
+        if (executorIndex == executorsCollection.activeExecutors.length) {
+            executorsCollection.activeExecutors.push(executor);
+        } else {
+            executorsCollection.activeExecutors[executorIndex] = executor;
+        }
         executorsCollection.activeIndexOf[msg.sender] = executorIndex;
         executorsCollection.amountOfActiveExecutors++;
     }
