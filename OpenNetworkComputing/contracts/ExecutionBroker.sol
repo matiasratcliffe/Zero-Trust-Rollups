@@ -399,8 +399,6 @@ contract ExecutionBroker is Transferable {
     //TODO puedo hacer que el precio del executionpower sea inversamente proporsional a la cantidad de ejecutores activos
     // Private Functions
 
-    event toBeRewarded(address executorAddress, uint activeIndexOf);
-    event toBePunished(address executorAddress, uint activeIndexOf);
     function _closeRequest(uint requestID) private {
         bytes32[] memory hashes = new bytes32[](taskAssignmentsMap[requestID].length);
         uint8[] memory indexes = new uint8[](taskAssignmentsMap[requestID].length);
@@ -448,13 +446,6 @@ contract ExecutionBroker is Transferable {
             }
         }
 
-        for (uint8 i = 0; i < executorsToBeRewarded.length; i++) {
-            emit toBeRewarded(executorsToBeRewarded[i], executorsCollection.activeIndexOf[executorsToBeRewarded[i]]);
-        }
-        for (uint8 i = 0; i < executorsToBePunished.length; i++) {
-            emit toBeRewarded(executorsToBePunished[i], executorsCollection.activeIndexOf[executorsToBePunished[i]]);
-        }
-        
         uint punishAmount;
         uint individualPayAmount = requests[requestID].executionPowerPaidFor;
         for (uint8 i = 0; i < executorsToBeRewarded.length; i++) {
@@ -502,14 +493,13 @@ contract ExecutionBroker is Transferable {
         emit executorLocked(executorAddress);
     }
 
-    event unlockExecutorEvent(address executorAddress, uint activeIndexOf);
     function _unlockExecutor(address executorAddress) private {
         require(executorsCollection.busyExecutors[executorAddress].executorAddress == executorAddress, "This address does not belong to a locked executor");
-        emit unlockExecutorEvent(executorAddress, executorsCollection.activeIndexOf[executorAddress]);
         executorsCollection.busyExecutors[executorAddress].assignedRequestID = 0;
         executorsCollection.busyExecutors[executorAddress].taskAssignmentIndex = 0;
         _activateExecutor(executorsCollection.busyExecutors[executorAddress]);
         delete executorsCollection.busyExecutors[executorAddress];
+        emit executorUnlocked(executorAddress);
     }
 
     function _activateExecutor(Executor memory executor) private {
@@ -525,7 +515,7 @@ contract ExecutionBroker is Transferable {
         } else {
             executorsCollection.activeExecutors[executorIndex] = executor;
         }
-        executorsCollection.activeIndexOf[msg.sender] = executorIndex;
+        executorsCollection.activeIndexOf[executor.executorAddress] = executorIndex;
         executorsCollection.amountOfActiveExecutors++;
     }
 

@@ -277,7 +277,6 @@ class TestExecutor:
         executor2._liberateResult(reqID)
         assert dict(broker.requests(reqID))["closed"] == False
         assert dict(broker.requests(reqID))["result"] == ('', '0x0000000000000000000000000000000000000000')
-        raise 123
         executor3._liberateResult(reqID)
         result1.signingAddress = broker.address
         assert dict(broker.requests(reqID))["closed"] == True
