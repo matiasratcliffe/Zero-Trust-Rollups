@@ -1,4 +1,4 @@
-
+from random import randint
 
 
 
@@ -10,7 +10,8 @@ class Requestor:
     
     def createRequest(self, inputStateReference="", codeReference="", amountOfExecutors=3, executionPower=1000):
         value = executionPower * amountOfExecutors
-        transaction = self.broker.submitRequest(inputStateReference, codeReference, amountOfExecutors, executionPower, {"from": self.account, "value": value})
+        randomSeed = randint(0, (2**256)-1)
+        transaction = self.broker.submitRequest(inputStateReference, codeReference, amountOfExecutors, executionPower, randomSeed, {"from": self.account, "value": value})
         transaction.wait(1)
         return transaction.return_value
 
@@ -18,6 +19,7 @@ class Requestor:
         chainData = {"from": self.account}
         if customGasPrice != None:
             chainData["gas_price"] = f"{customGasPrice} wei"
-        transaction = self.broker.rotateExecutors(requestID, chainData)
+        randomSeed = randomSeed = randint(0, (2**256)-1)
+        transaction = self.broker.rotateExecutors(requestID, randomSeed, chainData)
         transaction.wait(1)
         return transaction # TODO transaction wait for all projects

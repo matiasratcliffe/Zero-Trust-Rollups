@@ -41,6 +41,7 @@ struct TaskAssignment {
     bytes32 signedResultHash;
     bytes32 unsignedResultHash;
     Result result;
+    //bool truncated;
     bool submitted;
     bool liberated;
 }
@@ -134,6 +135,10 @@ contract ExecutionBroker is Transferable {
         return executorsCollection.busyExecutors[executorAddress];
     }
 
+    function getActiveIndexOfExecutorByAddress(address executorAddress) public view returns (uint) {
+        return executorsCollection.activeIndexOf[executorAddress];
+    }
+
     function getExecutorStateByAddress(address executorAddress) public view returns (string memory executorState) {
         if (executorsCollection.activeIndexOf[executorAddress] != 0) {
             return "active";
@@ -170,6 +175,10 @@ contract ExecutionBroker is Transferable {
             }
             j++;
         }
+    }
+
+    function getActiveExecutorByIndex(uint position) public view returns (Executor memory executor) {
+        return executorsCollection.activeExecutors[position];
     }
 
     // Open interaction functions
@@ -213,15 +222,7 @@ contract ExecutionBroker is Transferable {
         delete executorsCollection.inactiveExecutors[msg.sender];
     }
 
-    function getRandomNumber(uint floor, uint ceiling, uint blockOffset) public view returns (uint) {
-        require(floor < ceiling, "The floor must be smaller than the ceiling");
-        uint range = ceiling - floor;
-        uint seed = (uint(blockhash(block.number - 1 - blockOffset)) / block.timestamp) + (block.timestamp ** 3);  // TODO too expensive?
-        uint number = (seed % range) + floor;
-        return number;
-    }
-
-    function submitRequest(string calldata inputState, string calldata codeReference, uint amountOfExecutors, uint executionPowerPaidFor) public payable returns (uint) {
+    function submitRequest(string calldata inputState, string calldata codeReference, uint amountOfExecutors, uint executionPowerPaidFor, uint256 randomSeed) public payable returns (uint) {
         // TODO podria implementar que el cliente elija un threshold de estadisticas de punisheado o innacurate
         require(amountOfExecutors % 2 == 1, "You must choose an odd amount of executors");
         require(amountOfExecutors <= MAXIMUM_EXECUTORS_PER_REQUEST, "You exceeded the maximum number of allowed executors per request");
@@ -244,7 +245,8 @@ contract ExecutionBroker is Transferable {
         requests.push(request);
         TaskAssignment[] storage taskAssignments = taskAssignmentsMap[request.id];
         for (uint32 i = 0; i < amountOfExecutors; i++) {
-            address executorAddress = getActiveExecutorByPosition(getRandomNumber(0, executorsCollection.amountOfActiveExecutors, i)).executorAddress;
+            uint randomPosition = randomSeed % executorsCollection.amountOfActiveExecutors;
+            address executorAddress = getActiveExecutorByPosition(randomPosition).executorAddress;
             taskAssignments.push(TaskAssignment({
                 executorAddress: executorAddress,
                 timestamp: block.timestamp,
@@ -258,11 +260,12 @@ contract ExecutionBroker is Transferable {
                 liberated: false
             }));
             _lockExecutor(executorAddress, request.id, i);
+            randomSeed /= executorsCollection.amountOfActiveExecutors > 0 ? executorsCollection.amountOfActiveExecutors : 1;
         }
         return request.id;
     }
 
-    function rotateExecutors(uint requestID) public returns (bool) {
+    function rotateExecutors(uint requestID, uint256 randomSeed) public returns (bool) {
         uint initialGas = gasleft();
         require(requests[requestID].clientAddress == msg.sender, "You cant rotate a request that was not made by you");
         require(requests[requestID].submissionsLocked == false, "All executors for this request have already delivered");
@@ -282,11 +285,13 @@ contract ExecutionBroker is Transferable {
             if (executorsCollection.amountOfActiveExecutors > 0) {
                 uint taskIndex = punishedExecutorsTaskIDs[i];
                 punishedExecutorsAddresses[i] = taskAssignmentsMap[requestID][taskIndex].executorAddress;
-                address newExecutorAddress = getActiveExecutorByPosition(getRandomNumber(0, executorsCollection.amountOfActiveExecutors, i)).executorAddress;
+                uint randomPosition = randomSeed % executorsCollection.amountOfActiveExecutors;
+                address newExecutorAddress = getActiveExecutorByPosition(randomPosition).executorAddress;
                 taskAssignmentsMap[requestID][taskIndex].executorAddress = newExecutorAddress;
                 taskAssignmentsMap[requestID][taskIndex].timestamp = block.timestamp;
                 _lockExecutor(newExecutorAddress, requestID, i);
                 effectiveAmountOfPunishedExecutors++;
+                randomSeed /= executorsCollection.amountOfActiveExecutors > 0 ? executorsCollection.amountOfActiveExecutors : 1;
             }
         }
         if (effectiveAmountOfPunishedExecutors == 0) {
@@ -321,7 +326,7 @@ contract ExecutionBroker is Transferable {
             return false;
         }
 
-        TODO mejor solo marcar los truncated como submited y los marco de alguna manera para asegurarme que no van a hacer quorum y porende van a caer en toBePunished. Igual si la cagan con los require en liberate.
+        //TODO mejor solo marcar los truncated como submited y los marco de alguna manera para asegurarme que no van a hacer quorum y porende van a caer en toBePunished. Igual si la cagan con los require en liberate.
 
         uint punishGas = 12345; //TODO
         uint constantGasOverHead = 12345; //TODO
@@ -391,8 +396,11 @@ contract ExecutionBroker is Transferable {
 
     }
 
+    //TODO puedo hacer que el precio del executionpower sea inversamente proporsional a la cantidad de ejecutores activos
     // Private Functions
 
+    event toBeRewarded(address executorAddress, uint activeIndexOf);
+    event toBePunished(address executorAddress, uint activeIndexOf);
     function _closeRequest(uint requestID) private {
         bytes32[] memory hashes = new bytes32[](taskAssignmentsMap[requestID].length);
         uint8[] memory indexes = new uint8[](taskAssignmentsMap[requestID].length);
@@ -440,6 +448,13 @@ contract ExecutionBroker is Transferable {
             }
         }
 
+        for (uint8 i = 0; i < executorsToBeRewarded.length; i++) {
+            emit toBeRewarded(executorsToBeRewarded[i], executorsCollection.activeIndexOf[executorsToBeRewarded[i]]);
+        }
+        for (uint8 i = 0; i < executorsToBePunished.length; i++) {
+            emit toBeRewarded(executorsToBePunished[i], executorsCollection.activeIndexOf[executorsToBePunished[i]]);
+        }
+        
         uint punishAmount;
         uint individualPayAmount = requests[requestID].executionPowerPaidFor;
         for (uint8 i = 0; i < executorsToBeRewarded.length; i++) {
@@ -487,8 +502,10 @@ contract ExecutionBroker is Transferable {
         emit executorLocked(executorAddress);
     }
 
+    event unlockExecutorEvent(address executorAddress, uint activeIndexOf);
     function _unlockExecutor(address executorAddress) private {
         require(executorsCollection.busyExecutors[executorAddress].executorAddress == executorAddress, "This address does not belong to a locked executor");
+        emit unlockExecutorEvent(executorAddress, executorsCollection.activeIndexOf[executorAddress]);
         executorsCollection.busyExecutors[executorAddress].assignedRequestID = 0;
         executorsCollection.busyExecutors[executorAddress].taskAssignmentIndex = 0;
         _activateExecutor(executorsCollection.busyExecutors[executorAddress]);
@@ -496,7 +513,7 @@ contract ExecutionBroker is Transferable {
     }
 
     function _activateExecutor(Executor memory executor) private {
-        require(executorsCollection.activeIndexOf[msg.sender] == 0, "This address is already registered as an active executor");
+        require(executorsCollection.activeIndexOf[executor.executorAddress] == 0, "This address is already registered as an active executor");
         uint16 executorIndex;
         for (executorIndex = 1; executorIndex < executorsCollection.activeExecutors.length; executorIndex++) {
             if (executorsCollection.activeExecutors[executorIndex].executorAddress == address(0x0)) {
