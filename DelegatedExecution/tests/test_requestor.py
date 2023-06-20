@@ -101,7 +101,7 @@ class TestRequestor:
         assert request["challengeInsurance"] == requestedInsurance
         assert request["claimDelay"] == claimDelay
         assert request["client"] == requestor.client.address
-        assert int(request["acceptor"], 16) == 0
+        assert int(request["acceptance"][0], 16) == 0
         assert int(dict(request["submission"])["issuer"], 16) == 0
         assert request["cancelled"] == False
     
@@ -176,11 +176,11 @@ class TestRequestor:
         executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
         executor._acceptRequest(reqID)
         time.sleep(2)
-        assert dict(broker.requests(reqID))["acceptor"] == executor.account
+        assert dict(broker.requests(reqID))["acceptance"][0] == executor.account
         with pytest.raises(Exception, match="You cant cancel an accepted request"):
             requestor.cancelRequest(reqID)
 
-    def test_cancel_accepted_then_unnacepted_request(self):
+    def test_cancel_accepted_then_unnacept_request(self):
         requestor = Requestor(ClientFactory.getInstance())
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
         time.sleep(2)
@@ -189,10 +189,10 @@ class TestRequestor:
         executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
         executor._acceptRequest(reqID)
         time.sleep(3)
-        assert dict(broker.requests(reqID))["acceptor"] == executor.account
+        assert dict(broker.requests(reqID))["acceptance"][0] == executor.account
         executor._cancelAcceptance(reqID)
         time.sleep(4)
-        assert int(dict(broker.requests(reqID))["acceptor"], 16) == 0
+        assert int(dict(broker.requests(reqID))["acceptance"][0], 16) == 0
         requestor.cancelRequest(reqID)
         time.sleep(3)
         assert dict(broker.requests(reqID))["cancelled"] == True

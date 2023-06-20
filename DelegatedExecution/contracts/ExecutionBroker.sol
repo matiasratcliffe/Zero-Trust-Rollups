@@ -14,9 +14,14 @@ struct Request {
     uint challengeInsurance;  // amount of gas for challenges, deberia ser mayor al gas estimado, just in case
     uint claimDelay;  // the minimum amount of time that needs to pass between a submission and a payment claim, to allow for possible challengers, in secconds
     BaseClient client;
-    address acceptor;
+    Acceptance acceptance;
     Submission submission;
     bool cancelled;
+}
+
+struct Acceptance {
+    address acceptor;
+    uint timestamp;
 }
 
 struct Submission {
@@ -28,6 +33,8 @@ struct Submission {
 
 
 contract ExecutionBroker is Transferable {
+
+    uint public ACCEPTANCE_GRACE_PERIOD;  // = 300 seconds = 5 minutes 
 
     Request[] public requests;
 
@@ -42,14 +49,21 @@ contract ExecutionBroker is Transferable {
     event requestSolidified(uint requestID);
     
     event challengeProcessed(uint requestID, bytes result);
-    event challengePayment(uint requestID, bool success);
+    event challengePayment(uint requestID, address payee, bool success);
     
+    constructor(uint acceptanceGracePeriod) {
+        ACCEPTANCE_GRACE_PERIOD = acceptanceGracePeriod;
+    }
 
     // Restricted interaction functions
 
     function submitRequest(BaseClient.ClientInput calldata input, uint postProcessingGas, uint requestedInsurance, uint claimDelay) public payable returns (uint) {
         // check msg.sender is an actual client - creo que no se puede, me parece que lo voy a tener que dejar asi, creo que no es una vulnerabilidad, onda, si no es del tipo, va a fallar eventualmente, y problema del boludo que lo registro mal
         require(msg.value > postProcessingGas, "The post processing gas cannot takeup all of the supplied ether");  // en el bot de python, ver que efectivamente el net payment, valga la pena
+        Acceptance memory acceptance = Acceptance({
+            acceptor: address(0x0),
+            timestamp: 0
+        });
         Submission memory submission = Submission({
             issuer: address(0x0),
             timestamp: 0,
@@ -64,7 +78,7 @@ contract ExecutionBroker is Transferable {
             challengeInsurance: requestedInsurance,
             claimDelay: claimDelay,
             client: BaseClient(msg.sender),
-            acceptor: address(0x0),
+            acceptance: acceptance,
             submission: submission,
             cancelled: false
         });
@@ -77,7 +91,7 @@ contract ExecutionBroker is Transferable {
         require(requestID < requests.length, "Index out of range");
         require(!requests[requestID].cancelled, "The request was already cancelled");
         require(msg.sender == address(requests[requestID].client), "You cant cancel a request that was not made by you");
-        require(requests[requestID].acceptor == address(0x0), "You cant cancel an accepted request");
+        require(requests[requestID].acceptance.acceptor == address(0x0), "You cant cancel an accepted request");
         //delete requests[requestID], no puedo hacer esto, this fucks up the ids
         requests[requestID].cancelled = true;
         address payable payee = payable(address(requests[requestID].client));
@@ -88,7 +102,7 @@ contract ExecutionBroker is Transferable {
     // Open interaction functions
 
     function publicizeRequest(uint requestID) public {  // This is to re emit the event In case the request gets forgotten
-        require(requests[requestID].acceptor == address(0x00), "You cant publicize a taken request");
+        require(requests[requestID].acceptance.acceptor == address(0x00), "You cant publicize a taken request");
         emit requestCreated(requestID, requests[requestID].payment, requests[requestID].postProcessingGas, requests[requestID].challengeInsurance, requests[requestID].claimDelay);
     }
 
@@ -96,26 +110,33 @@ contract ExecutionBroker is Transferable {
         // what if Request does not exist? what happens to the funds? IF YOU TRY TO ACCESS AN INVALID INDEX IN AN ARRAY, THE FUNCTION GETS REVERTED AND FUNDS RETURNED TOGETHER WITH SPARE GAS (BUT NOT ALREADY CONSUMED GAS)
         // what happens to the funds if one of the requires fail? THEY GET RETURNED
         require(!requests[requestID].cancelled, "The request was cancelled");
-        require(requests[requestID].acceptor == address(0x0) , "Someone already accepted the request");
+        require(requests[requestID].submission.issuer == address(0x0), "There is already a submission for this request");
+        require(requests[requestID].acceptance.acceptor == address(0x0) || (requests[requestID].acceptance.timestamp + ACCEPTANCE_GRACE_PERIOD) < block.timestamp, "There already is an unexpired acceptance for this request");
         require(msg.value == requests[requestID].challengeInsurance, "Incorrect amount of insurance provided");
-        requests[requestID].acceptor = msg.sender;
+        if (requests[requestID].acceptance.acceptor != address(0x0)) {
+            address payable payee = payable(requests[requestID].acceptance.acceptor);
+            _internalTransferFunds(requests[requestID].challengeInsurance, payee);
+        }
+        requests[requestID].acceptance.acceptor = msg.sender;
+        requests[requestID].acceptance.timestamp = block.timestamp;
         emit requestAccepted(requestID, msg.sender);
     }
 
     function cancelAcceptance(uint requestID) public {
-        require(requests[requestID].acceptor != address(0x0), "There is no acceptor for the provided requestID");
+        require(requests[requestID].acceptance.acceptor != address(0x0), "There is no acceptor for the provided requestID");
         require(requests[requestID].submission.issuer == address(0x0), "This request already has a submission");
-        require(requests[requestID].acceptor == msg.sender, "You cant cancel an acceptance that does not belong to you");
-        address payable payee = payable(requests[requestID].acceptor);
-        requests[requestID].acceptor = address(0x0);
+        require(requests[requestID].acceptance.acceptor == msg.sender, "You cant cancel an acceptance that does not belong to you");
+        address payable payee = payable(requests[requestID].acceptance.acceptor);
+        requests[requestID].acceptance.acceptor = address(0x0);
+        requests[requestID].acceptance.timestamp = 0;
         bool transferSuccess = _internalTransferFunds(requests[requestID].challengeInsurance, payee);
         emit acceptanceCancelled(requestID, payee, transferSuccess);
     }
 
     function submitResult(uint requestID, bytes calldata result) public {
-        require(requests[requestID].acceptor != address(0x0), "You need to accept the request first");
+        require(requests[requestID].acceptance.acceptor != address(0x0), "You need to accept the request first");
         require(requests[requestID].submission.issuer == address(0x0), "There is already a submission for this request");
-        require(requests[requestID].acceptor == msg.sender, "Someone else has accepted the Request");
+        require(requests[requestID].acceptance.acceptor == msg.sender, "Someone else has accepted the Request");
         Submission memory submission = Submission({
             issuer: msg.sender,
             timestamp: block.timestamp,
@@ -144,9 +165,11 @@ contract ExecutionBroker is Transferable {
             });
             requests[requestID].submission = submission;  // notar que en las requests que se resolvieron por challenge el acceptor es diferente al issuer (a menos que alguien se autochallengee)
             bool transferSuccess = _solidify(requestID);
-            emit challengePayment(requestID, transferSuccess);
+            emit challengePayment(requestID, msg.sender, transferSuccess);
             return true;  // result was corrected
-        } else {  // el original lo hizo bien, dejo que pase el tiempo y cobre TODO decidir si quiero pagar un challenge a una sub correcta
+        } else {  // el original lo hizo bien, solidifico y le pago
+            bool transferSuccess = _solidify(requestID);
+            emit challengePayment(requestID, requests[requestID].submission.issuer, transferSuccess);
             return false;  // original was correct
         }
     }
@@ -163,7 +186,7 @@ contract ExecutionBroker is Transferable {
     // Public views
 
     function isRequestOpen(uint requestID) public view returns (bool) {  // solo a modo de ayuda
-        return (!requests[requestID].cancelled && requests[requestID].acceptor == address(0x0));
+        return (!requests[requestID].cancelled && requests[requestID].acceptance.acceptor == address(0x0));
     }
 
     function requestCount() public view returns (uint) {

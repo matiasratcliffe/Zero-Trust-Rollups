@@ -13,10 +13,11 @@ class BrokerFactory:
         else:
             return BrokerFactory.create(Accounts.getAccount())
 
-    def create(account=None):
+    def create(account=None, acceptanceGracePeriod=5):
         if account == None:
             account = Accounts.getAccount()
         ExecutionBroker.deploy(
+            acceptanceGracePeriod,
             {"from": account},
             publish_source=config["networks"][network.show_active()]["verify"]
         )

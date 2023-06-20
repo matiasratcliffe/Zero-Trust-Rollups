@@ -311,10 +311,16 @@ class TestExecutor:
     def test_liberate_an_already_liberated_result(self):
         broker = BrokerFactory.create()
         executor1 = Executor(broker, Accounts.getFromIndex(0), True)
+        executor2 = Executor(broker, Accounts.getFromIndex(1), True)
+        executor3 = Executor(broker, Accounts.getFromIndex(2), True)
         requestor = Requestor(broker, Accounts.getAccount())
-        reqID = requestor.createRequest("input state", "code reference", amountOfExecutors=1, executionPower=1000)
+        reqID = requestor.createRequest("input state", "code reference", amountOfExecutors=3, executionPower=1000)
         result1 = executor1._calculateFinalState(reqID)
+        result2 = executor2._calculateFinalState(reqID)
+        result3 = executor3._calculateFinalState(reqID)
         executor1._submitSignedHash(reqID, result1)
+        executor2._submitSignedHash(reqID, result2)
+        executor3._submitSignedHash(reqID, result3)
         executor1._liberateResult(reqID)
         with pytest.raises(Exception, match="The result for this request, for this executor, has already been liberated"):
             executor1._liberateResult(reqID)    

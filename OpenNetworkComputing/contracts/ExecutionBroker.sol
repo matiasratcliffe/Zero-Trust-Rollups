@@ -70,9 +70,6 @@ contract ExecutionBroker is Transferable {
     event executorLocked(address executorAddress);
     event executorUnlocked(address executorAddress);
     event executorPunished(address executorAddress);
-    
-
-    // Restricted interaction functions
 
     constructor(uint executionTimeFrame, uint baseStakeAmount, uint maximumPower, uint maximumExecutors) {
         EXECUTION_TIME_FRAME_SECONDS = executionTimeFrame;
@@ -365,6 +362,7 @@ contract ExecutionBroker is Transferable {
 
     function liberateResult(uint requestID, Result memory result) public {
         Executor memory executor = getExecutorByAddress(msg.sender);
+        require(requests[requestID].closed == false, "This request has already been closed"); //TODO test in python
         require(executor.assignedRequestID == requestID, "You must be assigned to the provided request to liberate the result");
         require(taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].submitted == true, "You must first submit a signed result hash before you can liberate it");
         require(requests[requestID].submissionsLocked == true, "You must wait until all submissions for this request have been locked");

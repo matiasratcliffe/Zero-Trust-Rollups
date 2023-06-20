@@ -22,8 +22,6 @@ class TestExecutor:
     def teardown_method(self, method):
         network.event.event_watcher.reset()
 
-    # TODO tests de transferable
-
     def test_is_request_open(self):
         requestor = Requestor(ClientFactory.getInstance())
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
@@ -44,9 +42,9 @@ class TestExecutor:
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
         executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
-        assert int(dict(broker.requests(reqID))["acceptor"], 16) == 0
+        assert int(dict(broker.requests(reqID))["acceptance"][0], 16) == 0
         executor._acceptRequest(reqID)
-        assert dict(broker.requests(reqID))["acceptor"] == executor.account
+        assert dict(broker.requests(reqID))["acceptance"][0] == executor.account
 
     def test_accept_cancelled_request(self):
         requestor = Requestor(ClientFactory.getInstance())
@@ -63,10 +61,45 @@ class TestExecutor:
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
         executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
-        assert int(dict(broker.requests(reqID))["acceptor"], 16) == 0
+        assert int(dict(broker.requests(reqID))["acceptance"][0], 16) == 0
         executor._acceptRequest(reqID)
-        with pytest.raises(Exception, match="Someone already accepted the request"):
-            executor._acceptRequest(reqID)        
+        with pytest.raises(Exception, match="There already is an unexpired acceptance for this request"):
+            executor._acceptRequest(reqID)
+
+    def test_overtake_expired_acceptance(self):
+        requestor = Requestor(ClientFactory.getInstance())
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor1 = Executor(Accounts.getFromIndex(0), broker, populateBuffers=False)
+        executor2 = Executor(Accounts.getFromIndex(1), broker, populateBuffers=False)
+        assert int(dict(broker.requests(reqID))["acceptance"][0], 16) == 0
+        originalBalance1 = executor1.account.balance()
+        transaction1 = executor1._acceptRequest(reqID)
+        assert dict(broker.requests(reqID))["acceptance"][0] == executor1.account
+        assert executor1.account.balance() == originalBalance1 - (transaction1.gas_used * transaction1.gas_price) - dict(broker.requests(reqID))["challengeInsurance"]
+        with pytest.raises(Exception, match="There already is an unexpired acceptance for this request"):
+            executor2._acceptRequest(reqID)
+        time.sleep(6)
+        originalBalance1 = executor1.account.balance()
+        originalBalance2 = executor2.account.balance()
+        transaction2 = executor2._acceptRequest(reqID)
+        assert dict(broker.requests(reqID))["acceptance"][0] == executor2.account
+        assert executor2.account.balance() == originalBalance2 - (transaction2.gas_used * transaction2.gas_price) - dict(broker.requests(reqID))["challengeInsurance"]
+        assert executor1.account.balance() == originalBalance1 + dict(broker.requests(reqID))["challengeInsurance"]
+
+    def test_accept_submitted_request(self):
+        requestor = Requestor(ClientFactory.getInstance())
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
+        executor._acceptRequest(reqID)
+        result = executor._computeResult(reqID)
+        executor._submitResult(reqID, result)
+        assert dict(dict(broker.requests(reqID))["submission"])["issuer"] == executor.account
+        assert dict(dict(broker.requests(reqID))["submission"])["result"] == result
+        assert dict(dict(broker.requests(reqID))["submission"])["solidified"] == False
+        with pytest.raises(Exception, match="There is already a submission for this request"):
+            executor._acceptRequest(reqID)
 
     def test_accept_request_wrong_insurance(self):
         requestor = Requestor(ClientFactory.getInstance())
@@ -89,7 +122,7 @@ class TestExecutor:
         executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
         executor._acceptRequest(reqID)
         executor._cancelAcceptance(reqID)
-        assert int(dict(broker.requests(reqID))["acceptor"], 16) == 0
+        assert int(dict(broker.requests(reqID))["acceptance"][0], 16) == 0
     
     def test_cancel_acceptance_on_non_existing_request(self):
         executor = Executor(Accounts.getAccount(), BrokerFactory.getInstance(), populateBuffers=False)
@@ -126,7 +159,7 @@ class TestExecutor:
         executor1 = Executor(Accounts.getFromIndex(0), broker, populateBuffers=False)
         executor2 = Executor(Accounts.getFromIndex(1), broker, populateBuffers=False)
         executor1._acceptRequest(reqID)
-        assert dict(broker.requests(reqID))["acceptor"] == executor1.account
+        assert dict(broker.requests(reqID))["acceptance"][0] == executor1.account
         with pytest.raises(Exception, match="You cant cancel an acceptance that does not belong to you"):
             executor2._cancelAcceptance(reqID)
 
@@ -187,11 +220,13 @@ class TestExecutor:
         assert dict(dict(broker.requests(reqID))["submission"])["result"] == alteredResult
         assert dict(dict(broker.requests(reqID))["submission"])["solidified"] == False
         originalBalance = executor2.account.balance()
-        challengeSuccess = executor2._challengeSubmission(reqID).return_value
+        transaction = executor2._challengeSubmission(reqID)
+        challengeSuccess = transaction.return_value
         assert challengeSuccess == True
         assert dict(dict(broker.requests(reqID))["submission"])["issuer"] == executor2.account
         assert dict(dict(broker.requests(reqID))["submission"])["result"] == result
         assert dict(dict(broker.requests(reqID))["submission"])["solidified"] == True
+        assert executor2.account.balance() == originalBalance - (transaction.gas_used * transaction.gas_price) + dict(broker.requests(reqID))["payment"] + dict(broker.requests(reqID))["challengeInsurance"]
         Logger.log(f"Pre-Challenge balance: {originalBalance} ----- Post-Challenge balance: {executor2.account.balance()}")
 
     def test_challenge_correct_submission(self):
@@ -206,11 +241,16 @@ class TestExecutor:
         assert dict(dict(broker.requests(reqID))["submission"])["issuer"] == executor1.account
         assert dict(dict(broker.requests(reqID))["submission"])["result"] == result
         assert dict(dict(broker.requests(reqID))["submission"])["solidified"] == False
-        challengeSuccess = executor2._challengeSubmission(reqID).return_value
+        originalBalance1 = executor1.account.balance()
+        originalBalance2 = executor2.account.balance()
+        transaction = executor2._challengeSubmission(reqID)
+        challengeSuccess = transaction.return_value
         assert challengeSuccess == False
         assert dict(dict(broker.requests(reqID))["submission"])["issuer"] == executor1.account
         assert dict(dict(broker.requests(reqID))["submission"])["result"] == result
-        assert dict(dict(broker.requests(reqID))["submission"])["solidified"] == False
+        assert dict(dict(broker.requests(reqID))["submission"])["solidified"] == True
+        assert executor1.account.balance() == originalBalance1 + dict(broker.requests(reqID))["payment"] + dict(broker.requests(reqID))["challengeInsurance"]
+        assert executor2.account.balance() == originalBalance2 - (transaction.gas_used * transaction.gas_price)
 
     def test_challenge_unsibmitted_request(self):
         requestor = Requestor(ClientFactory.getInstance())
@@ -426,8 +466,8 @@ class TestExecutor:
         result = executor1._computeResult(reqID)
         executor1._submitResult(reqID, result)
         time.sleep(3)
-        executor2.challengerLoopRound()
+        executor2.challengerLoopRound()  # As the original result is correct, the function does not transact with the challengeSubmission function, leaving the request unsolidified
         assert dict(dict(broker.requests(reqID))["submission"])["issuer"] == executor1.account
-        assert dict(dict(broker.requests(reqID))["submission"])["solidified"] == False  # TODO change this to True so it gets solidified
+        assert dict(dict(broker.requests(reqID))["submission"])["solidified"] == False
 
     #TODO test post process result
