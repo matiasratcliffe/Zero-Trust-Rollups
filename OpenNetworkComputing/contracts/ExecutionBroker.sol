@@ -189,7 +189,7 @@ contract ExecutionBroker is Transferable {
     }
 
     function getAmountOfActiveExecutorsWithCriteria(Criteria memory criteria) public view returns (uint) {
-        return 0;
+        return executorsCollection.amountOfActiveExecutors + criteria.dummy; //TODO
     }
 
     // Open interaction functions
@@ -349,8 +349,8 @@ contract ExecutionBroker is Transferable {
         for (uint8 i = 0; i < amountOfPunishedExecutors; i++) {
             _punishExecutor(taskAssignmentsMap[requestID][punishedExecutorsTaskIDs[i]].executorAddress, punishAmount);
             delete taskAssignmentsMap[requestID][punishedExecutorsTaskIDs[i]];
-            taskAssignmentsMap[requestID][punishedExecutorsTaskIDs[i]].submitted = true;
-            taskAssignmentsMap[requestID][punishedExecutorsTaskIDs[i]].liberated = true;
+            taskAssignmentsMap[requestID][punishedExecutorsTaskIDs[i]].submitted = true;  // Para que no obstruya la liberacion
+            taskAssignmentsMap[requestID][punishedExecutorsTaskIDs[i]].liberated = true;  // Para que no obstruya el cierre
         }            
         bool transferSuccess = _internalTransferFunds(punishAmount * amountOfPunishedExecutors, msg.sender);
         return transferSuccess;
@@ -369,7 +369,7 @@ contract ExecutionBroker is Transferable {
         // if last one, mark request as submitted? do something else like start the escrow? SI ES EL ULTIMO SOLO MARCO COMO SUBMITED, REQUISITO PARA LIBERATE RESULT. POR LO QUE IMPLICITAMENTE ARRANCA EL ESCROW, Y AHI VAN POSTULANDO LOS RESULTADOS. Y EN EL LIBERATE RESULTS, SI ES EL ULTIMO, SE GENERA LA PAGA Y LIBERAN LOS STAKES CLIENT&EXECUTOR, O SI PASA CIERTO TIEMPO, EL CLIENTE PUEDE TRUNCAR LA LIBERACION PARA RETIRAR SU STAKE, Y LOS QUE NO HAYAN LIBERADO LA COMEN
         bool lastOne = true;
         for (uint8 i = 0; i < taskAssignmentsMap[requestID].length; i++) {
-            if (!taskAssignmentsMap[requestID][i].submitted && taskAssignmentsMap[requestID][i].executorAddress != address(0x0)) {
+            if (!taskAssignmentsMap[requestID][i].submitted) {
                 lastOne = false;
             }
         }
@@ -380,7 +380,7 @@ contract ExecutionBroker is Transferable {
 
     }
 
-    function liberateResult(uint requestID, Result memory result) public {
+    function liberateResult(uint requestID, Result memory result) public returns (bool) {
         uint initialGas = gasleft();
         Executor memory executor = getExecutorByAddress(msg.sender);
         require(requests[requestID].closed == false, "This request has already been closed"); //TODO test in python
@@ -391,43 +391,57 @@ contract ExecutionBroker is Transferable {
         // TODO test in python
         require(result.issuer == msg.sender, "The issuer of the sent result does not match the transaction sender");
         
+        bool hashMatched;
         if (keccak256(abi.encode(result)) == taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].signedResultHash) {
-            //"Your result does not match your submitted hash");
-            // TODO ver que pasa si alguno submiteo el hash mal, lo castigo al toque? porque si lo hizo mal, no lo va a poder hacer bien jamas, y me trabaria toda la request para siempre. otro TODO seria ver que pasa si todos se mandan una cagada asi, y por ende, si no queda nadie. Se resetea la request con nuevos assignments? se le devuelve la guita al cliente???
-            
-            result.issuer = address(this);
-            
+            hashMatched = true;
+            result.issuer = address(this);    
             taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].unsignedResultHash = keccak256(abi.encode(result));
             taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].result = result;
-            taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].liberated = true;
         } else {
-            // TODO punish
+            hashMatched = false;
+            // Dejo el result.issuer en cero, forzando un castigo al ser ignorado por el majority detector en _closeRequest. Este castigo es peor que ser truncado como ejecutor
         }
+        taskAssignmentsMap[executor.assignedRequestID][executor.taskAssignmentIndex].liberated = true;
 
         bool lastOne = true;
-        for (uint8 i = 0; i < taskAssignmentsMap[requestID].length && ; i++) {
-            if (!taskAssignmentsMap[requestID][i].liberated && taskAssignmentsMap[requestID][i].executorAddress != address(0x0)) {
+        for (uint8 i = 0; i < taskAssignmentsMap[requestID].length; i++) {
+            if (!taskAssignmentsMap[requestID][i].liberated) {
                 lastOne = false;
+                break;
             }
         }
         if (lastOne) {
-            _closeRequest(requestID, initialGas);
+            bool validSubmissionsPresent = false;
+            for (uint8 i = 0; i < taskAssignmentsMap[requestID].length; i++) {
+                if (taskAssignmentsMap[requestID][i].result.issuer != address(0x0)) {
+                    validSubmissionsPresent = true;
+                    break;
+                }
+            }
+            if (validSubmissionsPresent) {
+                _closeRequest(requestID, initialGas);
+            } else {
+                //TODO que pasa si todos se mandan una cagada con el hash, y por ende, nadie tiene una submission buena. Se resetea la request con nuevos assignments? se le devuelve la guita al cliente???
+                //TODO aca si ver tema castigos de los malHasheros, porque hasta ahora dependia de la ejecucion de _closeRequest
+            }
         }
+        return hashMatched;
     }
 
     function truncateResultLiberation(uint requestID) public {
-
+        SEGUIR ACA O VER TEMA TIEMPO DE ESPERA ANTES DE TRUNCAR? Y PYTHON TESTS?
+        //TODO marcar el result.issuer en cero porque es mas severo que punishear directamente, o lo puedo forzar con el constantgasoverhead
     }
 
-    //TODO puedo hacer que el precio del executionpower sea inversamente proporsional a la cantidad de ejecutores activos
+    //TODO puedo hacer que el precio del executionpower sea inversamente proporsional a la cantidad de ejecutores activos, uso tx.gasprice? YA CONFIRME QUE SI EXISTE
     // Private Functions
 
-    function _closeRequest(uint requestID, uint initialGas) private returns (bool) {
+    function _closeRequest(uint requestID, uint initialGas) private {
         bytes32[] memory hashes = new bytes32[](taskAssignmentsMap[requestID].length);
         uint8[] memory indexes = new uint8[](taskAssignmentsMap[requestID].length);
         uint8[] memory appearences = new uint8[](taskAssignmentsMap[requestID].length);
         for (uint8 i = 0; i < taskAssignmentsMap[requestID].length; i++) {
-            if (taskAssignmentsMap[requestID][i].executorAddress == address(0x0)) {
+            if (taskAssignmentsMap[requestID][i].result.issuer == address(0x0)) {  // Estos son los truncados o marcados para ser castigados
                 continue;
             }
             for (uint8 j = 0; j <= i; j++) {
@@ -450,7 +464,8 @@ contract ExecutionBroker is Transferable {
                 assignmentIndexOfMaximum = indexes[i];
             }
         }
-        
+        // Jamas se deberia dar que haya cero appearrances de todos, por el chequeo de validSubmissionsPresent
+
         // Result posting
         requests[requestID].result = taskAssignmentsMap[requestID][assignmentIndexOfMaximum].result;
         requests[requestID].closed = true;
@@ -464,7 +479,7 @@ contract ExecutionBroker is Transferable {
         for (uint8 i = 0; i < taskAssignmentsMap[requestID].length; i++) {
             if (taskAssignmentsMap[requestID][i].unsignedResultHash == hashes[appearenceIndexOfMaximum]) {
                 executorsToBeRewarded[rewardedCount++] = taskAssignmentsMap[requestID][i].executorAddress;
-            } else if (taskAssignmentsMap[requestID][i].executorAddress != address(0x0)) {
+            } else if (taskAssignmentsMap[requestID][i].executorAddress != address(0x0)) {  // Aca gracias a esta condicion agarro a los marcados para punished pero no a los truncados
                 executorsToBePunished[punishedCount++] = taskAssignmentsMap[requestID][i].executorAddress;
             }
         }
@@ -484,8 +499,7 @@ contract ExecutionBroker is Transferable {
             executorsCollection.busyExecutors[executorsToBePunished[i]].inaccurateSolvings++;
             _punishExecutor(executorsToBePunished[i], punishAmount);
         }
-        bool transferSuccess = _internalTransferFunds(punishAmount * punishedCount, requests[requestID].clientAddress);
-        return transferSuccess;
+        _internalTransferFunds(punishAmount * punishedCount, requests[requestID].clientAddress);
     }
 
     function _punishExecutor(address executorAddress, uint punishAmount) private {
