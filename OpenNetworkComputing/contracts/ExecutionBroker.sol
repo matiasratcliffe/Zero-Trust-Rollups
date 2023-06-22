@@ -323,9 +323,8 @@ contract ExecutionBroker is Transferable {
     }
 
     function truncateExecutors(uint requestID) public returns (bool) {
-        //TODO tiene que haber pasado el tiempo, y es como rotate pero no los rota, solo los elimina y castiga. por ende, tiene que haber al menos un submit
         uint initialGas = gasleft();
-        require(requests[requestID].clientAddress == msg.sender, "You cant rotate a request that was not made by you");
+        require(requests[requestID].clientAddress == msg.sender, "You cant truncate a request that was not made by you"); //TODO test in python
         require(requests[requestID].submissionsLocked == false, "All executors for this request have already delivered");
         uint amountOfPunishedExecutors = 0;
         uint[] memory punishedExecutorsTaskIDs = new uint[](taskAssignmentsMap[requestID].length);  // Me van a quedar algunos en cero capaz, no importa
@@ -351,7 +350,8 @@ contract ExecutionBroker is Transferable {
             delete taskAssignmentsMap[requestID][punishedExecutorsTaskIDs[i]];
             taskAssignmentsMap[requestID][punishedExecutorsTaskIDs[i]].submitted = true;  // Para que no obstruya la liberacion
             taskAssignmentsMap[requestID][punishedExecutorsTaskIDs[i]].liberated = true;  // Para que no obstruya el cierre
-        }            
+        }
+        //TODO somewhere arround here mark the submissions locked as true, and test in python
         bool transferSuccess = _internalTransferFunds(punishAmount * amountOfPunishedExecutors, msg.sender);
         return transferSuccess;
     }
@@ -428,9 +428,25 @@ contract ExecutionBroker is Transferable {
         return hashMatched;
     }
 
-    function truncateResultLiberation(uint requestID) public {
-        SEGUIR ACA O VER TEMA TIEMPO DE ESPERA ANTES DE TRUNCAR? Y PYTHON TESTS?
+    function forceResultLiberation(uint requestID) public {
         //TODO marcar el result.issuer en cero porque es mas severo que punishear directamente, o lo puedo forzar con el constantgasoverhead
+        uint initialGas = gasleft();
+        require(requests[requestID].closed == false, "This request has already been closed"); //TODO test in python
+        require(requests[requestID].clientAddress == msg.sender, "You cant force the liberation of a request that was not made by you"); //TODO test in python
+        require(requests[requestID].submissionsLocked == true, "There are still executors who have not posted their results");
+        //TODO check at least one liberated
+        //maybe once submissionsLocked is set to true, I need a submissionsLocked timestamp to check if i can truncateliberation yet or not TODO
+        
+        uint amountOfValidSubmissions = 0;
+        for (uint8 i = 0; i < taskAssignmentsMap[requestID].length; i++) {
+            if (taskAssignmentsMap[requestID][i].result.issuer == address(0x0)) {
+                taskAssignmentsMap[requestID][i].liberated = true;  // Los libero pero les dejo el resultado en cero, forzando el castigo en close request
+            } else {
+                amountOfValidSubmissions++;
+            }
+        }
+        require(amountOfValidSubmissions < taskAssignmentsMap[requestID].length, "There must be at least one valid liberated result");
+        _closeRequest(requestID, initialGas);
     }
 
     //TODO puedo hacer que el precio del executionpower sea inversamente proporsional a la cantidad de ejecutores activos, uso tx.gasprice? YA CONFIRME QUE SI EXISTE
