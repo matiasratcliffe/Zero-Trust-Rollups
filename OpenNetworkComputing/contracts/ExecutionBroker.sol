@@ -25,16 +25,19 @@ struct ExecutorsCollection {
 
 struct Criteria {
     uint dummy;
+    //uint16 max inacuracy percentage with 3 decimal places = ( (innacurate*1000) / (innacurate*1000 + accurate*1000 + 1))
+    //uint16 max punished
 }
 
 struct Request {
     uint id;
     address clientAddress;
-    Criteria executorCriteria; //TODO
+    uint executionPowerPrice;
+    uint executionPowerPaidFor; // In Wei; deberia tener en cuenta el computo y el gas de las operaciones de submit; y se divide entre los executors
+    Criteria executorCriteria;
     string inputState;  // Tambien aca esta el point of insertion
     string codeReference;  // Tambien aca esta la data sobre la version y compilador y otras specs que pueden afectar el resultado
-    uint executionPowerPaidFor; // In Wei; deberia tener en cuenta el computo y el gas de las operaciones de submit; y se divide entre los executors
-    // TODO ver tema entorno de ejecucion restringido y capaz hacer payment fijo???
+    // TODO ver tema entorno de ejecucion restringido
     Result result; // start empty, gets populated after escrow
     bool submissionsLocked;
     bool closed;
@@ -97,10 +100,11 @@ contract ExecutionBroker is Transferable {
         Request memory request = Request({
             id: 0,
             clientAddress: address(0x0),
+            executionPowerPrice: 0,
+            executionPowerPaidFor: 0,
             executorCriteria: criteria,
             inputState: '',
             codeReference: '',
-            executionPowerPaidFor: 0,
             result: Result({
                 data: '',
                 issuer: address(0x0)
@@ -233,50 +237,18 @@ contract ExecutionBroker is Transferable {
         delete executorsCollection.inactiveExecutors[msg.sender];
     }
 
-    function submitRequest(string calldata inputState, string calldata codeReference, uint amountOfExecutors, uint executionPowerPaidFor, uint256 randomSeed, Criteria memory criteria) public payable returns (uint) {
-        // TODO podria implementar que el cliente elija un threshold de estadisticas de punisheado o innacurate
+    function submitRequest(string memory inputState, string memory codeReference, uint amountOfExecutors, uint executionPowerPaidFor, uint256 randomSeed, Criteria memory criteria) public payable returns (uint) {
         require(amountOfExecutors % 2 == 1, "You must choose an odd amount of executors");
         require(amountOfExecutors <= MAXIMUM_EXECUTORS_PER_REQUEST, "You exceeded the maximum number of allowed executors per request");
         require(executionPowerPaidFor <= MAXIMUM_EXECUTION_POWER, "You exceeded the maximum allowed execution power per request");
-        require(amountOfExecutors <= executorsCollection.amountOfActiveExecutors, "You exceeded the number of available executors");
+        require(amountOfExecutors <= getAmountOfActiveExecutorsWithCriteria(criteria), "You exceeded the number of available executors that fit your criteria");
+
+        //TODO aca hacer un calculo del ExecutionPowerPrice
+        uint executionPowerPrice = 1;
         //TODO ver que executionPower y ether no sean necesariamente la misma unidad. quizas hacer otro campo que sea powerPrice que sea negociable. ME PARECE QUE NO VA A SER POSIBLE PORQUE A LOS EJECUTORES LES TOCA POR ASAR, NO POR OFERTA Y DEMANDA. PODRIA USAR EL GAS_PRICE COMO REFERENCIA
         require(msg.value == executionPowerPaidFor * amountOfExecutors, "The value sent in the request must be the execution power you intend to pay for multiplied by the amount of executors");
-        //TODO validate criteria
-        Request memory request = Request({
-            id: requests.length,
-            clientAddress: msg.sender,
-            executorCriteria: criteria,
-            inputState: inputState,
-            codeReference: codeReference,
-            executionPowerPaidFor: executionPowerPaidFor,
-            result: Result({
-                data: '',
-                issuer: address(0x0)
-            }),
-            submissionsLocked: false,
-            closed: false
-        });
-        requests.push(request);
-        TaskAssignment[] storage taskAssignments = taskAssignmentsMap[request.id];
-        for (uint32 i = 0; i < amountOfExecutors; i++) {
-            uint randomPosition = randomSeed % executorsCollection.amountOfActiveExecutors;
-            address executorAddress = getActiveExecutorByPosition(randomPosition).executorAddress;
-            taskAssignments.push(TaskAssignment({
-                executorAddress: executorAddress,
-                timestamp: block.timestamp,
-                signedResultHash: bytes32(abi.encode(0)),
-                unsignedResultHash: bytes32(abi.encode(0)),
-                result: Result({
-                    data: '',
-                    issuer: address(0x0)
-                }),
-                submitted: false,
-                liberated: false
-            }));
-            _lockExecutor(executorAddress, request.id, i);
-            randomSeed /= executorsCollection.amountOfActiveExecutors > 0 ? executorsCollection.amountOfActiveExecutors : 1;
-        }
-        return request.id;
+        
+        return _submitRequest(msg.sender, executionPowerPrice, inputState, codeReference, amountOfExecutors, executionPowerPaidFor, randomSeed, criteria);
     }
 
     function rotateExecutors(uint requestID, uint256 randomSeed) public returns (bool) {
@@ -296,7 +268,7 @@ contract ExecutionBroker is Transferable {
         address[] memory punishedExecutorsAddresses = new address[](amountOfPunishedExecutors);
         uint effectiveAmountOfPunishedExecutors = 0;
         for (uint8 i = 0; i < amountOfPunishedExecutors; i++) {
-            if (getAmountOfActiveExecutorsWithCriteria(Criteria ({dummy:0})) > 0) {
+            if (getAmountOfActiveExecutorsWithCriteria(Criteria ({dummy:0})) > 0) { //TODO check criteria porque en los assignments estoy ignorando el criteria
                 uint taskIndex = punishedExecutorsTaskIDs[i];
                 punishedExecutorsAddresses[i] = taskAssignmentsMap[requestID][taskIndex].executorAddress;
                 uint randomPosition = randomSeed % executorsCollection.amountOfActiveExecutors;
@@ -377,7 +349,6 @@ contract ExecutionBroker is Transferable {
             requests[requestID].submissionsLocked = true;
             emit requestSubmissionsLocked(requestID);
         }
-
     }
 
     function liberateResult(uint requestID, Result memory result) public returns (bool) {
@@ -421,8 +392,14 @@ contract ExecutionBroker is Transferable {
             if (validSubmissionsPresent) {
                 _closeRequest(requestID, initialGas);
             } else {
-                //TODO que pasa si todos se mandan una cagada con el hash, y por ende, nadie tiene una submission buena. Se resetea la request con nuevos assignments? se le devuelve la guita al cliente???
-                //TODO aca si ver tema castigos de los malHasheros, porque hasta ahora dependia de la ejecucion de _closeRequest
+                requests[requestID].closed = true;
+                emit requestClosed(requestID, 0);
+                if (getAmountOfActiveExecutorsWithCriteria(requests[requestID].executorCriteria) >= taskAssignmentsMap[requestID].length) {
+                    _submitRequest(requests[requestID].clientAddress, requests[requestID].executionPowerPrice, requests[requestID].inputState, requests[requestID].codeReference, taskAssignmentsMap[requestID].length, requests[requestID].executionPowerPaidFor, uint256(blockhash(block.number-1)), requests[requestID].executorCriteria);
+                } else {
+                    //TODO refund to client
+                }
+                //TODO punish and recreate request, if cant, refund
             }
         }
         return hashMatched;
@@ -451,6 +428,45 @@ contract ExecutionBroker is Transferable {
 
     //TODO puedo hacer que el precio del executionpower sea inversamente proporsional a la cantidad de ejecutores activos, uso tx.gasprice? YA CONFIRME QUE SI EXISTE
     // Private Functions
+
+    function _submitRequest(address clientAddress, uint executionPowerPrice, string memory inputState, string memory codeReference, uint amountOfExecutors, uint executionPowerPaidFor, uint256 randomSeed, Criteria memory criteria) private returns (uint) {
+        Request memory request = Request({
+            id: requests.length,
+            clientAddress: clientAddress,
+            executionPowerPrice: executionPowerPrice,
+            executionPowerPaidFor: executionPowerPaidFor,
+            executorCriteria: criteria,
+            inputState: inputState,
+            codeReference: codeReference,
+            result: Result({
+                data: '',
+                issuer: address(0x0)
+            }),
+            submissionsLocked: false,
+            closed: false
+        });
+        requests.push(request);
+        TaskAssignment[] storage taskAssignments = taskAssignmentsMap[request.id];
+        for (uint32 i = 0; i < amountOfExecutors; i++) {
+            uint randomPosition = randomSeed % executorsCollection.amountOfActiveExecutors;
+            address executorAddress = getActiveExecutorByPosition(randomPosition).executorAddress;
+            taskAssignments.push(TaskAssignment({
+                executorAddress: executorAddress,
+                timestamp: block.timestamp,
+                signedResultHash: bytes32(abi.encode(0)),
+                unsignedResultHash: bytes32(abi.encode(0)),
+                result: Result({
+                    data: '',
+                    issuer: address(0x0)
+                }),
+                submitted: false,
+                liberated: false
+            }));
+            _lockExecutor(executorAddress, request.id, i);
+            randomSeed /= executorsCollection.amountOfActiveExecutors > 0 ? executorsCollection.amountOfActiveExecutors : 1;
+        }
+        return request.id;
+    }
 
     function _closeRequest(uint requestID, uint initialGas) private {
         bytes32[] memory hashes = new bytes32[](taskAssignmentsMap[requestID].length);
