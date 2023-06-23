@@ -16,7 +16,7 @@ struct Executor {
 }
 
 struct ExecutorsCollection {
-    Executor[] activeExecutors;  // Not in a mapping because I need to be able to index them by uint
+    Executor[] activeExecutors;  // Not in a mapping because I need to be able to index them by uint to pick random
     mapping (address => uint) activeIndexOf;
     mapping (address => Executor) inactiveExecutors;
     mapping (address => Executor) busyExecutors;
@@ -24,9 +24,8 @@ struct ExecutorsCollection {
 }
 
 struct Criteria {
-    uint dummy;
-    //uint16 max inacuracy percentage with 3 decimal places = ( (innacurate*1000) / (innacurate*1000 + accurate*1000 + 1))
-    //uint16 max punished
+    uint16 maxInaccuracyPercentage;
+    uint16 maxTimesPunished;
 }
 
 struct Request {
@@ -72,6 +71,7 @@ contract ExecutionBroker is Transferable {
     mapping (uint => TaskAssignment[]) public taskAssignmentsMap;
     ExecutorsCollection public executorsCollection;
     
+    event requestCreated(uint requestID, address clientAddress);
     event resultSubmitted(uint requestID, address submitter);
     event requestSubmissionsLocked(uint requestID);
     event requestClosed(uint requestID, uint coincidences);
@@ -95,7 +95,8 @@ contract ExecutionBroker is Transferable {
             timesPunished: 0
         });
         Criteria memory criteria = Criteria({
-            dummy: 0
+            maxInaccuracyPercentage: 0,
+            maxTimesPunished: 0
         });
         Request memory request = Request({
             id: 0,
@@ -193,7 +194,20 @@ contract ExecutionBroker is Transferable {
     }
 
     function getAmountOfActiveExecutorsWithCriteria(Criteria memory criteria) public view returns (uint) {
-        return executorsCollection.amountOfActiveExecutors + criteria.dummy; //TODO
+        uint16 count = 0;
+        for (uint16 i = 0; i < executorsCollection.activeExecutors.length; i++) {
+            if (executorsCollection.activeExecutors[i].executorAddress != address(0x0) &&
+                executorsCollection.activeExecutors[i].timesPunished <= criteria.maxTimesPunished &&
+                (executorsCollection.activeExecutors[i].inaccurateSolvings * 1000) / (executorsCollection.activeExecutors[i].inaccurateSolvings + executorsCollection.activeExecutors[i].accurateSolvings + 1) <= criteria.maxInaccuracyPercentage) {
+                    count++;
+            }
+        }
+        return count;
+    }
+
+    //TODO maybe change the name of the function to something like, get reference execution power o get market expow o algo asi
+    function getCurrentExecutionPowerPrice() public view returns (uint) {
+        return 1; //TODO quizas agregar mas cosas aca, como el gas price, y el ratio de total available executors
     }
 
     // Open interaction functions
@@ -237,18 +251,15 @@ contract ExecutionBroker is Transferable {
         delete executorsCollection.inactiveExecutors[msg.sender];
     }
 
-    function submitRequest(string memory inputState, string memory codeReference, uint amountOfExecutors, uint executionPowerPaidFor, uint256 randomSeed, Criteria memory criteria) public payable returns (uint) {
+    function submitRequest(string memory inputState, string memory codeReference, uint amountOfExecutors, uint executionPowerPrice, uint executionPowerPaidFor, uint256 randomSeed, Criteria memory criteria) public payable returns (uint) {
         require(amountOfExecutors % 2 == 1, "You must choose an odd amount of executors");
         require(amountOfExecutors <= MAXIMUM_EXECUTORS_PER_REQUEST, "You exceeded the maximum number of allowed executors per request");
         require(executionPowerPaidFor <= MAXIMUM_EXECUTION_POWER, "You exceeded the maximum allowed execution power per request");
         require(amountOfExecutors <= getAmountOfActiveExecutorsWithCriteria(criteria), "You exceeded the number of available executors that fit your criteria");
-
-        //TODO aca hacer un calculo del ExecutionPowerPrice
-        uint executionPowerPrice = 1;
-        //TODO ver que executionPower y ether no sean necesariamente la misma unidad. quizas hacer otro campo que sea powerPrice que sea negociable. ME PARECE QUE NO VA A SER POSIBLE PORQUE A LOS EJECUTORES LES TOCA POR ASAR, NO POR OFERTA Y DEMANDA. PODRIA USAR EL GAS_PRICE COMO REFERENCIA
-        require(msg.value == executionPowerPaidFor * amountOfExecutors, "The value sent in the request must be the execution power you intend to pay for multiplied by the amount of executors");
+        require(executionPowerPrice >= getCurrentExecutionPowerPrice(), "asdsaddsgfdgd"); //TODO message
+        require(msg.value == executionPowerPrice * executionPowerPaidFor * amountOfExecutors, "The value sent in the request must be the execution power you intend to pay for multiplied by the price and the amount of executors");
         
-        return _submitRequest(msg.sender, executionPowerPrice, inputState, codeReference, amountOfExecutors, executionPowerPaidFor, randomSeed, criteria);
+        return _submitRequest(msg.sender, executionPowerPrice, executionPowerPaidFor, inputState, codeReference, amountOfExecutors, randomSeed, criteria);
     }
 
     function rotateExecutors(uint requestID, uint256 randomSeed) public returns (bool) {
@@ -265,20 +276,20 @@ contract ExecutionBroker is Transferable {
         if (amountOfPunishedExecutors == 0) {
             return false;
         }
-        address[] memory punishedExecutorsAddresses = new address[](amountOfPunishedExecutors);
-        uint effectiveAmountOfPunishedExecutors = 0;
-        for (uint8 i = 0; i < amountOfPunishedExecutors; i++) {
-            if (getAmountOfActiveExecutorsWithCriteria(Criteria ({dummy:0})) > 0) { //TODO check criteria porque en los assignments estoy ignorando el criteria
-                uint taskIndex = punishedExecutorsTaskIDs[i];
-                punishedExecutorsAddresses[i] = taskAssignmentsMap[requestID][taskIndex].executorAddress;
-                uint randomPosition = randomSeed % executorsCollection.amountOfActiveExecutors;
-                address newExecutorAddress = getActiveExecutorByPosition(randomPosition).executorAddress;
-                taskAssignmentsMap[requestID][taskIndex].executorAddress = newExecutorAddress;
-                taskAssignmentsMap[requestID][taskIndex].timestamp = block.timestamp;
-                _lockExecutor(newExecutorAddress, requestID, i);
-                effectiveAmountOfPunishedExecutors++;
-                randomSeed /= executorsCollection.amountOfActiveExecutors > 0 ? executorsCollection.amountOfActiveExecutors : 1;
-            }
+        
+        uint amountOfAvailableExecutorsFittingCriteria = getAmountOfActiveExecutorsWithCriteria(requests[requestID].executorCriteria);
+        uint effectiveAmountOfPunishedExecutors = amountOfAvailableExecutorsFittingCriteria > amountOfPunishedExecutors ? amountOfPunishedExecutors : amountOfAvailableExecutorsFittingCriteria;
+        address[] memory punishedExecutorsAddresses = new address[](effectiveAmountOfPunishedExecutors);
+        for (uint8 i = 0; i < effectiveAmountOfPunishedExecutors; i++) {  // Si la cantidad efectiva es menor a la cantidad total, solo roto los primeros
+            uint taskIndex = punishedExecutorsTaskIDs[i];
+            punishedExecutorsAddresses[i] = taskAssignmentsMap[requestID][taskIndex].executorAddress;
+            uint randomPosition = randomSeed % executorsCollection.amountOfActiveExecutors;
+            address newExecutorAddress = getActiveExecutorByPosition(randomPosition).executorAddress; //TODO ver aca, que fitee el criteria
+            taskAssignmentsMap[requestID][taskIndex].executorAddress = newExecutorAddress;
+            taskAssignmentsMap[requestID][taskIndex].timestamp = block.timestamp;
+            _lockExecutor(newExecutorAddress, requestID, i);
+            effectiveAmountOfPunishedExecutors++;
+            randomSeed /= executorsCollection.amountOfActiveExecutors > 0 ? executorsCollection.amountOfActiveExecutors : 1;
         }
         if (effectiveAmountOfPunishedExecutors == 0) {
             return false;
@@ -323,11 +334,12 @@ contract ExecutionBroker is Transferable {
             taskAssignmentsMap[requestID][punishedExecutorsTaskIDs[i]].submitted = true;  // Para que no obstruya la liberacion
             taskAssignmentsMap[requestID][punishedExecutorsTaskIDs[i]].liberated = true;  // Para que no obstruya el cierre
         }
-        //TODO somewhere arround here mark the submissions locked as true, and test in python
+        requests[requestID].submissionsLocked = true; //TODO test in python
         bool transferSuccess = _internalTransferFunds(punishAmount * amountOfPunishedExecutors, msg.sender);
         return transferSuccess;
     }
 
+    //TODO fijarse que capaz un ejecutor truncado o un ejecutor marcado capaz todavia puede submitear o liberar????? mirar que onda las banderas y los index cacheados en el executor en si
     function submitSignedResultHash(uint requestID, bytes32 signedResultHash) public {
         Executor memory executor = getExecutorByAddress(msg.sender);
         require(executor.assignedRequestID == requestID, "You must be assigned to the provided request to submit a result hash");
@@ -381,25 +393,35 @@ contract ExecutionBroker is Transferable {
                 break;
             }
         }
-        if (lastOne) {
-            bool validSubmissionsPresent = false;
+        if (lastOne) { // TODO Hacer que el cliente ponga una prima para devolverle el gas al ultimo ejecutor en liberar, que es el que paga toda esta logica extra. El resto debe estar contemplado en el pago. TAMBIEN DEVOLVER DICHA PRIMA AL FINAL DE ESTA FUNCION, SI Y SOLO SI EL ULTIMO FUE ACCURATE
+            uint markedCount = 0;
+            address[] memory executorsMarked = new address[](taskAssignmentsMap[requestID].length);  // Para los castigos de aca y de close, uso address[] en vez de taskAssignmentIDs porque ya no me interesa el task assignment, ya que la request se va a cerrar
             for (uint8 i = 0; i < taskAssignmentsMap[requestID].length; i++) {
-                if (taskAssignmentsMap[requestID][i].result.issuer != address(0x0)) {
-                    validSubmissionsPresent = true;
-                    break;
+                if (taskAssignmentsMap[requestID][i].result.issuer == address(0x0)) {
+                    executorsMarked[markedCount++] = taskAssignmentsMap[requestID][i].executorAddress;
                 }
             }
-            if (validSubmissionsPresent) {
+            if (markedCount < taskAssignmentsMap[requestID].length) {  // if there is at least one valid submission
                 _closeRequest(requestID, initialGas);
             } else {
+                // TODO si solidity no me deja, puedo extraer esto y ponerlo en otra funcion que se llame _negateRequest o algo asi
+                uint refundAmount = 0;
                 requests[requestID].closed = true;
                 emit requestClosed(requestID, 0);
                 if (getAmountOfActiveExecutorsWithCriteria(requests[requestID].executorCriteria) >= taskAssignmentsMap[requestID].length) {
-                    _submitRequest(requests[requestID].clientAddress, requests[requestID].executionPowerPrice, requests[requestID].inputState, requests[requestID].codeReference, taskAssignmentsMap[requestID].length, requests[requestID].executionPowerPaidFor, uint256(blockhash(block.number-1)), requests[requestID].executorCriteria);
+                    _submitRequest(requests[requestID].clientAddress, requests[requestID].executionPowerPrice, requests[requestID].executionPowerPaidFor, requests[requestID].inputState, requests[requestID].codeReference, taskAssignmentsMap[requestID].length, uint256(blockhash(block.number-1)), requests[requestID].executorCriteria);
                 } else {
-                    //TODO refund to client
+                    refundAmount = requests[requestID].executionPowerPrice * requests[requestID].executionPowerPaidFor * taskAssignmentsMap[requestID].length;
                 }
-                //TODO punish and recreate request, if cant, refund
+                
+                uint constantGasOverHead = 12345; //TODO
+                uint estimatedGasSpent = ((initialGas - gasleft()) + ((PUNISH_GAS + 1/*little loop overhead TODO*/) * markedCount) + constantGasOverHead) * tx.gasprice;  // This is just an aproximation, make it generous to favor the client
+                uint punishAmount = estimatedGasSpent / markedCount;
+                for (uint8 i = 0; i < markedCount; i++) {
+                    executorsCollection.busyExecutors[executorsMarked[i]].inaccurateSolvings++;
+                    _punishExecutor(executorsMarked[i], punishAmount);
+                }
+                _internalTransferFunds((punishAmount * markedCount) + refundAmount, requests[requestID].clientAddress);
             }
         }
         return hashMatched;
@@ -429,7 +451,7 @@ contract ExecutionBroker is Transferable {
     //TODO puedo hacer que el precio del executionpower sea inversamente proporsional a la cantidad de ejecutores activos, uso tx.gasprice? YA CONFIRME QUE SI EXISTE
     // Private Functions
 
-    function _submitRequest(address clientAddress, uint executionPowerPrice, string memory inputState, string memory codeReference, uint amountOfExecutors, uint executionPowerPaidFor, uint256 randomSeed, Criteria memory criteria) private returns (uint) {
+    function _submitRequest(address clientAddress, uint executionPowerPrice, uint executionPowerPaidFor, string memory inputState, string memory codeReference, uint amountOfExecutors, uint256 randomSeed, Criteria memory criteria) private returns (uint) {
         Request memory request = Request({
             id: requests.length,
             clientAddress: clientAddress,
@@ -449,7 +471,7 @@ contract ExecutionBroker is Transferable {
         TaskAssignment[] storage taskAssignments = taskAssignmentsMap[request.id];
         for (uint32 i = 0; i < amountOfExecutors; i++) {
             uint randomPosition = randomSeed % executorsCollection.amountOfActiveExecutors;
-            address executorAddress = getActiveExecutorByPosition(randomPosition).executorAddress;
+            address executorAddress = getActiveExecutorByPosition(randomPosition).executorAddress; //TODO aca chequear el tema del criteria
             taskAssignments.push(TaskAssignment({
                 executorAddress: executorAddress,
                 timestamp: block.timestamp,
@@ -465,6 +487,7 @@ contract ExecutionBroker is Transferable {
             _lockExecutor(executorAddress, request.id, i);
             randomSeed /= executorsCollection.amountOfActiveExecutors > 0 ? executorsCollection.amountOfActiveExecutors : 1;
         }
+        emit requestCreated(request.id, clientAddress);
         return request.id;
     }
 
@@ -516,7 +539,7 @@ contract ExecutionBroker is Transferable {
             }
         }
 
-        uint individualPayAmount = requests[requestID].executionPowerPaidFor;  //TODO hacer un search de executionPowerPaidFor y fijarse el tema de las unidades power vs ether
+        uint individualPayAmount = requests[requestID].executionPowerPaidFor;  TODO hacer un search de executionPowerPaidFor y fijarse el tema de las unidades power vs ether
         for (uint8 i = 0; i < rewardedCount; i++) {
             _internalTransferFunds(individualPayAmount, executorsToBeRewarded[i]);
             executorsCollection.busyExecutors[executorsToBeRewarded[i]].accurateSolvings++;
