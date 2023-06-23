@@ -32,7 +32,7 @@ struct Request {
     uint id;
     address clientAddress;
     uint executionPowerPrice;
-    uint executionPowerPaidFor; // In Wei; deberia tener en cuenta el computo y el gas de las operaciones de submit; y se divide entre los executors
+    uint executionPowerPaidFor;
     Criteria executorCriteria;
     string inputState;  // Tambien aca esta el point of insertion
     string codeReference;  // Tambien aca esta la data sobre la version y compilador y otras specs que pueden afectar el resultado
@@ -175,25 +175,11 @@ contract ExecutionBroker is Transferable {
         }
     }
 
-    function getActiveExecutorByPosition(uint position) public view returns (Executor memory executor) {  // Position starts from zero and is not equal to index
-        require(position < executorsCollection.amountOfActiveExecutors, "You are selecting a position outside the existing executors");
-        uint32 j = 0;
-        for (uint32 i = 0; i < executorsCollection.activeExecutors.length; i++) {
-            if (executorsCollection.activeExecutors[i].executorAddress == address(0x0)) {
-                continue;
-            }
-            if (j == position) {
-                return executorsCollection.activeExecutors[i];
-            }
-            j++;
-        }
-    }
-
     function getActiveExecutorByIndex(uint position) public view returns (Executor memory executor) {
         return executorsCollection.activeExecutors[position];
     }
 
-    function getAmountOfActiveExecutorsWithCriteria(Criteria memory criteria) public view returns (uint) {
+    function getAmountOfActiveExecutorsWithCriteria(Criteria memory criteria) public view returns (uint16) {
         uint16 count = 0;
         for (uint16 i = 0; i < executorsCollection.activeExecutors.length; i++) {
             if (executorsCollection.activeExecutors[i].executorAddress != address(0x0) &&
@@ -203,6 +189,19 @@ contract ExecutionBroker is Transferable {
             }
         }
         return count;
+    }
+
+    function getRandomExecutorAddress(uint256 randomSeed, Criteria memory criteria) public view returns (address) {  // Position starts from zero and is not equal to index
+        uint32 j = 0;
+        for (uint32 i = 0; i < executorsCollection.activeExecutors.length; i++) {
+            if (executorsCollection.activeExecutors[i].executorAddress == address(0x0)) {
+                continue;
+            }
+            if (j == 1) {
+                return address(0x0); //executorsCollection.activeExecutors[i];
+            }
+            j++;
+        }
     }
 
     //TODO maybe change the name of the function to something like, get reference execution power o get market expow o algo asi
@@ -266,7 +265,7 @@ contract ExecutionBroker is Transferable {
         uint initialGas = gasleft();
         require(requests[requestID].clientAddress == msg.sender, "You cant rotate a request that was not made by you");
         require(requests[requestID].submissionsLocked == false, "All executors for this request have already delivered");
-        uint amountOfPunishedExecutors = 0;
+        uint8 amountOfPunishedExecutors = 0;
         uint[] memory punishedExecutorsTaskIDs = new uint[](taskAssignmentsMap[requestID].length);  // Me van a quedar algunos en cero capaz, no importa
         for (uint8 i = 0; i < taskAssignmentsMap[requestID].length; i++) {
             if (!taskAssignmentsMap[requestID][i].submitted && block.timestamp >= (taskAssignmentsMap[requestID][i].timestamp + EXECUTION_TIME_FRAME_SECONDS)) {
@@ -276,20 +275,20 @@ contract ExecutionBroker is Transferable {
         if (amountOfPunishedExecutors == 0) {
             return false;
         }
-        
-        uint amountOfAvailableExecutorsFittingCriteria = getAmountOfActiveExecutorsWithCriteria(requests[requestID].executorCriteria);
-        uint effectiveAmountOfPunishedExecutors = amountOfAvailableExecutorsFittingCriteria > amountOfPunishedExecutors ? amountOfPunishedExecutors : amountOfAvailableExecutorsFittingCriteria;
+        //TODO check all uint types, google if they are cheaper, include in thesis
+        uint16 amountOfAvailableExecutorsFittingCriteria = getAmountOfActiveExecutorsWithCriteria(requests[requestID].executorCriteria);
+        uint16 effectiveAmountOfPunishedExecutors = amountOfAvailableExecutorsFittingCriteria > amountOfPunishedExecutors ? amountOfPunishedExecutors : amountOfAvailableExecutorsFittingCriteria;
         address[] memory punishedExecutorsAddresses = new address[](effectiveAmountOfPunishedExecutors);
         for (uint8 i = 0; i < effectiveAmountOfPunishedExecutors; i++) {  // Si la cantidad efectiva es menor a la cantidad total, solo roto los primeros
             uint taskIndex = punishedExecutorsTaskIDs[i];
             punishedExecutorsAddresses[i] = taskAssignmentsMap[requestID][taskIndex].executorAddress;
-            uint randomPosition = randomSeed % executorsCollection.amountOfActiveExecutors;
-            address newExecutorAddress = getActiveExecutorByPosition(randomPosition).executorAddress; //TODO ver aca, que fitee el criteria
+            uint randomPosition = randomSeed % executorsCollection.amountOfActiveExecutors; //TODO borrar esto
+            address newExecutorAddress = getRandomExecutorAddress(randomSeed, requests[requestID].executorCriteria); //TODO ver aca, que fitee el criteria
             taskAssignmentsMap[requestID][taskIndex].executorAddress = newExecutorAddress;
             taskAssignmentsMap[requestID][taskIndex].timestamp = block.timestamp;
             _lockExecutor(newExecutorAddress, requestID, i);
             effectiveAmountOfPunishedExecutors++;
-            randomSeed /= executorsCollection.amountOfActiveExecutors > 0 ? executorsCollection.amountOfActiveExecutors : 1;
+            randomSeed /= executorsCollection.amountOfActiveExecutors > 0 ? executorsCollection.amountOfActiveExecutors : 1; //TODO borrar esto
         }
         if (effectiveAmountOfPunishedExecutors == 0) {
             return false;
@@ -470,8 +469,8 @@ contract ExecutionBroker is Transferable {
         requests.push(request);
         TaskAssignment[] storage taskAssignments = taskAssignmentsMap[request.id];
         for (uint32 i = 0; i < amountOfExecutors; i++) {
-            uint randomPosition = randomSeed % executorsCollection.amountOfActiveExecutors;
-            address executorAddress = getActiveExecutorByPosition(randomPosition).executorAddress; //TODO aca chequear el tema del criteria
+            uint randomPosition = randomSeed % executorsCollection.amountOfActiveExecutors;  // TODO borrar esto
+            address executorAddress = getRandomExecutorAddress(randomSeed, criteria);
             taskAssignments.push(TaskAssignment({
                 executorAddress: executorAddress,
                 timestamp: block.timestamp,
@@ -485,7 +484,7 @@ contract ExecutionBroker is Transferable {
                 liberated: false
             }));
             _lockExecutor(executorAddress, request.id, i);
-            randomSeed /= executorsCollection.amountOfActiveExecutors > 0 ? executorsCollection.amountOfActiveExecutors : 1;
+            randomSeed /= executorsCollection.amountOfActiveExecutors > 0 ? executorsCollection.amountOfActiveExecutors : 1; // TODO borrar esto
         }
         emit requestCreated(request.id, clientAddress);
         return request.id;
@@ -539,7 +538,7 @@ contract ExecutionBroker is Transferable {
             }
         }
 
-        uint individualPayAmount = requests[requestID].executionPowerPaidFor;  TODO hacer un search de executionPowerPaidFor y fijarse el tema de las unidades power vs ether
+        uint individualPayAmount = requests[requestID].executionPowerPaidFor * requests[requestID].executionPowerPrice;
         for (uint8 i = 0; i < rewardedCount; i++) {
             _internalTransferFunds(individualPayAmount, executorsToBeRewarded[i]);
             executorsCollection.busyExecutors[executorsToBeRewarded[i]].accurateSolvings++;
@@ -554,7 +553,8 @@ contract ExecutionBroker is Transferable {
             executorsCollection.busyExecutors[executorsToBePunished[i]].inaccurateSolvings++;
             _punishExecutor(executorsToBePunished[i], punishAmount);
         }
-        _internalTransferFunds(punishAmount * punishedCount, requests[requestID].clientAddress);
+        uint refundAmount = requests[requestID].executionPowerPaidFor * requests[requestID].executionPowerPrice * punishedCount;
+        _internalTransferFunds((punishAmount * punishedCount) + refundAmount, requests[requestID].clientAddress);
     }
 
     function _punishExecutor(address executorAddress, uint punishAmount) private {
