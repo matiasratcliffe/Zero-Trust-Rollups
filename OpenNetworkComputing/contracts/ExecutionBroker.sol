@@ -70,6 +70,7 @@ contract ExecutionBroker is Transferable {
     Request[] public requests;
     mapping (uint => TaskAssignment[]) public taskAssignmentsMap;
     ExecutorsCollection public executorsCollection;
+    uint referenceExecutionPowerPriceCache;
     
     event requestCreated(uint requestID, address clientAddress);
     event resultSubmitted(uint requestID, address submitter);
@@ -81,6 +82,7 @@ contract ExecutionBroker is Transferable {
     event executorPunished(address executorAddress);
 
     constructor(uint executionTimeFrame, uint baseStakeAmount, uint maximumPower, uint maximumExecutors) {
+        referenceExecutionPowerPriceCache = 1;
         EXECUTION_TIME_FRAME_SECONDS = executionTimeFrame;
         BASE_STAKE_AMOUNT = baseStakeAmount;
         MAXIMUM_EXECUTION_POWER = maximumPower;
@@ -204,9 +206,8 @@ contract ExecutionBroker is Transferable {
         }
     }
 
-    //TODO maybe change the name of the function to something like, get reference execution power o get market expow o algo asi
-    function getCurrentExecutionPowerPrice() public view returns (uint) {
-        return 1; //TODO quizas agregar mas cosas aca, como el gas price, y el ratio de total available executors
+    function getReferenceExecutionPowerPrice() public view returns (uint) {
+        return referenceExecutionPowerPriceCache; //TODO quizas agregar mas cosas aca, como el gas price, y el ratio de total available executors
     }
 
     // Open interaction functions
@@ -255,7 +256,7 @@ contract ExecutionBroker is Transferable {
         require(amountOfExecutors <= MAXIMUM_EXECUTORS_PER_REQUEST, "You exceeded the maximum number of allowed executors per request");
         require(executionPowerPaidFor <= MAXIMUM_EXECUTION_POWER, "You exceeded the maximum allowed execution power per request");
         require(amountOfExecutors <= getAmountOfActiveExecutorsWithCriteria(criteria), "You exceeded the number of available executors that fit your criteria");
-        require(executionPowerPrice >= getCurrentExecutionPowerPrice(), "asdsaddsgfdgd"); //TODO message
+        require(executionPowerPrice >= getReferenceExecutionPowerPrice(), "The offered execution power price must be greater or equal than the networks reference price"); //TODO capaz cambiarlo a que no pueda ser muy distinto? onda que la division de uno por otro sea igual a 1? ver como redondea solidity en division de enteros
         require(msg.value == executionPowerPrice * executionPowerPaidFor * amountOfExecutors, "The value sent in the request must be the execution power you intend to pay for multiplied by the price and the amount of executors");
         
         return _submitRequest(msg.sender, executionPowerPrice, executionPowerPaidFor, inputState, codeReference, amountOfExecutors, randomSeed, criteria);

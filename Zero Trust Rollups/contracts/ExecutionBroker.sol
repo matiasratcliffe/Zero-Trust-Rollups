@@ -4,162 +4,115 @@ pragma solidity >=0.7.0 <0.9.0;
 
 import "./Transferable.sol";
 import "./BaseClient.sol";
+import "./Ownable.sol";
 
 
 struct Request {
-    BaseClient.ClientInput input;
+    uint id;  // Index, for unicity when raw comparing
+    bytes input; //TODO ver tema inputs y logic reference?
     uint payment; // In Wei; deberia tener en cuenta el computo y el gas de las operaciones de submit y claim
-    uint postProcessingGas;  // In Wei; for the post processing, if any
     BaseClient client;
-    // TODO code source???
-    RequestAcceptance acceptance;
-    Submission submission;
-    bool closed;
-}
-
-struct RequestAcceptance {
-    address acceptor;
-    uint timestamp;  // TODO ver tema vencimiento o el castigo es la retencion de fondos?
-}
-
-struct Submission {
-    address issuer;
-    uint timestamp;
+    address executor;
     bytes result;
+    bool closed;
+    //TODO quizas para TS3000 hay que hacer un post processing logic
 }
 
 
-contract ExecutionBroker is Transferable {
+contract ExecutionBroker is Transferable, Ownable {
+
+    uint public ACCEPTANCE_STAKE;
 
     Request[] public requests;
 
-    event requestCreated(uint requestID, uint payment, uint challengeInsurance, uint claimDelay);
-    event requestCancelled(uint requestID, bool refundSuccess);
+    event requestCreated(uint requestID, uint payment);
+    event requestCancelled(uint requestID);
 
     event requestAccepted(uint requestID, address acceptor);
     event acceptanceCancelled(uint requestID, address acceptor, bool refundSuccess);
-    
-    event resultSubmitted(uint requestID, bytes result, address submitter);
-    event resultPostProcessed(uint requestID, bool success);
-    
-    event challengeProcessed(uint requestID, bytes result); //TODO
-    event challengePayment(uint requestID, bool success);
-    
+
+    event requestCompleted(uint requestID, bool transferSuccess);
+    event requestReOpened(uint requestID, bool transferSuccess);
+
+    constructor(uint acceptanceStake) {
+        ACCEPTANCE_STAKE = acceptanceStake;
+    }
 
     // Restricted interaction functions
 
-    function submitRequest(BaseClient.ClientInput calldata input, uint postProcessingGas, uint requestedInsurance, uint claimDelay) public payable returns (uint) {
-        // check msg.sender is an actual client - creo que no se puede, me parece que lo voy a tener que dejar asi, creo que no es una vulnerabilidad, onda, si no es del tipo, va a fallar eventualmente, y problema del boludo que lo registro mal
-        require(msg.value - postProcessingGas > 0, "The post processing gas cannot takeup all of the supplied ether");  // en el bot de python, ver que efectivamente el net payment, valga la pena
-        BaseClient clientImplementation = BaseClient(msg.sender);
-        RequestAcceptance memory acceptance = RequestAcceptance({
-            acceptor: address(0x0),
-            timestamp: 0
-        });
-        Submission memory submission = Submission({
-            issuer: address(0x0),
-            timestamp: 0,
-            result: "0x00",
-            solidified: false
-        });
+    function submitRequest(bytes calldata input) public payable returns (uint) {
         Request memory request = Request({
+            id: requests.length,
             input: input,
-            payment: msg.value,
-            postProcessingGas: postProcessingGas,
-            challengeInsurance: requestedInsurance,
-            client: clientImplementation,
-            acceptance: acceptance,
-            submission: submission,
-            cancelled: false
+            payment: msg.value,  // aca esta incluido el post processing gas, para evitar tener que devolver aparte
+            client: BaseClient(msg.sender),
+            executor: address(0x0),
+            result: abi.encode(0),
+            closed: false
         });
+        emit requestCreated(request.id, msg.value);
         requests.push(request);
-        emit requestCreated(requests.length-1, msg.value, requestedInsurance, claimDelay);
-        return requests.length - 1;
+        return request.id;
     }
 
-    function cancelRequest(uint requestID) public {
-        require(!requests[requestID].cancelled, "The request was already cancelled");
+    function cancelRequest(uint requestID) public returns (bool) {
+        require(!requests[requestID].closed, "The request is closed");
         require(msg.sender == address(requests[requestID].client), "You cant cancel a request that was not made by you");
-        require(requests[requestID].acceptance.acceptor == address(0x0), "You cant cancel an accepted request");
-        //delete requests[requestID], no puedo hacer esto, this fucks up the ids
-        requests[requestID].cancelled = true;
+        require(requests[requestID].executor == address(0x0), "You cant cancel an accepted request");
+        requests[requestID].closed = true;
         address payable payee = payable(address(requests[requestID].client));
-        bool transferSuccess = internalTransferFunds(requests[requestID].payment, payee);
-        emit requestCancelled(requestID, transferSuccess);
+        emit requestCancelled(requestID);
+        bool transferSuccess = _internalTransferFunds(requests[requestID].payment, payee);
+        return transferSuccess;
     }
 
     // Open interaction functions
 
     function publicizeRequest(uint requestID) public {  // This is to re emit the event In case the request gets forgotten
-        require(requests[requestID].acceptance.acceptor == address(0x00), "You cant publicize a taken request");
-        emit requestCreated(requestID, requests[requestID].payment, requests[requestID].challengeInsurance, requests[requestID].claimDelay);
+        require(requests[requestID].executor == address(0x00), "You cant publicize a taken request");
+        emit requestCreated(requestID, requests[requestID].payment);
     }
 
     function acceptRequest(uint requestID) public payable {
         // what if Request does not exist? what happens to the funds? IF YOU TRY TO ACCESS AN INVALID INDEX IN AN ARRAY, THE FUNCTION GETS REVERTED AND FUNDS RETURNED TOGETHER WITH SPARE GAS (BUT NOT ALREADY CONSUMED GAS)
         // what happens to the funds if one of the requires fail? THEY GET RETURNED
-        require(!requests[requestID].cancelled, "The request was cancelled");
-        require(requests[requestID].acceptance.acceptor == address(0x0) , "Someone already accepted the request");
-        require(msg.value == requests[requestID].challengeInsurance, "Incorrect amount of insurance provided");
-        RequestAcceptance memory acceptance = RequestAcceptance({
-            acceptor: msg.sender,
-            timestamp: block.timestamp
-        });
-        requests[requestID].acceptance = acceptance;
+        require(!requests[requestID].closed, "The request is closed");
+        require(requests[requestID].executor == address(0x0), "There already is an acceptance for this request");
+        require(msg.value == ACCEPTANCE_STAKE, "Incorrect amount of stake provided");
+        requests[requestID].executor = msg.sender;
         emit requestAccepted(requestID, msg.sender);
+        // TODO Aca no hay acceptance override ya que no hay necesidad de que haya competencia de calculo
     }
 
     function cancelAcceptance(uint requestID) public {
-        // check request unsubmitted (at this point it cant be cancelled because the acceptance blocks it
-        require(requests[requestID].acceptance.acceptor != address(0x0), "There is no acceptance in place for the provided requestID");
-        require(requests[requestID].submission.issuer == address(0x0), "The results for this request have already beem submitted");
-        require(requests[requestID].acceptance.acceptor == msg.sender, "You cant cancel an acceptance that does not belong to you");
-        address payable payee = payable(requests[requestID].acceptance.acceptor);
-        requests[requestID].acceptance.acceptor = address(0x0);
-        bool transferSuccess = internalTransferFunds(requests[requestID].challengeInsurance, payee);
-        emit acceptanceCancelled(requestID, payee, transferSuccess);
+        require(requests[requestID].executor != address(0x0), "There is no acceptor for the provided requestID");
+        require(requests[requestID].closed == false, "This request is closed");
+        require(requests[requestID].executor == msg.sender, "You cant cancel an acceptance that does not belong to you");
+        requests[requestID].executor = address(0x0);
+        bool transferSuccess = _internalTransferFunds((ACCEPTANCE_STAKE*95)/100, msg.sender);  // Devolver un 95% del stake
+        emit acceptanceCancelled(requestID, requests[requestID].executor, transferSuccess);
+        _internalTransferFunds((ACCEPTANCE_STAKE*5)/100, owner());
     }
 
-    function submitResult(uint requestID, bytes calldata result) public {
+    function submitResult(uint requestID, bytes calldata result) public returns (bool) {
         // para evitar que le roben el resultado, puede subirlo encriptado y posteriormente subir la clave de decrypt, NAAAA, no es eficiente
         // pero aca caigo en el mismo dilema, tengo que esperar que pase la clave decrypt y tengo que poner un timer para que no ponga cualquier cosa y se vaya, aunque supongo que no lo quiere hacer porque quiere recuperar la insurance. Entonces capaz saco el tiempo de acceptance time window, y confiar que el tipo va a cumplir porque quiere cobrar, aunque capaz se cuelga y no lo puede resolver, entonces capaz es mejor que se haga con encriptacion? no pero eso no me sirve porque desencriptar es costoso. Mejor le pongo una opcion al tipo para cancelar la aceptacion, y se come el gas pero recupera la prima
-        require(requests[requestID].acceptance.acceptor != address(0x0), "You need to accept the request first");
-        require(requests[requestID].submission.issuer == address(0x0), "There is already a submission for this request");
-        require(requests[requestID].acceptance.acceptor == msg.sender, "Someone else has accepted the Request");  // no chequeo el timestamp porque el timestamp es solo para ofertar, si se vencio, pero nadie mas contra oferto, vale
+        require(requests[requestID].executor != address(0x0), "You need to accept the request first");
+        require(requests[requestID].closed == false, "The request is already closed");
+        require(requests[requestID].executor == msg.sender, "Someone else has accepted the Request");
         if (requests[requestID].client.checkResult(requests[requestID].input, result)) {
-            Submission memory submission = Submission({
-                issuer: msg.sender,
-                timestamp: block.timestamp,
-                result: result,
-                solidified: false
-            });
-            requests[requestID].submission = submission;
-            emit resultSubmitted(requestID, result);  // TODO revisar esto
+            requests[requestID].result = result;
+            requests[requestID].closed = true;
+            uint payAmount = requests[requestID].payment + ACCEPTANCE_STAKE;
+            bool transferSuccess = _internalTransferFunds(payAmount, msg.sender);
+            emit requestCompleted(requestID, transferSuccess);
+            return true;
         } else {
-            // TODO remove acceptance, and emit event
+            requests[requestID].executor = address(0x0);
+            bool transferSuccess = _internalTransferFunds((ACCEPTANCE_STAKE*95)/100, msg.sender);
+            emit requestReOpened(requestID, transferSuccess);
+            _internalTransferFunds((ACCEPTANCE_STAKE*5)/100, owner());
+            return false;
         }
-        
-    }
-
-    function claimPayment(uint requestID) public returns (bool) {
-        require(requests[requestID].submission.issuer == msg.sender, "This payment does not belong to you");
-        require(!requests[requestID].submission.solidified, "The provided request has already been completed");  // TODO check .solidified parameter
-        require(requests[requestID].submission.timestamp + requests[requestID].claimDelay < block.timestamp, "The claim delay hasn't passed yet");
-        requests[requestID].closed = true;
-        address payee = requests[requestID].submission.issuer;
-        uint payAmount = requests[requestID].payment;
-        bool transferSuccess = internalTransferFunds(payAmount, payee);
-        
-        // capaz la logica de encadenamiento es mejor definirla en python, o un mix
-        bytes memory data = abi.encodeWithSelector(requests[requestID].client.processResult.selector, requests[requestID].submission.result);
-        (bool callSuccess, ) = address(requests[requestID].client).call{gas: requests[requestID].postProcessingGas}(data);  // el delegate para que me aparezca el sender como el broker. cuidado si esto no me hace una vulnerabilidad, puedo vaciar fondos desde client? no deberia pasar nada, ni el broker ni el client puede extraer fondos
-        emit resultPostProcessed(requestID, callSuccess);
-        emit paymentClaimed(requestID, transferSuccess);
-    }
-
-    // Public views
-
-    function isRequestOpen(uint requestID) public view returns (bool) {  // solo a modo de ayuda
-        return (!requests[requestID].cancelled && requests[requestID].acceptance.acceptor == address(0x0));
     }
 }

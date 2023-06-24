@@ -8,11 +8,6 @@ import "./Ownable.sol";
 
 abstract contract BaseClient is Ownable {
 
-    struct ClientInput {
-        uint functionToRun;
-        bytes data;
-    }
-
     ExecutionBroker public brokerContract;
 
     event requestSubmitted(uint requestID);
@@ -22,18 +17,11 @@ abstract contract BaseClient is Ownable {
         brokerContract = ExecutionBroker(brokerAddress);
     }
 
-    modifier onlyBroker() {
-        require(msg.sender == address(brokerContract), "Can only be called by the registered broker contract");
-        _;
-    }
-
-    function clientLogic(ClientInput calldata input) external virtual pure returns (bytes memory);  // TODO que el request tenga un source del codigo, asi no hace falta deployar onchain, que es caro, o capaz aca en el cliente esta la referencia al codigo? y el input es un json always
     function checkResult(bytes calldata input, bytes calldata result) external virtual pure returns (bool);
-    function processResult(bytes calldata result) external virtual onlyBroker {}
-
-    function submitRequest(uint payment, ClientInput calldata input, uint postProcessingGas, uint requestedInsurance, uint claimDelay) external onlyOwner payable returns (uint) {
+    
+    function submitRequest(uint payment, bytes calldata input) external onlyOwner payable returns (uint) {
         require(payment <= msg.value + address(this).balance, "Insufficient funds");
-        uint requestID = brokerContract.submitRequest{value: payment}(input, postProcessingGas, requestedInsurance, claimDelay);
+        uint requestID = brokerContract.submitRequest{value: payment}(input);
         emit requestSubmitted(requestID);
         return requestID;
     }

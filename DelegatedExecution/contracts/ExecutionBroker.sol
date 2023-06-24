@@ -94,8 +94,7 @@ contract ExecutionBroker is Transferable {
         require(requests[requestID].acceptance.acceptor == address(0x0), "You cant cancel an accepted request");
         //delete requests[requestID], no puedo hacer esto, this fucks up the ids
         requests[requestID].cancelled = true;
-        address payable payee = payable(address(requests[requestID].client));
-        bool transferSuccess = _internalTransferFunds(requests[requestID].payment, payee);
+        bool transferSuccess = _internalTransferFunds(requests[requestID].payment, address(requests[requestID].client));
         emit requestCancelled(requestID, transferSuccess);
     }
 
@@ -114,29 +113,28 @@ contract ExecutionBroker is Transferable {
         require(requests[requestID].acceptance.acceptor == address(0x0) || (requests[requestID].acceptance.timestamp + ACCEPTANCE_GRACE_PERIOD) < block.timestamp, "There already is an unexpired acceptance for this request");
         require(msg.value == requests[requestID].challengeInsurance, "Incorrect amount of insurance provided");
         if (requests[requestID].acceptance.acceptor != address(0x0)) {
-            address payable payee = payable(requests[requestID].acceptance.acceptor);
-            _internalTransferFunds(requests[requestID].challengeInsurance, payee);
+            _internalTransferFunds(requests[requestID].challengeInsurance, requests[requestID].acceptance.acceptor);
         }
         requests[requestID].acceptance.acceptor = msg.sender;
         requests[requestID].acceptance.timestamp = block.timestamp;
         emit requestAccepted(requestID, msg.sender);
+        //TODO Vale la pena el cancel acceptance?
     }
 
     function cancelAcceptance(uint requestID) public {
         require(requests[requestID].acceptance.acceptor != address(0x0), "There is no acceptor for the provided requestID");
         require(requests[requestID].submission.issuer == address(0x0), "This request already has a submission");
         require(requests[requestID].acceptance.acceptor == msg.sender, "You cant cancel an acceptance that does not belong to you");
-        address payable payee = payable(requests[requestID].acceptance.acceptor);
         requests[requestID].acceptance.acceptor = address(0x0);
         requests[requestID].acceptance.timestamp = 0;
-        bool transferSuccess = _internalTransferFunds(requests[requestID].challengeInsurance, payee);
-        emit acceptanceCancelled(requestID, payee, transferSuccess);
+        bool transferSuccess = _internalTransferFunds(requests[requestID].challengeInsurance, requests[requestID].acceptance.acceptor);
+        emit acceptanceCancelled(requestID, requests[requestID].acceptance.acceptor, transferSuccess);
     }
 
     function submitResult(uint requestID, bytes calldata result) public {
         require(requests[requestID].acceptance.acceptor != address(0x0), "You need to accept the request first");
         require(requests[requestID].submission.issuer == address(0x0), "There is already a submission for this request");
-        require(requests[requestID].acceptance.acceptor == msg.sender, "Someone else has accepted the Request");
+        require(requests[requestID].acceptance.acceptor == msg.sender, "Someone else has accepted the Request");  // no chequeo el timestamp porque el timestamp es solo para ofertar, si se vencio, pero nadie mas contra oferto, vale
         Submission memory submission = Submission({
             issuer: msg.sender,
             timestamp: block.timestamp,
@@ -198,9 +196,8 @@ contract ExecutionBroker is Transferable {
         // first solidify, then pay, for reentrancy issues
         requests[requestID].submission.solidified = true;
         emit requestSolidified(requestID);
-        address payable payee = payable(requests[requestID].submission.issuer);
         uint payAmount = requests[requestID].payment + requests[requestID].challengeInsurance;
-        bool transferSuccess = _internalTransferFunds(payAmount, payee);
+        bool transferSuccess = _internalTransferFunds(payAmount, requests[requestID].submission.issuer);
         
         bytes memory data = abi.encodeWithSelector(requests[requestID].client.processResult.selector, requests[requestID].submission.result);
         (bool callSuccess, ) = address(requests[requestID].client).call{gas: requests[requestID].postProcessingGas}(data);  // el delegate para que me aparezca el sender como el broker. cuidado si esto no me hace una vulnerabilidad, puedo vaciar fondos desde client? no deberia pasar nada, ni el broker ni el client puede extraer fondos

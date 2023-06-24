@@ -20,7 +20,7 @@ contract Transferable {
     }
 
     // To be used by child contracts to attempt fund transfers
-    function internalTransferFunds(uint amount, address destination) internal returns (bool) {
+    function _internalTransferFunds(uint amount, address destination) internal returns (bool) {
         weiBalances[msg.sender] += amount;
         return publicTransferFunds(amount, destination);
     }
