@@ -12,7 +12,7 @@ abstract contract BaseClient is Ownable {
 
     event requestSubmitted(uint requestID);
 
-    constructor(address brokerAddress) {
+    constructor(address brokerAddress) Ownable() {
         // aca linkear con Broker hardcoded
         brokerContract = ExecutionBroker(brokerAddress);
     }
