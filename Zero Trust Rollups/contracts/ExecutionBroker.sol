@@ -34,7 +34,7 @@ contract ExecutionBroker is Transferable, Ownable {
     event requestCompleted(uint requestID, bool transferSuccess);
     event requestReOpened(uint requestID, bool transferSuccess);
 
-    constructor(uint acceptanceStake) {
+    constructor(uint acceptanceStake) Ownable() {
         ACCEPTANCE_STAKE = acceptanceStake;
     }
 
