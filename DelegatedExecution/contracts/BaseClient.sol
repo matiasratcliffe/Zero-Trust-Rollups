@@ -19,14 +19,14 @@ abstract contract BaseClient is Ownable {
 
     event requestSubmitted(uint requestID);
 
-    constructor(address brokerAddress) Ownable() {
-        // aca linkear con Broker hardcoded
-        brokerContract = ExecutionBroker(brokerAddress);
-    }
-
     modifier onlyBroker() {
         require(msg.sender == address(brokerContract), "Can only be called by the registered broker contract");
         _;
+    }
+    
+    constructor(address brokerAddress) Ownable() {
+        // aca linkear con Broker hardcoded
+        brokerContract = ExecutionBroker(brokerAddress);
     }
 
     function clientLogic(ClientInput calldata input) external virtual pure returns (bytes memory);

@@ -20,8 +20,10 @@ class Requestor:
     def _encodeInput(self, functionToRun, data):
         return (functionToRun, HexString(encode(self._getFunctionTypes(functionToRun), data), "bytes"))
 
-    def createRequest(self, functionToRun, dataArray, payment=1e+16, postProcessingGas=2e13, requestedInsurance=1e+18, claimDelay=0, funds=0):
+    def createRequest(self, functionToRun, dataArray, payment=1e+16, postProcessingGas=2e13, requestedInsurance=1e+18, claimDelay=0, funds=0, gasPrice=None):
         transactionData = { "from": self.owner, "value": funds }
+        if (gasPrice != None):
+            transactionData["gas_price"] = gasPrice
         request = self.client.submitRequest(
             payment,
             self._encodeInput(functionToRun, dataArray),

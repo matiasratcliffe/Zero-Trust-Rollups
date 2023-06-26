@@ -470,4 +470,18 @@ class TestExecutor:
         assert dict(dict(broker.requests(reqID))["submission"])["issuer"] == executor1.account
         assert dict(dict(broker.requests(reqID))["submission"])["solidified"] == False
 
-    #TODO test post process result
+    def test_find_first_primes(self):
+        broker = BrokerFactory.create(account=Accounts.getFromIndex(0))
+        requestor = Requestor(ClientFactory.create(broker, owner=Accounts.getFromIndex(1)))
+        requestor.sendFunds(99e18)
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[3], payment=1e13, postProcessingGas=1e12, requestedInsurance=2e14)
+        executor = Executor(Accounts.getFromIndex(0), broker, populateBuffers=True)
+        initialFunds = executor.account.balance()
+        for i in range(20):
+            executor._acceptRequest(reqID + i)
+            result = executor._computeResult(reqID + i)
+            executor._submitResult(reqID + i, result)
+            executor._claimPayment(reqID + i)
+        assert executor.account.balance() > initialFunds
+        assert list(requestor.client.getPrimes()) == [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73]
+        

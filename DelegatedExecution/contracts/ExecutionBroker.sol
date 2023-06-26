@@ -59,7 +59,7 @@ contract ExecutionBroker is Transferable {
 
     function submitRequest(BaseClient.ClientInput calldata input, uint postProcessingGas, uint requestedInsurance, uint claimDelay) public payable returns (uint) {
         // check msg.sender is an actual client - creo que no se puede, me parece que lo voy a tener que dejar asi, creo que no es una vulnerabilidad, onda, si no es del tipo, va a fallar eventualmente, y problema del boludo que lo registro mal
-        require(msg.value > postProcessingGas, "The post processing gas cannot takeup all of the supplied ether");  // en el bot de python, ver que efectivamente el net payment, valga la pena
+        require(msg.value > postProcessingGas * tx.gasprice, "The post processing gas cannot takeup all of the supplied ether");  //TODO en el bot de python, ver que efectivamente el net payment, valga la pena
         Acceptance memory acceptance = Acceptance({
             acceptor: address(0x0),
             timestamp: 0
@@ -73,7 +73,7 @@ contract ExecutionBroker is Transferable {
         Request memory request = Request({
             id: requests.length,
             input: input,
-            payment: msg.value,  // aca esta incluido el post processing gas, para evitar tener que devolver aparte
+            payment: msg.value,  // aca esta incluido el post processing gas, para evitar tener que devolver aparte, ALSO el gasprice puede no ser el mismo entre el submit y el resolve, el payment tiene que ser generoso para el postprocessing
             postProcessingGas: postProcessingGas,
             challengeInsurance: requestedInsurance,
             claimDelay: claimDelay,
@@ -176,7 +176,7 @@ contract ExecutionBroker is Transferable {
         require(requests[requestID].submission.issuer != address(0x0), "There are no submissions for the provided request");
         require(requests[requestID].submission.issuer == msg.sender, "This payment does not belong to you");
         require(!requests[requestID].submission.solidified, "The provided request has already solidified");
-        require(requests[requestID].submission.timestamp + requests[requestID].claimDelay < block.timestamp, "The claim delay hasn't passed yet");
+        require(requests[requestID].submission.timestamp + requests[requestID].claimDelay <= block.timestamp, "The claim delay hasn't passed yet");
         bool transferSuccess = _solidify(requestID);
         return transferSuccess;
     }
@@ -189,6 +189,10 @@ contract ExecutionBroker is Transferable {
 
     function requestCount() public view returns (uint) {
         return requests.length;
+    }
+
+    function getRequests() public view returns (Request[] memory) {
+        return requests;
     }
 
     // Private functions

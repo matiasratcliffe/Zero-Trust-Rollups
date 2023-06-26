@@ -92,6 +92,9 @@ class Executor:
             self.unsolidifiedSubmissions.pop(self.unsolidifiedSubmissions.index(requestID))
         return transaction
 
+    def _claimPayment(self, requestID):
+        self.broker.claimPayment(requestID, {'from': self.account})
+
     def solverLoopRound(self):
         if len(self.unacceptedRequests) > 0:
             requestID = self.unacceptedRequests.pop(0)

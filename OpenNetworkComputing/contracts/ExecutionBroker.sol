@@ -125,6 +125,10 @@ contract ExecutionBroker is Transferable {
         return requests.length - 1;  // The request number 0 is blank
     }
 
+    function getRequests() public view returns (Request[] memory) {
+        return requests;
+    }
+
     function getActiveExecutorsList() public view returns (address[] memory) {
         address[] memory addresses = new address[](executorsCollection.amountOfActiveExecutors);
         uint32 j = 0;

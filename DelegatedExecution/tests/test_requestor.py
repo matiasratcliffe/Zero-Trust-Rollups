@@ -78,7 +78,7 @@ class TestRequestor:
     
     def test_encode_input_non_existing_function(self):
         requestor = Requestor(ClientFactory.getInstance())
-        with pytest.raises(ValueOutOfBounds):
+        with pytest.raises(Exception, match="Invalid function ID"):
             requestor._encodeInput(4, [10])
 
     def test_create_request_with_funds(self):
@@ -132,7 +132,8 @@ class TestRequestor:
                 dataArray=[10],
                 payment=1e+17,
                 postProcessingGas=1e+17,
-                funds=1e+18
+                funds=1e+18,
+                gasPrice=1
             )
 
     def test_cancel_request(self):

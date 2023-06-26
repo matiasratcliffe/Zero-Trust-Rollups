@@ -4,22 +4,21 @@ pragma solidity >=0.7.0 <0.9.0;
 
 import "./Transferable.sol";
 import "./BaseClient.sol";
-import "./Ownable.sol";
 
 
 struct Request {
     uint id;  // Index, for unicity when raw comparing
     bytes input; //TODO ver tema inputs y logic reference?
     uint payment; // In Wei; deberia tener en cuenta el computo y el gas de las operaciones de submit y claim
+    uint postProcessingGas;
     BaseClient client;
     address executor;
     bytes result;
     bool closed;
-    //TODO quizas para TS3000 hay que hacer un post processing logic
 }
 
 
-contract ExecutionBroker is Transferable, Ownable {
+contract ExecutionBroker is Transferable {
 
     uint public ACCEPTANCE_STAKE;
 
@@ -32,19 +31,32 @@ contract ExecutionBroker is Transferable, Ownable {
     event acceptanceCancelled(uint requestID, address acceptor, bool refundSuccess);
 
     event requestCompleted(uint requestID, bool transferSuccess);
-    event requestReOpened(uint requestID, bool transferSuccess);
+    event resultPostProcessed(uint requestID, bool success);
+    event requestReOpened(uint requestID, uint payment, bool transferSuccess);
 
-    constructor(uint acceptanceStake) Ownable() {
+    constructor(uint acceptanceStake) {
         ACCEPTANCE_STAKE = acceptanceStake;
+    }
+
+    // Public views
+
+    function requestCount() public view returns (uint) {
+        return requests.length;
+    }
+
+    function getRequests() public view returns (Request[] memory) {
+        return requests;
     }
 
     // Restricted interaction functions
 
-    function submitRequest(bytes calldata input) public payable returns (uint) {
+    function submitRequest(bytes calldata input, uint postProcessingGas) public payable returns (uint) {
+        require(msg.value > postProcessingGas * tx.gasprice, "The post processing gas cannot takeup all of the supplied ether");  //TODO en el bot de python, ver que efectivamente el net payment, valga la pena
         Request memory request = Request({
             id: requests.length,
             input: input,
             payment: msg.value,  // aca esta incluido el post processing gas, para evitar tener que devolver aparte
+            postProcessingGas: postProcessingGas,
             client: BaseClient(msg.sender),
             executor: address(0x0),
             result: abi.encode(0),
@@ -60,9 +72,8 @@ contract ExecutionBroker is Transferable, Ownable {
         require(msg.sender == address(requests[requestID].client), "You cant cancel a request that was not made by you");
         require(requests[requestID].executor == address(0x0), "You cant cancel an accepted request");
         requests[requestID].closed = true;
-        address payable payee = payable(address(requests[requestID].client));
         emit requestCancelled(requestID);
-        bool transferSuccess = _internalTransferFunds(requests[requestID].payment, payee);
+        bool transferSuccess = _internalTransferFunds(requests[requestID].payment, address(requests[requestID].client));
         return transferSuccess;
     }
 
@@ -81,7 +92,6 @@ contract ExecutionBroker is Transferable, Ownable {
         require(msg.value == ACCEPTANCE_STAKE, "Incorrect amount of stake provided");
         requests[requestID].executor = msg.sender;
         emit requestAccepted(requestID, msg.sender);
-        // TODO Aca no hay acceptance override ya que no hay necesidad de que haya competencia de calculo
     }
 
     function cancelAcceptance(uint requestID) public {
@@ -91,7 +101,7 @@ contract ExecutionBroker is Transferable, Ownable {
         requests[requestID].executor = address(0x0);
         bool transferSuccess = _internalTransferFunds((ACCEPTANCE_STAKE*95)/100, msg.sender);  // Devolver un 95% del stake
         emit acceptanceCancelled(requestID, requests[requestID].executor, transferSuccess);
-        _internalTransferFunds((ACCEPTANCE_STAKE*5)/100, owner());
+        _internalTransferFunds((ACCEPTANCE_STAKE*5)/100, address(requests[requestID].client));
     }
 
     function submitResult(uint requestID, bytes calldata result) public returns (bool) {
@@ -106,12 +116,17 @@ contract ExecutionBroker is Transferable, Ownable {
             uint payAmount = requests[requestID].payment + ACCEPTANCE_STAKE;
             bool transferSuccess = _internalTransferFunds(payAmount, msg.sender);
             emit requestCompleted(requestID, transferSuccess);
+
+            bytes memory data = abi.encodeWithSelector(requests[requestID].client.processResult.selector, requests[requestID].result);
+            (bool callSuccess, ) = address(requests[requestID].client).call{gas: requests[requestID].postProcessingGas}(data);  // el delegate para que me aparezca el sender como el broker. cuidado si esto no me hace una vulnerabilidad, puedo vaciar fondos desde client? no deberia pasar nada, ni el broker ni el client puede extraer fondos
+            emit resultPostProcessed(requestID, callSuccess);
+
             return true;
         } else {
             requests[requestID].executor = address(0x0);
             bool transferSuccess = _internalTransferFunds((ACCEPTANCE_STAKE*95)/100, msg.sender);
-            emit requestReOpened(requestID, transferSuccess);
-            _internalTransferFunds((ACCEPTANCE_STAKE*5)/100, owner());
+            emit requestReOpened(requestID, requests[requestID].payment, transferSuccess);
+            _internalTransferFunds((ACCEPTANCE_STAKE*5)/100, address(requests[requestID].client));
             return false;
         }
     }

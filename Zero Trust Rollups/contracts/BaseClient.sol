@@ -12,13 +12,21 @@ abstract contract BaseClient is Ownable {
 
     event requestSubmitted(uint requestID);
 
+    modifier onlyBroker() {
+        require(msg.sender == address(brokerContract), "Can only be called by the registered broker contract");
+        _;
+    }
+
     constructor(address brokerAddress) Ownable() {
         // aca linkear con Broker hardcoded
         brokerContract = ExecutionBroker(brokerAddress);
     }
 
     function checkResult(bytes calldata input, bytes calldata result) external virtual pure returns (bool);
-    
+    function getInputDataStructure() external virtual pure returns (string memory);
+    function getResultDataStructure() external virtual pure returns (string memory);
+    function processResult(bytes calldata result) external virtual onlyBroker {}
+
     function submitRequest(uint payment, bytes calldata input) external onlyOwner payable returns (uint) {
         require(payment <= msg.value + address(this).balance, "Insufficient funds");
         uint requestID = brokerContract.submitRequest{value: payment}(input);
