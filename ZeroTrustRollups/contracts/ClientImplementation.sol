@@ -17,13 +17,13 @@ contract ClientImplementation is BaseClient {
         uint dummy;
     }
 
-    function getInputDataStructure() external override pure returns (string memory) {
+    /*function getInputDataStructure() external override pure returns (string memory) {
 
     }
 
     function getResultDataStructure() external override pure returns (string memory) {
 
-    }
+    }*/
 
     function checkResult(bytes calldata inputData, bytes calldata resultData) external override pure returns (bool) {
         Input memory input = abi.decode(inputData, (Input));
