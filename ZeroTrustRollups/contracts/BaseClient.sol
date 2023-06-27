@@ -18,18 +18,17 @@ abstract contract BaseClient is Ownable {
     }
 
     constructor(address brokerAddress) Ownable() {
-        // aca linkear con Broker hardcoded
         brokerContract = ExecutionBroker(brokerAddress);
     }
 
-    function checkResult(bytes calldata input, bytes calldata result) external virtual pure returns (bool);
-    function getInputDataStructure() external virtual pure returns (string memory);
-    function getResultDataStructure() external virtual pure returns (string memory);
-    function processResult(bytes calldata result) external virtual onlyBroker {}
+    function checkResult(bytes calldata inputData, bytes calldata resultData) external virtual pure returns (bool); //TODO revisar estas funciones en DelegatedExecution
+    //function getInputDataStructure() external virtual pure returns (string memory);//TODO revisar estas funciones en DelegatedExecution
+    //function getResultDataStructure() external virtual pure returns (string memory);//TODO revisar estas funciones en DelegatedExecution
+    function processResult(bytes calldata resultData) external virtual onlyBroker {}
 
-    function submitRequest(uint payment, bytes calldata input) external onlyOwner payable returns (uint) {
+    function submitRequest(uint payment, bytes memory input, uint postProcessingGas) public onlyOwner payable returns (uint) {
         require(payment <= msg.value + address(this).balance, "Insufficient funds");
-        uint requestID = brokerContract.submitRequest{value: payment}(input);
+        uint requestID = brokerContract.submitRequest{value: payment}(input, postProcessingGas);
         emit requestSubmitted(requestID);
         return requestID;
     }

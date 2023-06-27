@@ -4,7 +4,7 @@ pragma solidity >=0.7.0 <0.9.0;
 
 import "./BaseClient.sol";
 
-
+//TODO BORRAR ESTE ARCHIVOOOO
 contract ClientImplementation is BaseClient {
 
     constructor(address brokerAddress) BaseClient(brokerAddress) {}
