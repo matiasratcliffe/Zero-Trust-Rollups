@@ -1,0 +1,10 @@
+dotenv: .env
+networks:
+  development:
+    verify: False
+  ganache-gui:
+    verify: False
+    wallets:
+      - ${GANACHE_GUI_PRIVATE_KEY0}
+      - ${GANACHE_GUI_PRIVATE_KEY1}
+      - ${GANACHE_GUI_PRIVATE_KEY2}

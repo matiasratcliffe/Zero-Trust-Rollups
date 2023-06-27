@@ -1,6 +1,8 @@
 from scripts.classes.executionState import ExecutionState
+from scripts.classes.utils.logger import Logger
 
 
+@Logger.LogClassMethods()
 class Executor:
 
     def __init__(self, broker, account, register=False, stake=None):

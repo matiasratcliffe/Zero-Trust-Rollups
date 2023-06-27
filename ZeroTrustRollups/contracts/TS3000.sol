@@ -36,7 +36,7 @@ contract TS3000 is BaseClient {
     constructor(address brokerAddress, string memory _encryptedDataRefference, bytes32 firstLocalHash, bytes32[] memory globalHashes) BaseClient(brokerAddress) payable {
         postProcessingGas = 10;  //TODO calculate postprocgas
         postProcessingEnabled = true;
-        rewardPerFragment = address(this).balance / globalHashes.length; //TODO aca tener en cuenta el postprocgas
+        rewardPerFragment = msg.value / globalHashes.length; //TODO aca tener en cuenta el postprocgas
         encryptedDataRefference = _encryptedDataRefference;
         for (uint i = 0; i < globalHashes.length; i++) {
             KeyFragment memory fragment; 

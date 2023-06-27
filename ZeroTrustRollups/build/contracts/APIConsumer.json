@@ -1,0 +1,4999 @@
+{
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "apiProviderAddress",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "provider",
+      "outputs": [
+        {
+          "internalType": "contract APIProvider",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "signature",
+          "type": "bytes"
+        }
+      ],
+      "name": "splitSignature",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "r",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "s",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint8",
+          "name": "v",
+          "type": "uint8"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "signedHash",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes",
+          "name": "signature",
+          "type": "bytes"
+        },
+        {
+          "internalType": "address",
+          "name": "signer",
+          "type": "address"
+        }
+      ],
+      "name": "verifySignature",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    }
+  ],
+  "allSourcePaths": {
+    "0": "contracts/APIConsumer.sol",
+    "1": "contracts/APIProvider.sol"
+  },
+  "ast": {
+    "absolutePath": "contracts/APIConsumer.sol",
+    "exportedSymbols": {
+      "APIConsumer": [
+        71
+      ],
+      "APIProvider": [
+        74
+      ]
+    },
+    "id": 72,
+    "license": "GPL-3.0",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.7",
+          ".0",
+          "<",
+          "0.9",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "37:31:0"
+      },
+      {
+        "absolutePath": "contracts/APIProvider.sol",
+        "file": "./APIProvider.sol",
+        "id": 2,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 72,
+        "sourceUnit": 75,
+        "src": "70:27:0",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "APIConsumer",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": true,
+        "id": 71,
+        "linearizedBaseContracts": [
+          71
+        ],
+        "name": "APIConsumer",
+        "nameLocation": "108:11:0",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": false,
+            "functionSelector": "085d4883",
+            "id": 5,
+            "mutability": "mutable",
+            "name": "provider",
+            "nameLocation": "403:8:0",
+            "nodeType": "VariableDeclaration",
+            "scope": 71,
+            "src": "384:27:0",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_contract$_APIProvider_$74",
+              "typeString": "contract APIProvider"
+            },
+            "typeName": {
+              "id": 4,
+              "nodeType": "UserDefinedTypeName",
+              "pathNode": {
+                "id": 3,
+                "name": "APIProvider",
+                "nameLocations": [
+                  "384:11:0"
+                ],
+                "nodeType": "IdentifierPath",
+                "referencedDeclaration": 74,
+                "src": "384:11:0"
+              },
+              "referencedDeclaration": 74,
+              "src": "384:11:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_APIProvider_$74",
+                "typeString": "contract APIProvider"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 16,
+              "nodeType": "Block",
+              "src": "526:59:0",
+              "statements": [
+                {
+                  "expression": {
+                    "id": 14,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 10,
+                      "name": "provider",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 5,
+                      "src": "536:8:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_APIProvider_$74",
+                        "typeString": "contract APIProvider"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "arguments": [
+                        {
+                          "id": 12,
+                          "name": "apiProviderAddress",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 7,
+                          "src": "559:18:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        ],
+                        "id": 11,
+                        "name": "APIProvider",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 74,
+                        "src": "547:11:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_contract$_APIProvider_$74_$",
+                          "typeString": "type(contract APIProvider)"
+                        }
+                      },
+                      "id": 13,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "typeConversion",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "547:31:0",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_APIProvider_$74",
+                        "typeString": "contract APIProvider"
+                      }
+                    },
+                    "src": "536:42:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_APIProvider_$74",
+                      "typeString": "contract APIProvider"
+                    }
+                  },
+                  "id": 15,
+                  "nodeType": "ExpressionStatement",
+                  "src": "536:42:0"
+                }
+              ]
+            },
+            "id": 17,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [],
+            "name": "",
+            "nameLocation": "-1:-1:-1",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 8,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 7,
+                  "mutability": "mutable",
+                  "name": "apiProviderAddress",
+                  "nameLocation": "506:18:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17,
+                  "src": "498:26:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 6,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "498:7:0",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "497:28:0"
+            },
+            "returnParameters": {
+              "id": 9,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "526:0:0"
+            },
+            "scope": 71,
+            "src": "486:99:0",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 48,
+              "nodeType": "Block",
+              "src": "719:135:0",
+              "statements": [
+                {
+                  "assignments": [
+                    29,
+                    31,
+                    33
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 29,
+                      "mutability": "mutable",
+                      "name": "r",
+                      "nameLocation": "738:1:0",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 48,
+                      "src": "730:9:0",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      },
+                      "typeName": {
+                        "id": 28,
+                        "name": "bytes32",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "730:7:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      },
+                      "visibility": "internal"
+                    },
+                    {
+                      "constant": false,
+                      "id": 31,
+                      "mutability": "mutable",
+                      "name": "s",
+                      "nameLocation": "749:1:0",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 48,
+                      "src": "741:9:0",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      },
+                      "typeName": {
+                        "id": 30,
+                        "name": "bytes32",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "741:7:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      },
+                      "visibility": "internal"
+                    },
+                    {
+                      "constant": false,
+                      "id": 33,
+                      "mutability": "mutable",
+                      "name": "v",
+                      "nameLocation": "758:1:0",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 48,
+                      "src": "752:7:0",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint8",
+                        "typeString": "uint8"
+                      },
+                      "typeName": {
+                        "id": 32,
+                        "name": "uint8",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "752:5:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint8",
+                          "typeString": "uint8"
+                        }
+                      },
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 37,
+                  "initialValue": {
+                    "arguments": [
+                      {
+                        "id": 35,
+                        "name": "signature",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 21,
+                        "src": "778:9:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes_calldata_ptr",
+                          "typeString": "bytes calldata"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bytes_calldata_ptr",
+                          "typeString": "bytes calldata"
+                        }
+                      ],
+                      "id": 34,
+                      "name": "splitSignature",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 70,
+                      "src": "763:14:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_pure$_t_bytes_memory_ptr_$returns$_t_bytes32_$_t_bytes32_$_t_uint8_$",
+                        "typeString": "function (bytes memory) pure returns (bytes32,bytes32,uint8)"
+                      }
+                    },
+                    "id": 36,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "763:25:0",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$_t_bytes32_$_t_bytes32_$_t_uint8_$",
+                      "typeString": "tuple(bytes32,bytes32,uint8)"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "729:59:0"
+                },
+                {
+                  "expression": {
+                    "components": [
+                      {
+                        "commonType": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        "id": 45,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "arguments": [
+                            {
+                              "id": 39,
+                              "name": "signedHash",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 19,
+                              "src": "816:10:0",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_bytes32",
+                                "typeString": "bytes32"
+                              }
+                            },
+                            {
+                              "id": 40,
+                              "name": "v",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 33,
+                              "src": "828:1:0",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_uint8",
+                                "typeString": "uint8"
+                              }
+                            },
+                            {
+                              "id": 41,
+                              "name": "r",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 29,
+                              "src": "831:1:0",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_bytes32",
+                                "typeString": "bytes32"
+                              }
+                            },
+                            {
+                              "id": 42,
+                              "name": "s",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 31,
+                              "src": "834:1:0",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_bytes32",
+                                "typeString": "bytes32"
+                              }
+                            }
+                          ],
+                          "expression": {
+                            "argumentTypes": [
+                              {
+                                "typeIdentifier": "t_bytes32",
+                                "typeString": "bytes32"
+                              },
+                              {
+                                "typeIdentifier": "t_uint8",
+                                "typeString": "uint8"
+                              },
+                              {
+                                "typeIdentifier": "t_bytes32",
+                                "typeString": "bytes32"
+                              },
+                              {
+                                "typeIdentifier": "t_bytes32",
+                                "typeString": "bytes32"
+                              }
+                            ],
+                            "id": 38,
+                            "name": "ecrecover",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": -6,
+                            "src": "806:9:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_function_ecrecover_pure$_t_bytes32_$_t_uint8_$_t_bytes32_$_t_bytes32_$returns$_t_address_$",
+                              "typeString": "function (bytes32,uint8,bytes32,bytes32) pure returns (address)"
+                            }
+                          },
+                          "id": 43,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "functionCall",
+                          "lValueRequested": false,
+                          "nameLocations": [],
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "806:30:0",
+                          "tryCall": false,
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "==",
+                        "rightExpression": {
+                          "id": 44,
+                          "name": "signer",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 23,
+                          "src": "840:6:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        },
+                        "src": "806:40:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      }
+                    ],
+                    "id": 46,
+                    "isConstant": false,
+                    "isInlineArray": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "nodeType": "TupleExpression",
+                    "src": "805:42:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "functionReturnParameters": 27,
+                  "id": 47,
+                  "nodeType": "Return",
+                  "src": "798:49:0"
+                }
+              ]
+            },
+            "functionSelector": "31cd4199",
+            "id": 49,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "verifySignature",
+            "nameLocation": "600:15:0",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 24,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 19,
+                  "mutability": "mutable",
+                  "name": "signedHash",
+                  "nameLocation": "633:10:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 49,
+                  "src": "625:18:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 18,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "625:7:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 21,
+                  "mutability": "mutable",
+                  "name": "signature",
+                  "nameLocation": "660:9:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 49,
+                  "src": "645:24:0",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 20,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "645:5:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 23,
+                  "mutability": "mutable",
+                  "name": "signer",
+                  "nameLocation": "679:6:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 49,
+                  "src": "671:14:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 22,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "671:7:0",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "615:76:0"
+            },
+            "returnParameters": {
+              "id": 27,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 26,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 49,
+                  "src": "713:4:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 25,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "713:4:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "712:6:0"
+            },
+            "scope": 71,
+            "src": "591:263:0",
+            "stateMutability": "pure",
+            "virtual": false,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 69,
+              "nodeType": "Block",
+              "src": "974:243:0",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "commonType": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        "id": 64,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "expression": {
+                            "id": 61,
+                            "name": "signature",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 51,
+                            "src": "992:9:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_bytes_memory_ptr",
+                              "typeString": "bytes memory"
+                            }
+                          },
+                          "id": 62,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberLocation": "1002:6:0",
+                          "memberName": "length",
+                          "nodeType": "MemberAccess",
+                          "src": "992:16:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "==",
+                        "rightExpression": {
+                          "hexValue": "3635",
+                          "id": 63,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "kind": "number",
+                          "lValueRequested": false,
+                          "nodeType": "Literal",
+                          "src": "1012:2:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_rational_65_by_1",
+                            "typeString": "int_const 65"
+                          },
+                          "value": "65"
+                        },
+                        "src": "992:22:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "hexValue": "696e76616c6964207369676e6174757265206c656e677468",
+                        "id": 65,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "1016:26:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_e0060b83051574ba40ded2ef248b0d17cb210e5fa4f776d436805ab1ebb12b87",
+                          "typeString": "literal_string \"invalid signature length\""
+                        },
+                        "value": "invalid signature length"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_e0060b83051574ba40ded2ef248b0d17cb210e5fa4f776d436805ab1ebb12b87",
+                          "typeString": "literal_string \"invalid signature length\""
+                        }
+                      ],
+                      "id": 60,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        -18,
+                        -18
+                      ],
+                      "referencedDeclaration": -18,
+                      "src": "984:7:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 66,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "984:59:0",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 67,
+                  "nodeType": "ExpressionStatement",
+                  "src": "984:59:0"
+                },
+                {
+                  "AST": {
+                    "nodeType": "YulBlock",
+                    "src": "1062:149:0",
+                    "statements": [
+                      {
+                        "nodeType": "YulAssignment",
+                        "src": "1076:30:0",
+                        "value": {
+                          "arguments": [
+                            {
+                              "arguments": [
+                                {
+                                  "name": "signature",
+                                  "nodeType": "YulIdentifier",
+                                  "src": "1091:9:0"
+                                },
+                                {
+                                  "kind": "number",
+                                  "nodeType": "YulLiteral",
+                                  "src": "1102:2:0",
+                                  "type": "",
+                                  "value": "32"
+                                }
+                              ],
+                              "functionName": {
+                                "name": "add",
+                                "nodeType": "YulIdentifier",
+                                "src": "1087:3:0"
+                              },
+                              "nodeType": "YulFunctionCall",
+                              "src": "1087:18:0"
+                            }
+                          ],
+                          "functionName": {
+                            "name": "mload",
+                            "nodeType": "YulIdentifier",
+                            "src": "1081:5:0"
+                          },
+                          "nodeType": "YulFunctionCall",
+                          "src": "1081:25:0"
+                        },
+                        "variableNames": [
+                          {
+                            "name": "r",
+                            "nodeType": "YulIdentifier",
+                            "src": "1076:1:0"
+                          }
+                        ]
+                      },
+                      {
+                        "nodeType": "YulAssignment",
+                        "src": "1119:30:0",
+                        "value": {
+                          "arguments": [
+                            {
+                              "arguments": [
+                                {
+                                  "name": "signature",
+                                  "nodeType": "YulIdentifier",
+                                  "src": "1134:9:0"
+                                },
+                                {
+                                  "kind": "number",
+                                  "nodeType": "YulLiteral",
+                                  "src": "1145:2:0",
+                                  "type": "",
+                                  "value": "64"
+                                }
+                              ],
+                              "functionName": {
+                                "name": "add",
+                                "nodeType": "YulIdentifier",
+                                "src": "1130:3:0"
+                              },
+                              "nodeType": "YulFunctionCall",
+                              "src": "1130:18:0"
+                            }
+                          ],
+                          "functionName": {
+                            "name": "mload",
+                            "nodeType": "YulIdentifier",
+                            "src": "1124:5:0"
+                          },
+                          "nodeType": "YulFunctionCall",
+                          "src": "1124:25:0"
+                        },
+                        "variableNames": [
+                          {
+                            "name": "s",
+                            "nodeType": "YulIdentifier",
+                            "src": "1119:1:0"
+                          }
+                        ]
+                      },
+                      {
+                        "nodeType": "YulAssignment",
+                        "src": "1162:39:0",
+                        "value": {
+                          "arguments": [
+                            {
+                              "kind": "number",
+                              "nodeType": "YulLiteral",
+                              "src": "1172:1:0",
+                              "type": "",
+                              "value": "0"
+                            },
+                            {
+                              "arguments": [
+                                {
+                                  "arguments": [
+                                    {
+                                      "name": "signature",
+                                      "nodeType": "YulIdentifier",
+                                      "src": "1185:9:0"
+                                    },
+                                    {
+                                      "kind": "number",
+                                      "nodeType": "YulLiteral",
+                                      "src": "1196:2:0",
+                                      "type": "",
+                                      "value": "96"
+                                    }
+                                  ],
+                                  "functionName": {
+                                    "name": "add",
+                                    "nodeType": "YulIdentifier",
+                                    "src": "1181:3:0"
+                                  },
+                                  "nodeType": "YulFunctionCall",
+                                  "src": "1181:18:0"
+                                }
+                              ],
+                              "functionName": {
+                                "name": "mload",
+                                "nodeType": "YulIdentifier",
+                                "src": "1175:5:0"
+                              },
+                              "nodeType": "YulFunctionCall",
+                              "src": "1175:25:0"
+                            }
+                          ],
+                          "functionName": {
+                            "name": "byte",
+                            "nodeType": "YulIdentifier",
+                            "src": "1167:4:0"
+                          },
+                          "nodeType": "YulFunctionCall",
+                          "src": "1167:34:0"
+                        },
+                        "variableNames": [
+                          {
+                            "name": "v",
+                            "nodeType": "YulIdentifier",
+                            "src": "1162:1:0"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "evmVersion": "istanbul",
+                  "externalReferences": [
+                    {
+                      "declaration": 54,
+                      "isOffset": false,
+                      "isSlot": false,
+                      "src": "1076:1:0",
+                      "valueSize": 1
+                    },
+                    {
+                      "declaration": 56,
+                      "isOffset": false,
+                      "isSlot": false,
+                      "src": "1119:1:0",
+                      "valueSize": 1
+                    },
+                    {
+                      "declaration": 51,
+                      "isOffset": false,
+                      "isSlot": false,
+                      "src": "1091:9:0",
+                      "valueSize": 1
+                    },
+                    {
+                      "declaration": 51,
+                      "isOffset": false,
+                      "isSlot": false,
+                      "src": "1134:9:0",
+                      "valueSize": 1
+                    },
+                    {
+                      "declaration": 51,
+                      "isOffset": false,
+                      "isSlot": false,
+                      "src": "1185:9:0",
+                      "valueSize": 1
+                    },
+                    {
+                      "declaration": 58,
+                      "isOffset": false,
+                      "isSlot": false,
+                      "src": "1162:1:0",
+                      "valueSize": 1
+                    }
+                  ],
+                  "id": 68,
+                  "nodeType": "InlineAssembly",
+                  "src": "1053:158:0"
+                }
+              ]
+            },
+            "functionSelector": "a7bb5803",
+            "id": 70,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "splitSignature",
+            "nameLocation": "869:14:0",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 52,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 51,
+                  "mutability": "mutable",
+                  "name": "signature",
+                  "nameLocation": "906:9:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 70,
+                  "src": "893:22:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_memory_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 50,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "893:5:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "883:38:0"
+            },
+            "returnParameters": {
+              "id": 59,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 54,
+                  "mutability": "mutable",
+                  "name": "r",
+                  "nameLocation": "951:1:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 70,
+                  "src": "943:9:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 53,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "943:7:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 56,
+                  "mutability": "mutable",
+                  "name": "s",
+                  "nameLocation": "962:1:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 70,
+                  "src": "954:9:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 55,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "954:7:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 58,
+                  "mutability": "mutable",
+                  "name": "v",
+                  "nameLocation": "971:1:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 70,
+                  "src": "965:7:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  },
+                  "typeName": {
+                    "id": 57,
+                    "name": "uint8",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "965:5:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint8",
+                      "typeString": "uint8"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "942:31:0"
+            },
+            "scope": 71,
+            "src": "860:357:0",
+            "stateMutability": "pure",
+            "virtual": false,
+            "visibility": "public"
+          }
+        ],
+        "scope": 72,
+        "src": "99:1121:0",
+        "usedErrors": []
+      }
+    ],
+    "src": "37:1183:0"
+  },
+  "bytecode": "608060405234801561001057600080fd5b5060405161044138038061044183398101604081905261002f91610054565b600080546001600160a01b0319166001600160a01b0392909216919091179055610084565b60006020828403121561006657600080fd5b81516001600160a01b038116811461007d57600080fd5b9392505050565b6103ae806100936000396000f3fe608060405234801561001057600080fd5b50600436106100415760003560e01c8063085d48831461004657806331cd419914610076578063a7bb580314610099575b600080fd5b600054610059906001600160a01b031681565b6040516001600160a01b0390911681526020015b60405180910390f35b610089610084366004610216565b6100ca565b604051901515815260200161006d565b6100ac6100a73660046102c7565b61019e565b60408051938452602084019290925260ff169082015260600161006d565b60008060008061010f87878080601f01602080910402602001604051908101604052809392919081815260200183838082843760009201919091525061019e92505050565b925092509250846001600160a01b03166001898386866040516000815260200160405260405161015b949392919093845260ff9290921660208401526040830152606082015260800190565b6020604051602081039080840390855afa15801561017d573d6000803e3d6000fd5b505050602060405103516001600160a01b0316149350505050949350505050565b600080600083516041146101f85760405162461bcd60e51b815260206004820152601860248201527f696e76616c6964207369676e6174757265206c656e6774680000000000000000604482015260640160405180910390fd5b50505060208101516040820151606090920151909260009190911a90565b6000806000806060858703121561022c57600080fd5b84359350602085013567ffffffffffffffff8082111561024b57600080fd5b818701915087601f83011261025f57600080fd5b81358181111561026e57600080fd5b88602082850101111561028057600080fd5b60209290920194509092505060408501356001600160a01b03811681146102a657600080fd5b939692955090935050565b634e487b7160e01b600052604160045260246000fd5b6000602082840312156102d957600080fd5b813567ffffffffffffffff808211156102f157600080fd5b818401915084601f83011261030557600080fd5b813581811115610317576103176102b1565b604051601f8201601f19908116603f0116810190838211818310171561033f5761033f6102b1565b8160405282815287602084870101111561035857600080fd5b82602086016020830137600092810160200192909252509594505050505056fea264697066735822122014a06c0e2a07645e4364574b3cc5a16f04b204c3c6f2cd17d2dbdbfb7948595764736f6c63430008130033",
+  "bytecodeSha1": "423ff956902cab0cc186441951db001b189e5c4f",
+  "compiler": {
+    "evm_version": "istanbul",
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "version": "0.8.19+commit.7dd6d404"
+  },
+  "contractName": "APIConsumer",
+  "coverageMap": {
+    "branches": {
+      "0": {
+        "APIConsumer.splitSignature": {
+          "2": [
+            992,
+            1014,
+            true
+          ]
+        }
+      },
+      "1": {}
+    },
+    "statements": {
+      "0": {
+        "APIConsumer.splitSignature": {
+          "1": [
+            984,
+            1043
+          ]
+        },
+        "APIConsumer.verifySignature": {
+          "0": [
+            798,
+            847
+          ]
+        }
+      },
+      "1": {}
+    }
+  },
+  "dependencies": [
+    "APIProvider"
+  ],
+  "deployedBytecode": "608060405234801561001057600080fd5b50600436106100415760003560e01c8063085d48831461004657806331cd419914610076578063a7bb580314610099575b600080fd5b600054610059906001600160a01b031681565b6040516001600160a01b0390911681526020015b60405180910390f35b610089610084366004610216565b6100ca565b604051901515815260200161006d565b6100ac6100a73660046102c7565b61019e565b60408051938452602084019290925260ff169082015260600161006d565b60008060008061010f87878080601f01602080910402602001604051908101604052809392919081815260200183838082843760009201919091525061019e92505050565b925092509250846001600160a01b03166001898386866040516000815260200160405260405161015b949392919093845260ff9290921660208401526040830152606082015260800190565b6020604051602081039080840390855afa15801561017d573d6000803e3d6000fd5b505050602060405103516001600160a01b0316149350505050949350505050565b600080600083516041146101f85760405162461bcd60e51b815260206004820152601860248201527f696e76616c6964207369676e6174757265206c656e6774680000000000000000604482015260640160405180910390fd5b50505060208101516040820151606090920151909260009190911a90565b6000806000806060858703121561022c57600080fd5b84359350602085013567ffffffffffffffff8082111561024b57600080fd5b818701915087601f83011261025f57600080fd5b81358181111561026e57600080fd5b88602082850101111561028057600080fd5b60209290920194509092505060408501356001600160a01b03811681146102a657600080fd5b939692955090935050565b634e487b7160e01b600052604160045260246000fd5b6000602082840312156102d957600080fd5b813567ffffffffffffffff808211156102f157600080fd5b818401915084601f83011261030557600080fd5b813581811115610317576103176102b1565b604051601f8201601f19908116603f0116810190838211818310171561033f5761033f6102b1565b8160405282815287602084870101111561035857600080fd5b82602086016020830137600092810160200192909252509594505050505056fea264697066735822122014a06c0e2a07645e4364574b3cc5a16f04b204c3c6f2cd17d2dbdbfb7948595764736f6c63430008130033",
+  "deployedSourceMap": "99:1121:0:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;384:27;;;;;-1:-1:-1;;;;;384:27:0;;;;;;-1:-1:-1;;;;;196:32:8;;;178:51;;166:2;151:18;384:27:0;;;;;;;;591:263;;;;;;:::i;:::-;;:::i;:::-;;;1243:14:8;;1236:22;1218:41;;1206:2;1191:18;591:263:0;1078:187:8;860:357:0;;;;;;:::i;:::-;;:::i;:::-;;;;2526:25:8;;;2582:2;2567:18;;2560:34;;;;2642:4;2630:17;2610:18;;;2603:45;2514:2;2499:18;860:357:0;2328:326:8;591:263:0;713:4;730:9;741;752:7;763:25;778:9;;763:25;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;763:14:0;;-1:-1:-1;;;763:25:0:i;:::-;729:59;;;;;;840:6;-1:-1:-1;;;;;806:40:0;:30;816:10;828:1;831;834;806:30;;;;;;;;;;;;;;;;;2886:25:8;;;2959:4;2947:17;;;;2942:2;2927:18;;2920:45;2996:2;2981:18;;2974:34;3039:2;3024:18;;3017:34;2873:3;2858:19;;2659:398;806:30:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;806:40:0;;798:49;;;;;591:263;;;;;;:::o;860:357::-;943:9;954;965:7;992:9;:16;1012:2;992:22;984:59;;;;-1:-1:-1;;;984:59:0;;3264:2:8;984:59:0;;;3246:21:8;3303:2;3283:18;;;3276:30;3342:26;3322:18;;;3315:54;3386:18;;984:59:0;;;;;;;;-1:-1:-1;;;1102:2:0;1087:18;;1081:25;1145:2;1130:18;;1124:25;1196:2;1181:18;;;1175:25;1081;;1172:1;1167:34;;;;;860:357::o;240:833:8:-;328:6;336;344;352;405:2;393:9;384:7;380:23;376:32;373:52;;;421:1;418;411:12;373:52;457:9;444:23;434:33;;518:2;507:9;503:18;490:32;541:18;582:2;574:6;571:14;568:34;;;598:1;595;588:12;568:34;636:6;625:9;621:22;611:32;;681:7;674:4;670:2;666:13;662:27;652:55;;703:1;700;693:12;652:55;743:2;730:16;769:2;761:6;758:14;755:34;;;785:1;782;775:12;755:34;830:7;825:2;816:6;812:2;808:15;804:24;801:37;798:57;;;851:1;848;841:12;798:57;882:2;874:11;;;;;-1:-1:-1;904:6:8;;-1:-1:-1;;960:2:8;945:18;;932:32;-1:-1:-1;;;;;993:31:8;;983:42;;973:70;;1039:1;1036;1029:12;973:70;240:833;;;;-1:-1:-1;240:833:8;;-1:-1:-1;;240:833:8:o;1270:127::-;1331:10;1326:3;1322:20;1319:1;1312:31;1362:4;1359:1;1352:15;1386:4;1383:1;1376:15;1402:921;1470:6;1523:2;1511:9;1502:7;1498:23;1494:32;1491:52;;;1539:1;1536;1529:12;1491:52;1579:9;1566:23;1608:18;1649:2;1641:6;1638:14;1635:34;;;1665:1;1662;1655:12;1635:34;1703:6;1692:9;1688:22;1678:32;;1748:7;1741:4;1737:2;1733:13;1729:27;1719:55;;1770:1;1767;1760:12;1719:55;1806:2;1793:16;1828:2;1824;1821:10;1818:36;;;1834:18;;:::i;:::-;1909:2;1903:9;1877:2;1963:13;;-1:-1:-1;;1959:22:8;;;1983:2;1955:31;1951:40;1939:53;;;2007:18;;;2027:22;;;2004:46;2001:72;;;2053:18;;:::i;:::-;2093:10;2089:2;2082:22;2128:2;2120:6;2113:18;2168:7;2163:2;2158;2154;2150:11;2146:20;2143:33;2140:53;;;2189:1;2186;2179:12;2140:53;2245:2;2240;2236;2232:11;2227:2;2219:6;2215:15;2202:46;2290:1;2268:15;;;2285:2;2264:24;2257:35;;;;-1:-1:-1;2272:6:8;1402:921;-1:-1:-1;;;;;1402:921:8:o",
+  "language": "Solidity",
+  "natspec": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "offset": [
+    99,
+    1220
+  ],
+  "opcodes": "PUSH1 0x80 PUSH1 0x40 MSTORE CALLVALUE DUP1 ISZERO PUSH2 0x10 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST POP PUSH1 0x4 CALLDATASIZE LT PUSH2 0x41 JUMPI PUSH1 0x0 CALLDATALOAD PUSH1 0xE0 SHR DUP1 PUSH4 0x85D4883 EQ PUSH2 0x46 JUMPI DUP1 PUSH4 0x31CD4199 EQ PUSH2 0x76 JUMPI DUP1 PUSH4 0xA7BB5803 EQ PUSH2 0x99 JUMPI JUMPDEST PUSH1 0x0 DUP1 REVERT JUMPDEST PUSH1 0x0 SLOAD PUSH2 0x59 SWAP1 PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB AND DUP2 JUMP JUMPDEST PUSH1 0x40 MLOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB SWAP1 SWAP2 AND DUP2 MSTORE PUSH1 0x20 ADD JUMPDEST PUSH1 0x40 MLOAD DUP1 SWAP2 SUB SWAP1 RETURN JUMPDEST PUSH2 0x89 PUSH2 0x84 CALLDATASIZE PUSH1 0x4 PUSH2 0x216 JUMP JUMPDEST PUSH2 0xCA JUMP JUMPDEST PUSH1 0x40 MLOAD SWAP1 ISZERO ISZERO DUP2 MSTORE PUSH1 0x20 ADD PUSH2 0x6D JUMP JUMPDEST PUSH2 0xAC PUSH2 0xA7 CALLDATASIZE PUSH1 0x4 PUSH2 0x2C7 JUMP JUMPDEST PUSH2 0x19E JUMP JUMPDEST PUSH1 0x40 DUP1 MLOAD SWAP4 DUP5 MSTORE PUSH1 0x20 DUP5 ADD SWAP3 SWAP1 SWAP3 MSTORE PUSH1 0xFF AND SWAP1 DUP3 ADD MSTORE PUSH1 0x60 ADD PUSH2 0x6D JUMP JUMPDEST PUSH1 0x0 DUP1 PUSH1 0x0 DUP1 PUSH2 0x10F DUP8 DUP8 DUP1 DUP1 PUSH1 0x1F ADD PUSH1 0x20 DUP1 SWAP2 DIV MUL PUSH1 0x20 ADD PUSH1 0x40 MLOAD SWAP1 DUP2 ADD PUSH1 0x40 MSTORE DUP1 SWAP4 SWAP3 SWAP2 SWAP1 DUP2 DUP2 MSTORE PUSH1 0x20 ADD DUP4 DUP4 DUP1 DUP3 DUP5 CALLDATACOPY PUSH1 0x0 SWAP3 ADD SWAP2 SWAP1 SWAP2 MSTORE POP PUSH2 0x19E SWAP3 POP POP POP JUMP JUMPDEST SWAP3 POP SWAP3 POP SWAP3 POP DUP5 PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB AND PUSH1 0x1 DUP10 DUP4 DUP7 DUP7 PUSH1 0x40 MLOAD PUSH1 0x0 DUP2 MSTORE PUSH1 0x20 ADD PUSH1 0x40 MSTORE PUSH1 0x40 MLOAD PUSH2 0x15B SWAP5 SWAP4 SWAP3 SWAP2 SWAP1 SWAP4 DUP5 MSTORE PUSH1 0xFF SWAP3 SWAP1 SWAP3 AND PUSH1 0x20 DUP5 ADD MSTORE PUSH1 0x40 DUP4 ADD MSTORE PUSH1 0x60 DUP3 ADD MSTORE PUSH1 0x80 ADD SWAP1 JUMP JUMPDEST PUSH1 0x20 PUSH1 0x40 MLOAD PUSH1 0x20 DUP2 SUB SWAP1 DUP1 DUP5 SUB SWAP1 DUP6 GAS STATICCALL ISZERO DUP1 ISZERO PUSH2 0x17D JUMPI RETURNDATASIZE PUSH1 0x0 DUP1 RETURNDATACOPY RETURNDATASIZE PUSH1 0x0 REVERT JUMPDEST POP POP POP PUSH1 0x20 PUSH1 0x40 MLOAD SUB MLOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB AND EQ SWAP4 POP POP POP POP SWAP5 SWAP4 POP POP POP POP JUMP JUMPDEST PUSH1 0x0 DUP1 PUSH1 0x0 DUP4 MLOAD PUSH1 0x41 EQ PUSH2 0x1F8 JUMPI PUSH1 0x40 MLOAD PUSH3 0x461BCD PUSH1 0xE5 SHL DUP2 MSTORE PUSH1 0x20 PUSH1 0x4 DUP3 ADD MSTORE PUSH1 0x18 PUSH1 0x24 DUP3 ADD MSTORE PUSH32 0x696E76616C6964207369676E6174757265206C656E6774680000000000000000 PUSH1 0x44 DUP3 ADD MSTORE PUSH1 0x64 ADD PUSH1 0x40 MLOAD DUP1 SWAP2 SUB SWAP1 REVERT JUMPDEST POP POP POP PUSH1 0x20 DUP2 ADD MLOAD PUSH1 0x40 DUP3 ADD MLOAD PUSH1 0x60 SWAP1 SWAP3 ADD MLOAD SWAP1 SWAP3 PUSH1 0x0 SWAP2 SWAP1 SWAP2 BYTE SWAP1 JUMP JUMPDEST PUSH1 0x0 DUP1 PUSH1 0x0 DUP1 PUSH1 0x60 DUP6 DUP8 SUB SLT ISZERO PUSH2 0x22C JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST DUP5 CALLDATALOAD SWAP4 POP PUSH1 0x20 DUP6 ADD CALLDATALOAD PUSH8 0xFFFFFFFFFFFFFFFF DUP1 DUP3 GT ISZERO PUSH2 0x24B JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST DUP2 DUP8 ADD SWAP2 POP DUP8 PUSH1 0x1F DUP4 ADD SLT PUSH2 0x25F JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST DUP2 CALLDATALOAD DUP2 DUP2 GT ISZERO PUSH2 0x26E JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST DUP9 PUSH1 0x20 DUP3 DUP6 ADD ADD GT ISZERO PUSH2 0x280 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST PUSH1 0x20 SWAP3 SWAP1 SWAP3 ADD SWAP5 POP SWAP1 SWAP3 POP POP PUSH1 0x40 DUP6 ADD CALLDATALOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB DUP2 AND DUP2 EQ PUSH2 0x2A6 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST SWAP4 SWAP7 SWAP3 SWAP6 POP SWAP1 SWAP4 POP POP JUMP JUMPDEST PUSH4 0x4E487B71 PUSH1 0xE0 SHL PUSH1 0x0 MSTORE PUSH1 0x41 PUSH1 0x4 MSTORE PUSH1 0x24 PUSH1 0x0 REVERT JUMPDEST PUSH1 0x0 PUSH1 0x20 DUP3 DUP5 SUB SLT ISZERO PUSH2 0x2D9 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST DUP2 CALLDATALOAD PUSH8 0xFFFFFFFFFFFFFFFF DUP1 DUP3 GT ISZERO PUSH2 0x2F1 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST DUP2 DUP5 ADD SWAP2 POP DUP5 PUSH1 0x1F DUP4 ADD SLT PUSH2 0x305 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST DUP2 CALLDATALOAD DUP2 DUP2 GT ISZERO PUSH2 0x317 JUMPI PUSH2 0x317 PUSH2 0x2B1 JUMP JUMPDEST PUSH1 0x40 MLOAD PUSH1 0x1F DUP3 ADD PUSH1 0x1F NOT SWAP1 DUP2 AND PUSH1 0x3F ADD AND DUP2 ADD SWAP1 DUP4 DUP3 GT DUP2 DUP4 LT OR ISZERO PUSH2 0x33F JUMPI PUSH2 0x33F PUSH2 0x2B1 JUMP JUMPDEST DUP2 PUSH1 0x40 MSTORE DUP3 DUP2 MSTORE DUP8 PUSH1 0x20 DUP5 DUP8 ADD ADD GT ISZERO PUSH2 0x358 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST DUP3 PUSH1 0x20 DUP7 ADD PUSH1 0x20 DUP4 ADD CALLDATACOPY PUSH1 0x0 SWAP3 DUP2 ADD PUSH1 0x20 ADD SWAP3 SWAP1 SWAP3 MSTORE POP SWAP6 SWAP5 POP POP POP POP POP JUMP INVALID LOG2 PUSH5 0x6970667358 0x22 SLT KECCAK256 EQ LOG0 PUSH13 0xE2A07645E4364574B3CC5A16F DIV 0xB2 DIV 0xC3 0xC6 CALLCODE 0xCD OR 0xD2 0xDB 0xDB 0xFB PUSH26 0x48595764736F6C63430008130033000000000000000000000000 ",
+  "pcMap": {
+    "0": {
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x80"
+    },
+    "2": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x40"
+    },
+    "4": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "MSTORE",
+      "path": "0"
+    },
+    "5": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "CALLVALUE",
+      "path": "0"
+    },
+    "6": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "DUP1",
+      "path": "0"
+    },
+    "7": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "ISZERO",
+      "path": "0"
+    },
+    "8": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "PUSH2",
+      "path": "0",
+      "value": "0x10"
+    },
+    "11": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "JUMPI",
+      "path": "0"
+    },
+    "12": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x0"
+    },
+    "14": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "DUP1",
+      "path": "0"
+    },
+    "15": {
+      "dev": "Cannot send ether to nonpayable function",
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "REVERT",
+      "path": "0"
+    },
+    "16": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "JUMPDEST",
+      "path": "0"
+    },
+    "17": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "POP",
+      "path": "0"
+    },
+    "18": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x4"
+    },
+    "20": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "CALLDATASIZE",
+      "path": "0"
+    },
+    "21": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "LT",
+      "path": "0"
+    },
+    "22": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "PUSH2",
+      "path": "0",
+      "value": "0x41"
+    },
+    "25": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "JUMPI",
+      "path": "0"
+    },
+    "26": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x0"
+    },
+    "28": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "CALLDATALOAD",
+      "path": "0"
+    },
+    "29": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0xE0"
+    },
+    "31": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "SHR",
+      "path": "0"
+    },
+    "32": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "DUP1",
+      "path": "0"
+    },
+    "33": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "PUSH4",
+      "path": "0",
+      "value": "0x85D4883"
+    },
+    "38": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "EQ",
+      "path": "0"
+    },
+    "39": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "PUSH2",
+      "path": "0",
+      "value": "0x46"
+    },
+    "42": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "JUMPI",
+      "path": "0"
+    },
+    "43": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "DUP1",
+      "path": "0"
+    },
+    "44": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "PUSH4",
+      "path": "0",
+      "value": "0x31CD4199"
+    },
+    "49": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "EQ",
+      "path": "0"
+    },
+    "50": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "PUSH2",
+      "path": "0",
+      "value": "0x76"
+    },
+    "53": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "JUMPI",
+      "path": "0"
+    },
+    "54": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "DUP1",
+      "path": "0"
+    },
+    "55": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "PUSH4",
+      "path": "0",
+      "value": "0xA7BB5803"
+    },
+    "60": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "EQ",
+      "path": "0"
+    },
+    "61": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "PUSH2",
+      "path": "0",
+      "value": "0x99"
+    },
+    "64": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "JUMPI",
+      "path": "0"
+    },
+    "65": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "JUMPDEST",
+      "path": "0"
+    },
+    "66": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x0"
+    },
+    "68": {
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "DUP1",
+      "path": "0"
+    },
+    "69": {
+      "first_revert": true,
+      "fn": null,
+      "offset": [
+        99,
+        1220
+      ],
+      "op": "REVERT",
+      "path": "0"
+    },
+    "70": {
+      "offset": [
+        384,
+        411
+      ],
+      "op": "JUMPDEST",
+      "path": "0"
+    },
+    "71": {
+      "fn": null,
+      "offset": [
+        384,
+        411
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x0"
+    },
+    "73": {
+      "fn": null,
+      "offset": [
+        384,
+        411
+      ],
+      "op": "SLOAD",
+      "path": "0"
+    },
+    "74": {
+      "fn": null,
+      "offset": [
+        384,
+        411
+      ],
+      "op": "PUSH2",
+      "path": "0",
+      "value": "0x59"
+    },
+    "77": {
+      "fn": null,
+      "offset": [
+        384,
+        411
+      ],
+      "op": "SWAP1",
+      "path": "0"
+    },
+    "78": {
+      "op": "PUSH1",
+      "value": "0x1"
+    },
+    "80": {
+      "op": "PUSH1",
+      "value": "0x1"
+    },
+    "82": {
+      "op": "PUSH1",
+      "value": "0xA0"
+    },
+    "84": {
+      "op": "SHL"
+    },
+    "85": {
+      "op": "SUB"
+    },
+    "86": {
+      "offset": [
+        384,
+        411
+      ],
+      "op": "AND",
+      "path": "0"
+    },
+    "87": {
+      "fn": null,
+      "offset": [
+        384,
+        411
+      ],
+      "op": "DUP2",
+      "path": "0"
+    },
+    "88": {
+      "fn": null,
+      "offset": [
+        384,
+        411
+      ],
+      "op": "JUMP",
+      "path": "0"
+    },
+    "89": {
+      "fn": null,
+      "offset": [
+        384,
+        411
+      ],
+      "op": "JUMPDEST",
+      "path": "0"
+    },
+    "90": {
+      "fn": null,
+      "offset": [
+        384,
+        411
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x40"
+    },
+    "92": {
+      "fn": null,
+      "offset": [
+        384,
+        411
+      ],
+      "op": "MLOAD",
+      "path": "0"
+    },
+    "93": {
+      "op": "PUSH1",
+      "value": "0x1"
+    },
+    "95": {
+      "op": "PUSH1",
+      "value": "0x1"
+    },
+    "97": {
+      "op": "PUSH1",
+      "value": "0xA0"
+    },
+    "99": {
+      "op": "SHL"
+    },
+    "100": {
+      "op": "SUB"
+    },
+    "101": {
+      "op": "SWAP1"
+    },
+    "102": {
+      "op": "SWAP2"
+    },
+    "103": {
+      "op": "AND"
+    },
+    "104": {
+      "op": "DUP2"
+    },
+    "105": {
+      "op": "MSTORE"
+    },
+    "106": {
+      "op": "PUSH1",
+      "value": "0x20"
+    },
+    "108": {
+      "op": "ADD"
+    },
+    "109": {
+      "offset": [
+        384,
+        411
+      ],
+      "op": "JUMPDEST",
+      "path": "0"
+    },
+    "110": {
+      "fn": null,
+      "offset": [
+        384,
+        411
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x40"
+    },
+    "112": {
+      "fn": null,
+      "offset": [
+        384,
+        411
+      ],
+      "op": "MLOAD",
+      "path": "0"
+    },
+    "113": {
+      "fn": null,
+      "offset": [
+        384,
+        411
+      ],
+      "op": "DUP1",
+      "path": "0"
+    },
+    "114": {
+      "fn": null,
+      "offset": [
+        384,
+        411
+      ],
+      "op": "SWAP2",
+      "path": "0"
+    },
+    "115": {
+      "fn": null,
+      "offset": [
+        384,
+        411
+      ],
+      "op": "SUB",
+      "path": "0"
+    },
+    "116": {
+      "fn": null,
+      "offset": [
+        384,
+        411
+      ],
+      "op": "SWAP1",
+      "path": "0"
+    },
+    "117": {
+      "fn": null,
+      "offset": [
+        384,
+        411
+      ],
+      "op": "RETURN",
+      "path": "0"
+    },
+    "118": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        591,
+        854
+      ],
+      "op": "JUMPDEST",
+      "path": "0"
+    },
+    "119": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        591,
+        854
+      ],
+      "op": "PUSH2",
+      "path": "0",
+      "value": "0x89"
+    },
+    "122": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        591,
+        854
+      ],
+      "op": "PUSH2",
+      "path": "0",
+      "value": "0x84"
+    },
+    "125": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        591,
+        854
+      ],
+      "op": "CALLDATASIZE",
+      "path": "0"
+    },
+    "126": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        591,
+        854
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x4"
+    },
+    "128": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        591,
+        854
+      ],
+      "op": "PUSH2",
+      "path": "0",
+      "value": "0x216"
+    },
+    "131": {
+      "fn": "APIConsumer.verifySignature",
+      "jump": "i",
+      "offset": [
+        591,
+        854
+      ],
+      "op": "JUMP",
+      "path": "0"
+    },
+    "132": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        591,
+        854
+      ],
+      "op": "JUMPDEST",
+      "path": "0"
+    },
+    "133": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        591,
+        854
+      ],
+      "op": "PUSH2",
+      "path": "0",
+      "value": "0xCA"
+    },
+    "136": {
+      "fn": "APIConsumer.verifySignature",
+      "jump": "i",
+      "offset": [
+        591,
+        854
+      ],
+      "op": "JUMP",
+      "path": "0"
+    },
+    "137": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        591,
+        854
+      ],
+      "op": "JUMPDEST",
+      "path": "0"
+    },
+    "138": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        591,
+        854
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x40"
+    },
+    "140": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        591,
+        854
+      ],
+      "op": "MLOAD",
+      "path": "0"
+    },
+    "141": {
+      "op": "SWAP1"
+    },
+    "142": {
+      "op": "ISZERO"
+    },
+    "143": {
+      "op": "ISZERO"
+    },
+    "144": {
+      "op": "DUP2"
+    },
+    "145": {
+      "op": "MSTORE"
+    },
+    "146": {
+      "op": "PUSH1",
+      "value": "0x20"
+    },
+    "148": {
+      "op": "ADD"
+    },
+    "149": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        591,
+        854
+      ],
+      "op": "PUSH2",
+      "path": "0",
+      "value": "0x6D"
+    },
+    "152": {
+      "op": "JUMP"
+    },
+    "153": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        860,
+        1217
+      ],
+      "op": "JUMPDEST",
+      "path": "0"
+    },
+    "154": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        860,
+        1217
+      ],
+      "op": "PUSH2",
+      "path": "0",
+      "value": "0xAC"
+    },
+    "157": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        860,
+        1217
+      ],
+      "op": "PUSH2",
+      "path": "0",
+      "value": "0xA7"
+    },
+    "160": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        860,
+        1217
+      ],
+      "op": "CALLDATASIZE",
+      "path": "0"
+    },
+    "161": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        860,
+        1217
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x4"
+    },
+    "163": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        860,
+        1217
+      ],
+      "op": "PUSH2",
+      "path": "0",
+      "value": "0x2C7"
+    },
+    "166": {
+      "fn": "APIConsumer.splitSignature",
+      "jump": "i",
+      "offset": [
+        860,
+        1217
+      ],
+      "op": "JUMP",
+      "path": "0"
+    },
+    "167": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        860,
+        1217
+      ],
+      "op": "JUMPDEST",
+      "path": "0"
+    },
+    "168": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        860,
+        1217
+      ],
+      "op": "PUSH2",
+      "path": "0",
+      "value": "0x19E"
+    },
+    "171": {
+      "fn": "APIConsumer.splitSignature",
+      "jump": "i",
+      "offset": [
+        860,
+        1217
+      ],
+      "op": "JUMP",
+      "path": "0"
+    },
+    "172": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        860,
+        1217
+      ],
+      "op": "JUMPDEST",
+      "path": "0"
+    },
+    "173": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        860,
+        1217
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x40"
+    },
+    "175": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        860,
+        1217
+      ],
+      "op": "DUP1",
+      "path": "0"
+    },
+    "176": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        860,
+        1217
+      ],
+      "op": "MLOAD",
+      "path": "0"
+    },
+    "177": {
+      "op": "SWAP4"
+    },
+    "178": {
+      "op": "DUP5"
+    },
+    "179": {
+      "op": "MSTORE"
+    },
+    "180": {
+      "op": "PUSH1",
+      "value": "0x20"
+    },
+    "182": {
+      "op": "DUP5"
+    },
+    "183": {
+      "op": "ADD"
+    },
+    "184": {
+      "op": "SWAP3"
+    },
+    "185": {
+      "op": "SWAP1"
+    },
+    "186": {
+      "op": "SWAP3"
+    },
+    "187": {
+      "op": "MSTORE"
+    },
+    "188": {
+      "op": "PUSH1",
+      "value": "0xFF"
+    },
+    "190": {
+      "op": "AND"
+    },
+    "191": {
+      "op": "SWAP1"
+    },
+    "192": {
+      "op": "DUP3"
+    },
+    "193": {
+      "op": "ADD"
+    },
+    "194": {
+      "op": "MSTORE"
+    },
+    "195": {
+      "op": "PUSH1",
+      "value": "0x60"
+    },
+    "197": {
+      "op": "ADD"
+    },
+    "198": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        860,
+        1217
+      ],
+      "op": "PUSH2",
+      "path": "0",
+      "value": "0x6D"
+    },
+    "201": {
+      "op": "JUMP"
+    },
+    "202": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        591,
+        854
+      ],
+      "op": "JUMPDEST",
+      "path": "0"
+    },
+    "203": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        713,
+        717
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x0"
+    },
+    "205": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        730,
+        739
+      ],
+      "op": "DUP1",
+      "path": "0"
+    },
+    "206": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        741,
+        750
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x0"
+    },
+    "208": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        752,
+        759
+      ],
+      "op": "DUP1",
+      "path": "0"
+    },
+    "209": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "PUSH2",
+      "path": "0",
+      "value": "0x10F"
+    },
+    "212": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        778,
+        787
+      ],
+      "op": "DUP8",
+      "path": "0"
+    },
+    "213": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        778,
+        787
+      ],
+      "op": "DUP8",
+      "path": "0"
+    },
+    "214": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "DUP1",
+      "path": "0"
+    },
+    "215": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "DUP1",
+      "path": "0"
+    },
+    "216": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x1F"
+    },
+    "218": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "ADD",
+      "path": "0"
+    },
+    "219": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x20"
+    },
+    "221": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "DUP1",
+      "path": "0"
+    },
+    "222": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "SWAP2",
+      "path": "0"
+    },
+    "223": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "DIV",
+      "path": "0"
+    },
+    "224": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "MUL",
+      "path": "0"
+    },
+    "225": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x20"
+    },
+    "227": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "ADD",
+      "path": "0"
+    },
+    "228": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x40"
+    },
+    "230": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "MLOAD",
+      "path": "0"
+    },
+    "231": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "SWAP1",
+      "path": "0"
+    },
+    "232": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "DUP2",
+      "path": "0"
+    },
+    "233": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "ADD",
+      "path": "0"
+    },
+    "234": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x40"
+    },
+    "236": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "MSTORE",
+      "path": "0"
+    },
+    "237": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "DUP1",
+      "path": "0"
+    },
+    "238": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "SWAP4",
+      "path": "0"
+    },
+    "239": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "SWAP3",
+      "path": "0"
+    },
+    "240": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "SWAP2",
+      "path": "0"
+    },
+    "241": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "SWAP1",
+      "path": "0"
+    },
+    "242": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "DUP2",
+      "path": "0"
+    },
+    "243": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "DUP2",
+      "path": "0"
+    },
+    "244": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "MSTORE",
+      "path": "0"
+    },
+    "245": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x20"
+    },
+    "247": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "ADD",
+      "path": "0"
+    },
+    "248": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "DUP4",
+      "path": "0"
+    },
+    "249": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "DUP4",
+      "path": "0"
+    },
+    "250": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "DUP1",
+      "path": "0"
+    },
+    "251": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "DUP3",
+      "path": "0"
+    },
+    "252": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "DUP5",
+      "path": "0"
+    },
+    "253": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "CALLDATACOPY",
+      "path": "0"
+    },
+    "254": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x0"
+    },
+    "256": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "SWAP3",
+      "path": "0"
+    },
+    "257": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "ADD",
+      "path": "0"
+    },
+    "258": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "SWAP2",
+      "path": "0"
+    },
+    "259": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "SWAP1",
+      "path": "0"
+    },
+    "260": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "SWAP2",
+      "path": "0"
+    },
+    "261": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "MSTORE",
+      "path": "0"
+    },
+    "262": {
+      "op": "POP"
+    },
+    "263": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        777
+      ],
+      "op": "PUSH2",
+      "path": "0",
+      "value": "0x19E"
+    },
+    "266": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        777
+      ],
+      "op": "SWAP3",
+      "path": "0"
+    },
+    "267": {
+      "op": "POP"
+    },
+    "268": {
+      "op": "POP"
+    },
+    "269": {
+      "op": "POP"
+    },
+    "270": {
+      "fn": "APIConsumer.verifySignature",
+      "jump": "i",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "JUMP",
+      "path": "0"
+    },
+    "271": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        763,
+        788
+      ],
+      "op": "JUMPDEST",
+      "path": "0"
+    },
+    "272": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        729,
+        788
+      ],
+      "op": "SWAP3",
+      "path": "0"
+    },
+    "273": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        729,
+        788
+      ],
+      "op": "POP",
+      "path": "0"
+    },
+    "274": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        729,
+        788
+      ],
+      "op": "SWAP3",
+      "path": "0"
+    },
+    "275": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        729,
+        788
+      ],
+      "op": "POP",
+      "path": "0"
+    },
+    "276": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        729,
+        788
+      ],
+      "op": "SWAP3",
+      "path": "0"
+    },
+    "277": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        729,
+        788
+      ],
+      "op": "POP",
+      "path": "0"
+    },
+    "278": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        840,
+        846
+      ],
+      "op": "DUP5",
+      "path": "0",
+      "statement": 0
+    },
+    "279": {
+      "op": "PUSH1",
+      "value": "0x1"
+    },
+    "281": {
+      "op": "PUSH1",
+      "value": "0x1"
+    },
+    "283": {
+      "op": "PUSH1",
+      "value": "0xA0"
+    },
+    "285": {
+      "op": "SHL"
+    },
+    "286": {
+      "op": "SUB"
+    },
+    "287": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        846
+      ],
+      "op": "AND",
+      "path": "0"
+    },
+    "288": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x1"
+    },
+    "290": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        816,
+        826
+      ],
+      "op": "DUP10",
+      "path": "0"
+    },
+    "291": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        828,
+        829
+      ],
+      "op": "DUP4",
+      "path": "0"
+    },
+    "292": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        831,
+        832
+      ],
+      "op": "DUP7",
+      "path": "0"
+    },
+    "293": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        834,
+        835
+      ],
+      "op": "DUP7",
+      "path": "0"
+    },
+    "294": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x40"
+    },
+    "296": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "MLOAD",
+      "path": "0"
+    },
+    "297": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x0"
+    },
+    "299": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "DUP2",
+      "path": "0"
+    },
+    "300": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "MSTORE",
+      "path": "0"
+    },
+    "301": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x20"
+    },
+    "303": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "ADD",
+      "path": "0"
+    },
+    "304": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x40"
+    },
+    "306": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "MSTORE",
+      "path": "0"
+    },
+    "307": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x40"
+    },
+    "309": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "MLOAD",
+      "path": "0"
+    },
+    "310": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "PUSH2",
+      "path": "0",
+      "value": "0x15B"
+    },
+    "313": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "SWAP5",
+      "path": "0"
+    },
+    "314": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "SWAP4",
+      "path": "0"
+    },
+    "315": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "SWAP3",
+      "path": "0"
+    },
+    "316": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "SWAP2",
+      "path": "0"
+    },
+    "317": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "SWAP1",
+      "path": "0"
+    },
+    "318": {
+      "op": "SWAP4"
+    },
+    "319": {
+      "op": "DUP5"
+    },
+    "320": {
+      "op": "MSTORE"
+    },
+    "321": {
+      "op": "PUSH1",
+      "value": "0xFF"
+    },
+    "323": {
+      "op": "SWAP3"
+    },
+    "324": {
+      "op": "SWAP1"
+    },
+    "325": {
+      "op": "SWAP3"
+    },
+    "326": {
+      "op": "AND"
+    },
+    "327": {
+      "op": "PUSH1",
+      "value": "0x20"
+    },
+    "329": {
+      "op": "DUP5"
+    },
+    "330": {
+      "op": "ADD"
+    },
+    "331": {
+      "op": "MSTORE"
+    },
+    "332": {
+      "op": "PUSH1",
+      "value": "0x40"
+    },
+    "334": {
+      "op": "DUP4"
+    },
+    "335": {
+      "op": "ADD"
+    },
+    "336": {
+      "op": "MSTORE"
+    },
+    "337": {
+      "op": "PUSH1",
+      "value": "0x60"
+    },
+    "339": {
+      "op": "DUP3"
+    },
+    "340": {
+      "op": "ADD"
+    },
+    "341": {
+      "op": "MSTORE"
+    },
+    "342": {
+      "op": "PUSH1",
+      "value": "0x80"
+    },
+    "344": {
+      "op": "ADD"
+    },
+    "345": {
+      "op": "SWAP1"
+    },
+    "346": {
+      "op": "JUMP"
+    },
+    "347": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "JUMPDEST",
+      "path": "0"
+    },
+    "348": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x20"
+    },
+    "350": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x40"
+    },
+    "352": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "MLOAD",
+      "path": "0"
+    },
+    "353": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x20"
+    },
+    "355": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "DUP2",
+      "path": "0"
+    },
+    "356": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "SUB",
+      "path": "0"
+    },
+    "357": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "SWAP1",
+      "path": "0"
+    },
+    "358": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "DUP1",
+      "path": "0"
+    },
+    "359": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "DUP5",
+      "path": "0"
+    },
+    "360": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "SUB",
+      "path": "0"
+    },
+    "361": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "SWAP1",
+      "path": "0"
+    },
+    "362": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "DUP6",
+      "path": "0"
+    },
+    "363": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "GAS",
+      "path": "0"
+    },
+    "364": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "STATICCALL",
+      "path": "0"
+    },
+    "365": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "ISZERO",
+      "path": "0"
+    },
+    "366": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "DUP1",
+      "path": "0"
+    },
+    "367": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "ISZERO",
+      "path": "0"
+    },
+    "368": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "PUSH2",
+      "path": "0",
+      "value": "0x17D"
+    },
+    "371": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "JUMPI",
+      "path": "0"
+    },
+    "372": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "RETURNDATASIZE",
+      "path": "0"
+    },
+    "373": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x0"
+    },
+    "375": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "DUP1",
+      "path": "0"
+    },
+    "376": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "RETURNDATACOPY",
+      "path": "0"
+    },
+    "377": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "RETURNDATASIZE",
+      "path": "0"
+    },
+    "378": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x0"
+    },
+    "380": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "REVERT",
+      "path": "0"
+    },
+    "381": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "JUMPDEST",
+      "path": "0"
+    },
+    "382": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "POP",
+      "path": "0"
+    },
+    "383": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "POP",
+      "path": "0"
+    },
+    "384": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "POP",
+      "path": "0"
+    },
+    "385": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x20"
+    },
+    "387": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x40"
+    },
+    "389": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "MLOAD",
+      "path": "0"
+    },
+    "390": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "SUB",
+      "path": "0"
+    },
+    "391": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        836
+      ],
+      "op": "MLOAD",
+      "path": "0"
+    },
+    "392": {
+      "op": "PUSH1",
+      "value": "0x1"
+    },
+    "394": {
+      "op": "PUSH1",
+      "value": "0x1"
+    },
+    "396": {
+      "op": "PUSH1",
+      "value": "0xA0"
+    },
+    "398": {
+      "op": "SHL"
+    },
+    "399": {
+      "op": "SUB"
+    },
+    "400": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        846
+      ],
+      "op": "AND",
+      "path": "0"
+    },
+    "401": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        806,
+        846
+      ],
+      "op": "EQ",
+      "path": "0"
+    },
+    "402": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        798,
+        847
+      ],
+      "op": "SWAP4",
+      "path": "0"
+    },
+    "403": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        798,
+        847
+      ],
+      "op": "POP",
+      "path": "0"
+    },
+    "404": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        798,
+        847
+      ],
+      "op": "POP",
+      "path": "0"
+    },
+    "405": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        798,
+        847
+      ],
+      "op": "POP",
+      "path": "0"
+    },
+    "406": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        798,
+        847
+      ],
+      "op": "POP",
+      "path": "0"
+    },
+    "407": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        591,
+        854
+      ],
+      "op": "SWAP5",
+      "path": "0"
+    },
+    "408": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        591,
+        854
+      ],
+      "op": "SWAP4",
+      "path": "0"
+    },
+    "409": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        591,
+        854
+      ],
+      "op": "POP",
+      "path": "0"
+    },
+    "410": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        591,
+        854
+      ],
+      "op": "POP",
+      "path": "0"
+    },
+    "411": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        591,
+        854
+      ],
+      "op": "POP",
+      "path": "0"
+    },
+    "412": {
+      "fn": "APIConsumer.verifySignature",
+      "offset": [
+        591,
+        854
+      ],
+      "op": "POP",
+      "path": "0"
+    },
+    "413": {
+      "fn": "APIConsumer.verifySignature",
+      "jump": "o",
+      "offset": [
+        591,
+        854
+      ],
+      "op": "JUMP",
+      "path": "0"
+    },
+    "414": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        860,
+        1217
+      ],
+      "op": "JUMPDEST",
+      "path": "0"
+    },
+    "415": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        943,
+        952
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x0"
+    },
+    "417": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        954,
+        963
+      ],
+      "op": "DUP1",
+      "path": "0"
+    },
+    "418": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        965,
+        972
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x0"
+    },
+    "420": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        992,
+        1001
+      ],
+      "op": "DUP4",
+      "path": "0",
+      "statement": 1
+    },
+    "421": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        992,
+        1008
+      ],
+      "op": "MLOAD",
+      "path": "0"
+    },
+    "422": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        1012,
+        1014
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x41"
+    },
+    "424": {
+      "branch": 2,
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        992,
+        1014
+      ],
+      "op": "EQ",
+      "path": "0"
+    },
+    "425": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        984,
+        1043
+      ],
+      "op": "PUSH2",
+      "path": "0",
+      "value": "0x1F8"
+    },
+    "428": {
+      "branch": 2,
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        984,
+        1043
+      ],
+      "op": "JUMPI",
+      "path": "0"
+    },
+    "429": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        984,
+        1043
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x40"
+    },
+    "431": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        984,
+        1043
+      ],
+      "op": "MLOAD",
+      "path": "0"
+    },
+    "432": {
+      "op": "PUSH3",
+      "value": "0x461BCD"
+    },
+    "436": {
+      "op": "PUSH1",
+      "value": "0xE5"
+    },
+    "438": {
+      "op": "SHL"
+    },
+    "439": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        984,
+        1043
+      ],
+      "op": "DUP2",
+      "path": "0"
+    },
+    "440": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        984,
+        1043
+      ],
+      "op": "MSTORE",
+      "path": "0"
+    },
+    "441": {
+      "op": "PUSH1",
+      "value": "0x20"
+    },
+    "443": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        984,
+        1043
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x4"
+    },
+    "445": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        984,
+        1043
+      ],
+      "op": "DUP3",
+      "path": "0"
+    },
+    "446": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        984,
+        1043
+      ],
+      "op": "ADD",
+      "path": "0"
+    },
+    "447": {
+      "op": "MSTORE"
+    },
+    "448": {
+      "op": "PUSH1",
+      "value": "0x18"
+    },
+    "450": {
+      "op": "PUSH1",
+      "value": "0x24"
+    },
+    "452": {
+      "op": "DUP3"
+    },
+    "453": {
+      "op": "ADD"
+    },
+    "454": {
+      "op": "MSTORE"
+    },
+    "455": {
+      "op": "PUSH32",
+      "value": "0x696E76616C6964207369676E6174757265206C656E6774680000000000000000"
+    },
+    "488": {
+      "op": "PUSH1",
+      "value": "0x44"
+    },
+    "490": {
+      "op": "DUP3"
+    },
+    "491": {
+      "op": "ADD"
+    },
+    "492": {
+      "op": "MSTORE"
+    },
+    "493": {
+      "op": "PUSH1",
+      "value": "0x64"
+    },
+    "495": {
+      "op": "ADD"
+    },
+    "496": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        984,
+        1043
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x40"
+    },
+    "498": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        984,
+        1043
+      ],
+      "op": "MLOAD",
+      "path": "0"
+    },
+    "499": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        984,
+        1043
+      ],
+      "op": "DUP1",
+      "path": "0"
+    },
+    "500": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        984,
+        1043
+      ],
+      "op": "SWAP2",
+      "path": "0"
+    },
+    "501": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        984,
+        1043
+      ],
+      "op": "SUB",
+      "path": "0"
+    },
+    "502": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        984,
+        1043
+      ],
+      "op": "SWAP1",
+      "path": "0"
+    },
+    "503": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        984,
+        1043
+      ],
+      "op": "REVERT",
+      "optimizer_revert": true,
+      "path": "0"
+    },
+    "504": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        984,
+        1043
+      ],
+      "op": "JUMPDEST",
+      "path": "0"
+    },
+    "505": {
+      "op": "POP"
+    },
+    "506": {
+      "op": "POP"
+    },
+    "507": {
+      "op": "POP"
+    },
+    "508": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        1102,
+        1104
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x20"
+    },
+    "510": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        1087,
+        1105
+      ],
+      "op": "DUP2",
+      "path": "0"
+    },
+    "511": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        1087,
+        1105
+      ],
+      "op": "ADD",
+      "path": "0"
+    },
+    "512": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        1081,
+        1106
+      ],
+      "op": "MLOAD",
+      "path": "0"
+    },
+    "513": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        1145,
+        1147
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x40"
+    },
+    "515": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        1130,
+        1148
+      ],
+      "op": "DUP3",
+      "path": "0"
+    },
+    "516": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        1130,
+        1148
+      ],
+      "op": "ADD",
+      "path": "0"
+    },
+    "517": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        1124,
+        1149
+      ],
+      "op": "MLOAD",
+      "path": "0"
+    },
+    "518": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        1196,
+        1198
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x60"
+    },
+    "520": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        1181,
+        1199
+      ],
+      "op": "SWAP1",
+      "path": "0"
+    },
+    "521": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        1181,
+        1199
+      ],
+      "op": "SWAP3",
+      "path": "0"
+    },
+    "522": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        1181,
+        1199
+      ],
+      "op": "ADD",
+      "path": "0"
+    },
+    "523": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        1175,
+        1200
+      ],
+      "op": "MLOAD",
+      "path": "0"
+    },
+    "524": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        1081,
+        1106
+      ],
+      "op": "SWAP1",
+      "path": "0"
+    },
+    "525": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        1081,
+        1106
+      ],
+      "op": "SWAP3",
+      "path": "0"
+    },
+    "526": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        1172,
+        1173
+      ],
+      "op": "PUSH1",
+      "path": "0",
+      "value": "0x0"
+    },
+    "528": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        1167,
+        1201
+      ],
+      "op": "SWAP2",
+      "path": "0"
+    },
+    "529": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        1167,
+        1201
+      ],
+      "op": "SWAP1",
+      "path": "0"
+    },
+    "530": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        1167,
+        1201
+      ],
+      "op": "SWAP2",
+      "path": "0"
+    },
+    "531": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        1167,
+        1201
+      ],
+      "op": "BYTE",
+      "path": "0"
+    },
+    "532": {
+      "fn": "APIConsumer.splitSignature",
+      "offset": [
+        1167,
+        1201
+      ],
+      "op": "SWAP1",
+      "path": "0"
+    },
+    "533": {
+      "fn": "APIConsumer.splitSignature",
+      "jump": "o",
+      "offset": [
+        860,
+        1217
+      ],
+      "op": "JUMP",
+      "path": "0"
+    },
+    "534": {
+      "op": "JUMPDEST"
+    },
+    "535": {
+      "op": "PUSH1",
+      "value": "0x0"
+    },
+    "537": {
+      "op": "DUP1"
+    },
+    "538": {
+      "op": "PUSH1",
+      "value": "0x0"
+    },
+    "540": {
+      "op": "DUP1"
+    },
+    "541": {
+      "op": "PUSH1",
+      "value": "0x60"
+    },
+    "543": {
+      "op": "DUP6"
+    },
+    "544": {
+      "op": "DUP8"
+    },
+    "545": {
+      "op": "SUB"
+    },
+    "546": {
+      "op": "SLT"
+    },
+    "547": {
+      "op": "ISZERO"
+    },
+    "548": {
+      "op": "PUSH2",
+      "value": "0x22C"
+    },
+    "551": {
+      "op": "JUMPI"
+    },
+    "552": {
+      "op": "PUSH1",
+      "value": "0x0"
+    },
+    "554": {
+      "op": "DUP1"
+    },
+    "555": {
+      "op": "REVERT"
+    },
+    "556": {
+      "op": "JUMPDEST"
+    },
+    "557": {
+      "op": "DUP5"
+    },
+    "558": {
+      "op": "CALLDATALOAD"
+    },
+    "559": {
+      "op": "SWAP4"
+    },
+    "560": {
+      "op": "POP"
+    },
+    "561": {
+      "op": "PUSH1",
+      "value": "0x20"
+    },
+    "563": {
+      "op": "DUP6"
+    },
+    "564": {
+      "op": "ADD"
+    },
+    "565": {
+      "op": "CALLDATALOAD"
+    },
+    "566": {
+      "op": "PUSH8",
+      "value": "0xFFFFFFFFFFFFFFFF"
+    },
+    "575": {
+      "op": "DUP1"
+    },
+    "576": {
+      "op": "DUP3"
+    },
+    "577": {
+      "op": "GT"
+    },
+    "578": {
+      "op": "ISZERO"
+    },
+    "579": {
+      "op": "PUSH2",
+      "value": "0x24B"
+    },
+    "582": {
+      "op": "JUMPI"
+    },
+    "583": {
+      "op": "PUSH1",
+      "value": "0x0"
+    },
+    "585": {
+      "op": "DUP1"
+    },
+    "586": {
+      "op": "REVERT"
+    },
+    "587": {
+      "op": "JUMPDEST"
+    },
+    "588": {
+      "op": "DUP2"
+    },
+    "589": {
+      "op": "DUP8"
+    },
+    "590": {
+      "op": "ADD"
+    },
+    "591": {
+      "op": "SWAP2"
+    },
+    "592": {
+      "op": "POP"
+    },
+    "593": {
+      "op": "DUP8"
+    },
+    "594": {
+      "op": "PUSH1",
+      "value": "0x1F"
+    },
+    "596": {
+      "op": "DUP4"
+    },
+    "597": {
+      "op": "ADD"
+    },
+    "598": {
+      "op": "SLT"
+    },
+    "599": {
+      "op": "PUSH2",
+      "value": "0x25F"
+    },
+    "602": {
+      "op": "JUMPI"
+    },
+    "603": {
+      "op": "PUSH1",
+      "value": "0x0"
+    },
+    "605": {
+      "op": "DUP1"
+    },
+    "606": {
+      "op": "REVERT"
+    },
+    "607": {
+      "op": "JUMPDEST"
+    },
+    "608": {
+      "op": "DUP2"
+    },
+    "609": {
+      "op": "CALLDATALOAD"
+    },
+    "610": {
+      "op": "DUP2"
+    },
+    "611": {
+      "op": "DUP2"
+    },
+    "612": {
+      "op": "GT"
+    },
+    "613": {
+      "op": "ISZERO"
+    },
+    "614": {
+      "op": "PUSH2",
+      "value": "0x26E"
+    },
+    "617": {
+      "op": "JUMPI"
+    },
+    "618": {
+      "op": "PUSH1",
+      "value": "0x0"
+    },
+    "620": {
+      "op": "DUP1"
+    },
+    "621": {
+      "op": "REVERT"
+    },
+    "622": {
+      "op": "JUMPDEST"
+    },
+    "623": {
+      "op": "DUP9"
+    },
+    "624": {
+      "op": "PUSH1",
+      "value": "0x20"
+    },
+    "626": {
+      "op": "DUP3"
+    },
+    "627": {
+      "op": "DUP6"
+    },
+    "628": {
+      "op": "ADD"
+    },
+    "629": {
+      "op": "ADD"
+    },
+    "630": {
+      "op": "GT"
+    },
+    "631": {
+      "op": "ISZERO"
+    },
+    "632": {
+      "op": "PUSH2",
+      "value": "0x280"
+    },
+    "635": {
+      "op": "JUMPI"
+    },
+    "636": {
+      "op": "PUSH1",
+      "value": "0x0"
+    },
+    "638": {
+      "op": "DUP1"
+    },
+    "639": {
+      "op": "REVERT"
+    },
+    "640": {
+      "op": "JUMPDEST"
+    },
+    "641": {
+      "op": "PUSH1",
+      "value": "0x20"
+    },
+    "643": {
+      "op": "SWAP3"
+    },
+    "644": {
+      "op": "SWAP1"
+    },
+    "645": {
+      "op": "SWAP3"
+    },
+    "646": {
+      "op": "ADD"
+    },
+    "647": {
+      "op": "SWAP5"
+    },
+    "648": {
+      "op": "POP"
+    },
+    "649": {
+      "op": "SWAP1"
+    },
+    "650": {
+      "op": "SWAP3"
+    },
+    "651": {
+      "op": "POP"
+    },
+    "652": {
+      "op": "POP"
+    },
+    "653": {
+      "op": "PUSH1",
+      "value": "0x40"
+    },
+    "655": {
+      "op": "DUP6"
+    },
+    "656": {
+      "op": "ADD"
+    },
+    "657": {
+      "op": "CALLDATALOAD"
+    },
+    "658": {
+      "op": "PUSH1",
+      "value": "0x1"
+    },
+    "660": {
+      "op": "PUSH1",
+      "value": "0x1"
+    },
+    "662": {
+      "op": "PUSH1",
+      "value": "0xA0"
+    },
+    "664": {
+      "op": "SHL"
+    },
+    "665": {
+      "op": "SUB"
+    },
+    "666": {
+      "op": "DUP2"
+    },
+    "667": {
+      "op": "AND"
+    },
+    "668": {
+      "op": "DUP2"
+    },
+    "669": {
+      "op": "EQ"
+    },
+    "670": {
+      "op": "PUSH2",
+      "value": "0x2A6"
+    },
+    "673": {
+      "op": "JUMPI"
+    },
+    "674": {
+      "op": "PUSH1",
+      "value": "0x0"
+    },
+    "676": {
+      "op": "DUP1"
+    },
+    "677": {
+      "op": "REVERT"
+    },
+    "678": {
+      "op": "JUMPDEST"
+    },
+    "679": {
+      "op": "SWAP4"
+    },
+    "680": {
+      "op": "SWAP7"
+    },
+    "681": {
+      "op": "SWAP3"
+    },
+    "682": {
+      "op": "SWAP6"
+    },
+    "683": {
+      "op": "POP"
+    },
+    "684": {
+      "op": "SWAP1"
+    },
+    "685": {
+      "op": "SWAP4"
+    },
+    "686": {
+      "op": "POP"
+    },
+    "687": {
+      "op": "POP"
+    },
+    "688": {
+      "jump": "o",
+      "op": "JUMP"
+    },
+    "689": {
+      "op": "JUMPDEST"
+    },
+    "690": {
+      "op": "PUSH4",
+      "value": "0x4E487B71"
+    },
+    "695": {
+      "op": "PUSH1",
+      "value": "0xE0"
+    },
+    "697": {
+      "op": "SHL"
+    },
+    "698": {
+      "op": "PUSH1",
+      "value": "0x0"
+    },
+    "700": {
+      "op": "MSTORE"
+    },
+    "701": {
+      "op": "PUSH1",
+      "value": "0x41"
+    },
+    "703": {
+      "op": "PUSH1",
+      "value": "0x4"
+    },
+    "705": {
+      "op": "MSTORE"
+    },
+    "706": {
+      "op": "PUSH1",
+      "value": "0x24"
+    },
+    "708": {
+      "op": "PUSH1",
+      "value": "0x0"
+    },
+    "710": {
+      "op": "REVERT"
+    },
+    "711": {
+      "op": "JUMPDEST"
+    },
+    "712": {
+      "op": "PUSH1",
+      "value": "0x0"
+    },
+    "714": {
+      "op": "PUSH1",
+      "value": "0x20"
+    },
+    "716": {
+      "op": "DUP3"
+    },
+    "717": {
+      "op": "DUP5"
+    },
+    "718": {
+      "op": "SUB"
+    },
+    "719": {
+      "op": "SLT"
+    },
+    "720": {
+      "op": "ISZERO"
+    },
+    "721": {
+      "op": "PUSH2",
+      "value": "0x2D9"
+    },
+    "724": {
+      "op": "JUMPI"
+    },
+    "725": {
+      "op": "PUSH1",
+      "value": "0x0"
+    },
+    "727": {
+      "op": "DUP1"
+    },
+    "728": {
+      "op": "REVERT"
+    },
+    "729": {
+      "op": "JUMPDEST"
+    },
+    "730": {
+      "op": "DUP2"
+    },
+    "731": {
+      "op": "CALLDATALOAD"
+    },
+    "732": {
+      "op": "PUSH8",
+      "value": "0xFFFFFFFFFFFFFFFF"
+    },
+    "741": {
+      "op": "DUP1"
+    },
+    "742": {
+      "op": "DUP3"
+    },
+    "743": {
+      "op": "GT"
+    },
+    "744": {
+      "op": "ISZERO"
+    },
+    "745": {
+      "op": "PUSH2",
+      "value": "0x2F1"
+    },
+    "748": {
+      "op": "JUMPI"
+    },
+    "749": {
+      "op": "PUSH1",
+      "value": "0x0"
+    },
+    "751": {
+      "op": "DUP1"
+    },
+    "752": {
+      "op": "REVERT"
+    },
+    "753": {
+      "op": "JUMPDEST"
+    },
+    "754": {
+      "op": "DUP2"
+    },
+    "755": {
+      "op": "DUP5"
+    },
+    "756": {
+      "op": "ADD"
+    },
+    "757": {
+      "op": "SWAP2"
+    },
+    "758": {
+      "op": "POP"
+    },
+    "759": {
+      "op": "DUP5"
+    },
+    "760": {
+      "op": "PUSH1",
+      "value": "0x1F"
+    },
+    "762": {
+      "op": "DUP4"
+    },
+    "763": {
+      "op": "ADD"
+    },
+    "764": {
+      "op": "SLT"
+    },
+    "765": {
+      "op": "PUSH2",
+      "value": "0x305"
+    },
+    "768": {
+      "op": "JUMPI"
+    },
+    "769": {
+      "op": "PUSH1",
+      "value": "0x0"
+    },
+    "771": {
+      "op": "DUP1"
+    },
+    "772": {
+      "op": "REVERT"
+    },
+    "773": {
+      "op": "JUMPDEST"
+    },
+    "774": {
+      "op": "DUP2"
+    },
+    "775": {
+      "op": "CALLDATALOAD"
+    },
+    "776": {
+      "op": "DUP2"
+    },
+    "777": {
+      "op": "DUP2"
+    },
+    "778": {
+      "op": "GT"
+    },
+    "779": {
+      "op": "ISZERO"
+    },
+    "780": {
+      "op": "PUSH2",
+      "value": "0x317"
+    },
+    "783": {
+      "op": "JUMPI"
+    },
+    "784": {
+      "op": "PUSH2",
+      "value": "0x317"
+    },
+    "787": {
+      "op": "PUSH2",
+      "value": "0x2B1"
+    },
+    "790": {
+      "jump": "i",
+      "op": "JUMP"
+    },
+    "791": {
+      "op": "JUMPDEST"
+    },
+    "792": {
+      "op": "PUSH1",
+      "value": "0x40"
+    },
+    "794": {
+      "op": "MLOAD"
+    },
+    "795": {
+      "op": "PUSH1",
+      "value": "0x1F"
+    },
+    "797": {
+      "op": "DUP3"
+    },
+    "798": {
+      "op": "ADD"
+    },
+    "799": {
+      "op": "PUSH1",
+      "value": "0x1F"
+    },
+    "801": {
+      "op": "NOT"
+    },
+    "802": {
+      "op": "SWAP1"
+    },
+    "803": {
+      "op": "DUP2"
+    },
+    "804": {
+      "op": "AND"
+    },
+    "805": {
+      "op": "PUSH1",
+      "value": "0x3F"
+    },
+    "807": {
+      "op": "ADD"
+    },
+    "808": {
+      "op": "AND"
+    },
+    "809": {
+      "op": "DUP2"
+    },
+    "810": {
+      "op": "ADD"
+    },
+    "811": {
+      "op": "SWAP1"
+    },
+    "812": {
+      "op": "DUP4"
+    },
+    "813": {
+      "op": "DUP3"
+    },
+    "814": {
+      "op": "GT"
+    },
+    "815": {
+      "op": "DUP2"
+    },
+    "816": {
+      "op": "DUP4"
+    },
+    "817": {
+      "op": "LT"
+    },
+    "818": {
+      "op": "OR"
+    },
+    "819": {
+      "op": "ISZERO"
+    },
+    "820": {
+      "op": "PUSH2",
+      "value": "0x33F"
+    },
+    "823": {
+      "op": "JUMPI"
+    },
+    "824": {
+      "op": "PUSH2",
+      "value": "0x33F"
+    },
+    "827": {
+      "op": "PUSH2",
+      "value": "0x2B1"
+    },
+    "830": {
+      "jump": "i",
+      "op": "JUMP"
+    },
+    "831": {
+      "op": "JUMPDEST"
+    },
+    "832": {
+      "op": "DUP2"
+    },
+    "833": {
+      "op": "PUSH1",
+      "value": "0x40"
+    },
+    "835": {
+      "op": "MSTORE"
+    },
+    "836": {
+      "op": "DUP3"
+    },
+    "837": {
+      "op": "DUP2"
+    },
+    "838": {
+      "op": "MSTORE"
+    },
+    "839": {
+      "op": "DUP8"
+    },
+    "840": {
+      "op": "PUSH1",
+      "value": "0x20"
+    },
+    "842": {
+      "op": "DUP5"
+    },
+    "843": {
+      "op": "DUP8"
+    },
+    "844": {
+      "op": "ADD"
+    },
+    "845": {
+      "op": "ADD"
+    },
+    "846": {
+      "op": "GT"
+    },
+    "847": {
+      "op": "ISZERO"
+    },
+    "848": {
+      "op": "PUSH2",
+      "value": "0x358"
+    },
+    "851": {
+      "op": "JUMPI"
+    },
+    "852": {
+      "op": "PUSH1",
+      "value": "0x0"
+    },
+    "854": {
+      "op": "DUP1"
+    },
+    "855": {
+      "op": "REVERT"
+    },
+    "856": {
+      "op": "JUMPDEST"
+    },
+    "857": {
+      "op": "DUP3"
+    },
+    "858": {
+      "op": "PUSH1",
+      "value": "0x20"
+    },
+    "860": {
+      "op": "DUP7"
+    },
+    "861": {
+      "op": "ADD"
+    },
+    "862": {
+      "op": "PUSH1",
+      "value": "0x20"
+    },
+    "864": {
+      "op": "DUP4"
+    },
+    "865": {
+      "op": "ADD"
+    },
+    "866": {
+      "op": "CALLDATACOPY"
+    },
+    "867": {
+      "op": "PUSH1",
+      "value": "0x0"
+    },
+    "869": {
+      "op": "SWAP3"
+    },
+    "870": {
+      "op": "DUP2"
+    },
+    "871": {
+      "op": "ADD"
+    },
+    "872": {
+      "op": "PUSH1",
+      "value": "0x20"
+    },
+    "874": {
+      "op": "ADD"
+    },
+    "875": {
+      "op": "SWAP3"
+    },
+    "876": {
+      "op": "SWAP1"
+    },
+    "877": {
+      "op": "SWAP3"
+    },
+    "878": {
+      "op": "MSTORE"
+    },
+    "879": {
+      "op": "POP"
+    },
+    "880": {
+      "op": "SWAP6"
+    },
+    "881": {
+      "op": "SWAP5"
+    },
+    "882": {
+      "op": "POP"
+    },
+    "883": {
+      "op": "POP"
+    },
+    "884": {
+      "op": "POP"
+    },
+    "885": {
+      "op": "POP"
+    },
+    "886": {
+      "op": "POP"
+    },
+    "887": {
+      "jump": "o",
+      "op": "JUMP"
+    }
+  },
+  "sha1": "8e67f0d51d104c5638617b1038ba56930089ffe7",
+  "source": "// SPDX-License-Identifier: GPL-3.0\n\npragma solidity >=0.7.0 <0.9.0;\n\nimport \"./APIProvider.sol\";\n\ncontract APIConsumer {\n    // TODO esto es un ejemplo de ZT rollup, o ZT Oracle\n    // TODO el turbosnitch 3000 es otro ejemplo, que ademas el post process genere el nuevo bloque a minar, y capaz haga uso de api consumer para obtener los bloques? o mejor los guardo en el cliente?\n    APIProvider public provider;\n    //web3.personal.sign(hash, web3.eth.defaultAccount, console.log)\n    constructor(address apiProviderAddress) {\n        provider = APIProvider(apiProviderAddress);\n    }\n\n    function verifySignature(\n        bytes32 signedHash, bytes calldata signature, address signer\n    ) public pure returns (bool) {\n        (bytes32 r, bytes32 s, uint8 v) = splitSignature(signature);\n        return (ecrecover(signedHash, v, r, s) == signer);\n    }\n\n    function splitSignature(\n        bytes memory signature\n    ) public pure returns (bytes32 r, bytes32 s, uint8 v) {\n        require(signature.length == 65, \"invalid signature length\");\n        assembly {\n            r := mload(add(signature, 32))\n            s := mload(add(signature, 64))\n            v := byte(0, mload(add(signature, 96)))\n        }\n    }\n\n}",
+  "sourceMap": "99:1121:0:-:0;;;486:99;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;536:8;:42;;-1:-1:-1;;;;;;536:42:0;-1:-1:-1;;;;;536:42:0;;;;;;;;;;99:1121;;14:290:8;84:6;137:2;125:9;116:7;112:23;108:32;105:52;;;153:1;150;143:12;105:52;179:16;;-1:-1:-1;;;;;224:31:8;;214:42;;204:70;;270:1;267;260:12;204:70;293:5;14:290;-1:-1:-1;;;14:290:8:o;:::-;99:1121:0;;;;;;",
+  "sourcePath": "contracts/APIConsumer.sol",
+  "type": "contract"
+}

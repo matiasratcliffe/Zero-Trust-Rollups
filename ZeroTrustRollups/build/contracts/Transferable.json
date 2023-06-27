@@ -1,0 +1,4067 @@
+{
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "destination",
+          "type": "address"
+        }
+      ],
+      "name": "publicTransferFunds",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "weiBalances",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "allSourcePaths": {
+    "4": "contracts/Transferable.sol"
+  },
+  "ast": {
+    "absolutePath": "contracts/Transferable.sol",
+    "exportedSymbols": {
+      "Transferable": [
+        1184
+      ]
+    },
+    "id": 1185,
+    "license": "GPL-3.0",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1102,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.7",
+          ".0",
+          "<",
+          "0.9",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "37:31:4"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "Transferable",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": true,
+        "id": 1184,
+        "linearizedBaseContracts": [
+          1184
+        ],
+        "name": "Transferable",
+        "nameLocation": "278:12:4",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": false,
+            "functionSelector": "6ef9e145",
+            "id": 1106,
+            "mutability": "mutable",
+            "name": "weiBalances",
+            "nameLocation": "330:11:4",
+            "nodeType": "VariableDeclaration",
+            "scope": 1184,
+            "src": "298:43:4",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
+              "typeString": "mapping(address => uint256)"
+            },
+            "typeName": {
+              "id": 1105,
+              "keyName": "",
+              "keyNameLocation": "-1:-1:-1",
+              "keyType": {
+                "id": 1103,
+                "name": "address",
+                "nodeType": "ElementaryTypeName",
+                "src": "306:7:4",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                }
+              },
+              "nodeType": "Mapping",
+              "src": "298:24:4",
+              "typeDescriptions": {
+                "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
+                "typeString": "mapping(address => uint256)"
+              },
+              "valueName": "",
+              "valueNameLocation": "-1:-1:-1",
+              "valueType": {
+                "id": 1104,
+                "name": "uint",
+                "nodeType": "ElementaryTypeName",
+                "src": "317:4:4",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                }
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 1160,
+              "nodeType": "Block",
+              "src": "489:472:4",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "commonType": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        "id": 1121,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "baseExpression": {
+                            "id": 1116,
+                            "name": "weiBalances",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 1106,
+                            "src": "507:11:4",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
+                              "typeString": "mapping(address => uint256)"
+                            }
+                          },
+                          "id": 1119,
+                          "indexExpression": {
+                            "expression": {
+                              "id": 1117,
+                              "name": "msg",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": -15,
+                              "src": "519:3:4",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_magic_message",
+                                "typeString": "msg"
+                              }
+                            },
+                            "id": 1118,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberLocation": "523:6:4",
+                            "memberName": "sender",
+                            "nodeType": "MemberAccess",
+                            "src": "519:10:4",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          },
+                          "isConstant": false,
+                          "isLValue": true,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "nodeType": "IndexAccess",
+                          "src": "507:23:4",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": ">=",
+                        "rightExpression": {
+                          "id": 1120,
+                          "name": "amount",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1108,
+                          "src": "534:6:4",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "src": "507:33:4",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "hexValue": "53656e64657220646f6573206e6f74206861766520656e6f7567682066756e6473",
+                        "id": 1122,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "542:35:4",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_73eadb23ae6db933eec9c4e37ff40fbcaa063938192dcf810ed9f79d9f343008",
+                          "typeString": "literal_string \"Sender does not have enough funds\""
+                        },
+                        "value": "Sender does not have enough funds"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_73eadb23ae6db933eec9c4e37ff40fbcaa063938192dcf810ed9f79d9f343008",
+                          "typeString": "literal_string \"Sender does not have enough funds\""
+                        }
+                      ],
+                      "id": 1115,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        -18,
+                        -18
+                      ],
+                      "referencedDeclaration": -18,
+                      "src": "499:7:4",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 1123,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "499:79:4",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 1124,
+                  "nodeType": "ExpressionStatement",
+                  "src": "499:79:4"
+                },
+                {
+                  "expression": {
+                    "id": 1130,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "baseExpression": {
+                        "id": 1125,
+                        "name": "weiBalances",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 1106,
+                        "src": "588:11:4",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
+                          "typeString": "mapping(address => uint256)"
+                        }
+                      },
+                      "id": 1128,
+                      "indexExpression": {
+                        "expression": {
+                          "id": 1126,
+                          "name": "msg",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": -15,
+                          "src": "600:3:4",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_magic_message",
+                            "typeString": "msg"
+                          }
+                        },
+                        "id": 1127,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "604:6:4",
+                        "memberName": "sender",
+                        "nodeType": "MemberAccess",
+                        "src": "600:10:4",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "nodeType": "IndexAccess",
+                      "src": "588:23:4",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "-=",
+                    "rightHandSide": {
+                      "id": 1129,
+                      "name": "amount",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 1108,
+                      "src": "615:6:4",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "588:33:4",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 1131,
+                  "nodeType": "ExpressionStatement",
+                  "src": "588:33:4"
+                },
+                {
+                  "assignments": [
+                    1133
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 1133,
+                      "mutability": "mutable",
+                      "name": "payee",
+                      "nameLocation": "647:5:4",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 1160,
+                      "src": "631:21:4",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address_payable",
+                        "typeString": "address payable"
+                      },
+                      "typeName": {
+                        "id": 1132,
+                        "name": "address",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "631:15:4",
+                        "stateMutability": "payable",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address_payable",
+                          "typeString": "address payable"
+                        }
+                      },
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 1138,
+                  "initialValue": {
+                    "arguments": [
+                      {
+                        "id": 1136,
+                        "name": "destination",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 1110,
+                        "src": "663:11:4",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "id": 1135,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "lValueRequested": false,
+                      "nodeType": "ElementaryTypeNameExpression",
+                      "src": "655:8:4",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_type$_t_address_payable_$",
+                        "typeString": "type(address payable)"
+                      },
+                      "typeName": {
+                        "id": 1134,
+                        "name": "address",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "655:8:4",
+                        "stateMutability": "payable",
+                        "typeDescriptions": {}
+                      }
+                    },
+                    "id": 1137,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "typeConversion",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "655:20:4",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address_payable",
+                      "typeString": "address payable"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "631:44:4"
+                },
+                {
+                  "assignments": [
+                    1140,
+                    null
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 1140,
+                      "mutability": "mutable",
+                      "name": "transferSuccess",
+                      "nameLocation": "691:15:4",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 1160,
+                      "src": "686:20:4",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bool",
+                        "typeString": "bool"
+                      },
+                      "typeName": {
+                        "id": 1139,
+                        "name": "bool",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "686:4:4",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      "visibility": "internal"
+                    },
+                    null
+                  ],
+                  "id": 1147,
+                  "initialValue": {
+                    "arguments": [
+                      {
+                        "hexValue": "",
+                        "id": 1145,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "738:2:4",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+                          "typeString": "literal_string \"\""
+                        },
+                        "value": ""
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_stringliteral_c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+                          "typeString": "literal_string \"\""
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_stringliteral_c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+                            "typeString": "literal_string \"\""
+                          }
+                        ],
+                        "expression": {
+                          "id": 1141,
+                          "name": "payee",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1133,
+                          "src": "712:5:4",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address_payable",
+                            "typeString": "address payable"
+                          }
+                        },
+                        "id": 1142,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "718:4:4",
+                        "memberName": "call",
+                        "nodeType": "MemberAccess",
+                        "src": "712:10:4",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_barecall_payable$_t_bytes_memory_ptr_$returns$_t_bool_$_t_bytes_memory_ptr_$",
+                          "typeString": "function (bytes memory) payable returns (bool,bytes memory)"
+                        }
+                      },
+                      "id": 1144,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "names": [
+                        "value"
+                      ],
+                      "nodeType": "FunctionCallOptions",
+                      "options": [
+                        {
+                          "id": 1143,
+                          "name": "amount",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1108,
+                          "src": "730:6:4",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        }
+                      ],
+                      "src": "712:25:4",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_barecall_payable$_t_bytes_memory_ptr_$returns$_t_bool_$_t_bytes_memory_ptr_$value",
+                        "typeString": "function (bytes memory) payable returns (bool,bytes memory)"
+                      }
+                    },
+                    "id": 1146,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "712:29:4",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$_t_bool_$_t_bytes_memory_ptr_$",
+                      "typeString": "tuple(bool,bytes memory)"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "685:56:4"
+                },
+                {
+                  "condition": {
+                    "id": 1149,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "nodeType": "UnaryOperation",
+                    "operator": "!",
+                    "prefix": true,
+                    "src": "755:16:4",
+                    "subExpression": {
+                      "id": 1148,
+                      "name": "transferSuccess",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 1140,
+                      "src": "756:15:4",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bool",
+                        "typeString": "bool"
+                      }
+                    },
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 1157,
+                  "nodeType": "IfStatement",
+                  "src": "751:172:4",
+                  "trueBody": {
+                    "id": 1156,
+                    "nodeType": "Block",
+                    "src": "773:150:4",
+                    "statements": [
+                      {
+                        "expression": {
+                          "id": 1154,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "leftHandSide": {
+                            "baseExpression": {
+                              "id": 1150,
+                              "name": "weiBalances",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 1106,
+                              "src": "878:11:4",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
+                                "typeString": "mapping(address => uint256)"
+                              }
+                            },
+                            "id": 1152,
+                            "indexExpression": {
+                              "id": 1151,
+                              "name": "destination",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 1110,
+                              "src": "890:11:4",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_address",
+                                "typeString": "address"
+                              }
+                            },
+                            "isConstant": false,
+                            "isLValue": true,
+                            "isPure": false,
+                            "lValueRequested": true,
+                            "nodeType": "IndexAccess",
+                            "src": "878:24:4",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          },
+                          "nodeType": "Assignment",
+                          "operator": "+=",
+                          "rightHandSide": {
+                            "id": 1153,
+                            "name": "amount",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 1108,
+                            "src": "906:6:4",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          },
+                          "src": "878:34:4",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "id": 1155,
+                        "nodeType": "ExpressionStatement",
+                        "src": "878:34:4"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "expression": {
+                    "id": 1158,
+                    "name": "transferSuccess",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 1140,
+                    "src": "939:15:4",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "functionReturnParameters": 1114,
+                  "id": 1159,
+                  "nodeType": "Return",
+                  "src": "932:22:4"
+                }
+              ]
+            },
+            "functionSelector": "0d45c199",
+            "id": 1161,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "publicTransferFunds",
+            "nameLocation": "413:19:4",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1111,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1108,
+                  "mutability": "mutable",
+                  "name": "amount",
+                  "nameLocation": "438:6:4",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1161,
+                  "src": "433:11:4",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1107,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "433:4:4",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1110,
+                  "mutability": "mutable",
+                  "name": "destination",
+                  "nameLocation": "454:11:4",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1161,
+                  "src": "446:19:4",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1109,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "446:7:4",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "432:34:4"
+            },
+            "returnParameters": {
+              "id": 1114,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1113,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1161,
+                  "src": "483:4:4",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 1112,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "483:4:4",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "482:6:4"
+            },
+            "scope": 1184,
+            "src": "404:557:4",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 1182,
+              "nodeType": "Block",
+              "src": "1120:107:4",
+              "statements": [
+                {
+                  "expression": {
+                    "id": 1175,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "baseExpression": {
+                        "id": 1170,
+                        "name": "weiBalances",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 1106,
+                        "src": "1130:11:4",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
+                          "typeString": "mapping(address => uint256)"
+                        }
+                      },
+                      "id": 1173,
+                      "indexExpression": {
+                        "expression": {
+                          "id": 1171,
+                          "name": "msg",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": -15,
+                          "src": "1142:3:4",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_magic_message",
+                            "typeString": "msg"
+                          }
+                        },
+                        "id": 1172,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "1146:6:4",
+                        "memberName": "sender",
+                        "nodeType": "MemberAccess",
+                        "src": "1142:10:4",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "nodeType": "IndexAccess",
+                      "src": "1130:23:4",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "+=",
+                    "rightHandSide": {
+                      "id": 1174,
+                      "name": "amount",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 1163,
+                      "src": "1157:6:4",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "1130:33:4",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 1176,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1130:33:4"
+                },
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 1178,
+                        "name": "amount",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 1163,
+                        "src": "1200:6:4",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      {
+                        "id": 1179,
+                        "name": "destination",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 1165,
+                        "src": "1208:11:4",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "id": 1177,
+                      "name": "publicTransferFunds",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 1161,
+                      "src": "1180:19:4",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_uint256_$_t_address_$returns$_t_bool_$",
+                        "typeString": "function (uint256,address) returns (bool)"
+                      }
+                    },
+                    "id": 1180,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1180:40:4",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "functionReturnParameters": 1169,
+                  "id": 1181,
+                  "nodeType": "Return",
+                  "src": "1173:47:4"
+                }
+              ]
+            },
+            "id": 1183,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "_internalTransferFunds",
+            "nameLocation": "1039:22:4",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1166,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1163,
+                  "mutability": "mutable",
+                  "name": "amount",
+                  "nameLocation": "1067:6:4",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1183,
+                  "src": "1062:11:4",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1162,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1062:4:4",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 1165,
+                  "mutability": "mutable",
+                  "name": "destination",
+                  "nameLocation": "1083:11:4",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1183,
+                  "src": "1075:19:4",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 1164,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1075:7:4",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1061:34:4"
+            },
+            "returnParameters": {
+              "id": 1169,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1168,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1183,
+                  "src": "1114:4:4",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 1167,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1114:4:4",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1113:6:4"
+            },
+            "scope": 1184,
+            "src": "1030:197:4",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          }
+        ],
+        "scope": 1185,
+        "src": "269:960:4",
+        "usedErrors": []
+      }
+    ],
+    "src": "37:1192:4"
+  },
+  "bytecode": "608060405234801561001057600080fd5b50610291806100206000396000f3fe608060405234801561001057600080fd5b50600436106100365760003560e01c80630d45c1991461003b5780636ef9e14514610063575b600080fd5b61004e6100493660046101d1565b610091565b60405190151581526020015b60405180910390f35b6100836100713660046101fd565b60006020819052908152604090205481565b60405190815260200161005a565b336000908152602081905260408120548311156100fe5760405162461bcd60e51b815260206004820152602160248201527f53656e64657220646f6573206e6f74206861766520656e6f7567682066756e646044820152607360f81b606482015260840160405180910390fd5b336000908152602081905260408120805485929061011d908490610235565b909155505060405182906000906001600160a01b0383169086908381818185875af1925050503d806000811461016f576040519150601f19603f3d011682016040523d82523d6000602084013e610174565b606091505b50509050806101ab576001600160a01b038416600090815260208190526040812080548792906101a5908490610248565b90915550505b9150505b92915050565b80356001600160a01b03811681146101cc57600080fd5b919050565b600080604083850312156101e457600080fd5b823591506101f4602084016101b5565b90509250929050565b60006020828403121561020f57600080fd5b610218826101b5565b9392505050565b634e487b7160e01b600052601160045260246000fd5b818103818111156101af576101af61021f565b808201808211156101af576101af61021f56fea2646970667358221220540d7261c6e8376c09be70a9017575fd29306029bca56e68c10eea3ad0f6697064736f6c63430008130033",
+  "bytecodeSha1": "46d8302b7b373057f7bb873d07b598531307e853",
+  "compiler": {
+    "evm_version": "istanbul",
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "version": "0.8.19+commit.7dd6d404"
+  },
+  "contractName": "Transferable",
+  "coverageMap": {
+    "branches": {
+      "4": {
+        "Transferable.publicTransferFunds": {
+          "4": [
+            507,
+            540,
+            true
+          ],
+          "5": [
+            756,
+            771,
+            false
+          ]
+        }
+      }
+    },
+    "statements": {
+      "4": {
+        "Transferable.publicTransferFunds": {
+          "0": [
+            499,
+            578
+          ],
+          "1": [
+            588,
+            621
+          ],
+          "2": [
+            878,
+            912
+          ],
+          "3": [
+            932,
+            954
+          ]
+        }
+      }
+    }
+  },
+  "dependencies": [],
+  "deployedBytecode": "608060405234801561001057600080fd5b50600436106100365760003560e01c80630d45c1991461003b5780636ef9e14514610063575b600080fd5b61004e6100493660046101d1565b610091565b60405190151581526020015b60405180910390f35b6100836100713660046101fd565b60006020819052908152604090205481565b60405190815260200161005a565b336000908152602081905260408120548311156100fe5760405162461bcd60e51b815260206004820152602160248201527f53656e64657220646f6573206e6f74206861766520656e6f7567682066756e646044820152607360f81b606482015260840160405180910390fd5b336000908152602081905260408120805485929061011d908490610235565b909155505060405182906000906001600160a01b0383169086908381818185875af1925050503d806000811461016f576040519150601f19603f3d011682016040523d82523d6000602084013e610174565b606091505b50509050806101ab576001600160a01b038416600090815260208190526040812080548792906101a5908490610248565b90915550505b9150505b92915050565b80356001600160a01b03811681146101cc57600080fd5b919050565b600080604083850312156101e457600080fd5b823591506101f4602084016101b5565b90509250929050565b60006020828403121561020f57600080fd5b610218826101b5565b9392505050565b634e487b7160e01b600052601160045260246000fd5b818103818111156101af576101af61021f565b808201808211156101af576101af61021f56fea2646970667358221220540d7261c6e8376c09be70a9017575fd29306029bca56e68c10eea3ad0f6697064736f6c63430008130033",
+  "deployedSourceMap": "269:960:4:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;404:557;;;;;;:::i;:::-;;:::i;:::-;;;616:14:5;;609:22;591:41;;579:2;564:18;404:557:4;;;;;;;;298:43;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;980:25:5;;;968:2;953:18;298:43:4;834:177:5;404:557:4;519:10;483:4;507:23;;;;;;;;;;;:33;-1:-1:-1;507:33:4;499:79;;;;-1:-1:-1;;;499:79:4;;1218:2:5;499:79:4;;;1200:21:5;1257:2;1237:18;;;1230:30;1296:34;1276:18;;;1269:62;-1:-1:-1;;;1347:18:5;;;1340:31;1388:19;;499:79:4;;;;;;;;600:10;588:11;:23;;;;;;;;;;:33;;615:6;;588:11;:33;;615:6;;588:33;:::i;:::-;;;;-1:-1:-1;;712:29:4;;663:11;;631:21;;-1:-1:-1;;;;;712:10:4;;;730:6;;631:21;712:29;631:21;712:29;730:6;712:10;:29;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;685:56;;;756:15;751:172;;-1:-1:-1;;;;;878:24:4;;:11;:24;;;;;;;;;;:34;;906:6;;878:11;:34;;906:6;;878:34;:::i;:::-;;;;-1:-1:-1;;751:172:4;939:15;-1:-1:-1;;404:557:4;;;;;:::o;14:173:5:-;82:20;;-1:-1:-1;;;;;131:31:5;;121:42;;111:70;;177:1;174;167:12;111:70;14:173;;;:::o;192:254::-;260:6;268;321:2;309:9;300:7;296:23;292:32;289:52;;;337:1;334;327:12;289:52;373:9;360:23;350:33;;402:38;436:2;425:9;421:18;402:38;:::i;:::-;392:48;;192:254;;;;;:::o;643:186::-;702:6;755:2;743:9;734:7;730:23;726:32;723:52;;;771:1;768;761:12;723:52;794:29;813:9;794:29;:::i;:::-;784:39;643:186;-1:-1:-1;;;643:186:5:o;1418:127::-;1479:10;1474:3;1470:20;1467:1;1460:31;1510:4;1507:1;1500:15;1534:4;1531:1;1524:15;1550:128;1617:9;;;1638:11;;;1635:37;;;1652:18;;:::i;1893:125::-;1958:9;;;1979:10;;;1976:36;;;1992:18;;:::i",
+  "language": "Solidity",
+  "natspec": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "offset": [
+    269,
+    1229
+  ],
+  "opcodes": "PUSH1 0x80 PUSH1 0x40 MSTORE CALLVALUE DUP1 ISZERO PUSH2 0x10 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST POP PUSH1 0x4 CALLDATASIZE LT PUSH2 0x36 JUMPI PUSH1 0x0 CALLDATALOAD PUSH1 0xE0 SHR DUP1 PUSH4 0xD45C199 EQ PUSH2 0x3B JUMPI DUP1 PUSH4 0x6EF9E145 EQ PUSH2 0x63 JUMPI JUMPDEST PUSH1 0x0 DUP1 REVERT JUMPDEST PUSH2 0x4E PUSH2 0x49 CALLDATASIZE PUSH1 0x4 PUSH2 0x1D1 JUMP JUMPDEST PUSH2 0x91 JUMP JUMPDEST PUSH1 0x40 MLOAD SWAP1 ISZERO ISZERO DUP2 MSTORE PUSH1 0x20 ADD JUMPDEST PUSH1 0x40 MLOAD DUP1 SWAP2 SUB SWAP1 RETURN JUMPDEST PUSH2 0x83 PUSH2 0x71 CALLDATASIZE PUSH1 0x4 PUSH2 0x1FD JUMP JUMPDEST PUSH1 0x0 PUSH1 0x20 DUP2 SWAP1 MSTORE SWAP1 DUP2 MSTORE PUSH1 0x40 SWAP1 KECCAK256 SLOAD DUP2 JUMP JUMPDEST PUSH1 0x40 MLOAD SWAP1 DUP2 MSTORE PUSH1 0x20 ADD PUSH2 0x5A JUMP JUMPDEST CALLER PUSH1 0x0 SWAP1 DUP2 MSTORE PUSH1 0x20 DUP2 SWAP1 MSTORE PUSH1 0x40 DUP2 KECCAK256 SLOAD DUP4 GT ISZERO PUSH2 0xFE JUMPI PUSH1 0x40 MLOAD PUSH3 0x461BCD PUSH1 0xE5 SHL DUP2 MSTORE PUSH1 0x20 PUSH1 0x4 DUP3 ADD MSTORE PUSH1 0x21 PUSH1 0x24 DUP3 ADD MSTORE PUSH32 0x53656E64657220646F6573206E6F74206861766520656E6F7567682066756E64 PUSH1 0x44 DUP3 ADD MSTORE PUSH1 0x73 PUSH1 0xF8 SHL PUSH1 0x64 DUP3 ADD MSTORE PUSH1 0x84 ADD PUSH1 0x40 MLOAD DUP1 SWAP2 SUB SWAP1 REVERT JUMPDEST CALLER PUSH1 0x0 SWAP1 DUP2 MSTORE PUSH1 0x20 DUP2 SWAP1 MSTORE PUSH1 0x40 DUP2 KECCAK256 DUP1 SLOAD DUP6 SWAP3 SWAP1 PUSH2 0x11D SWAP1 DUP5 SWAP1 PUSH2 0x235 JUMP JUMPDEST SWAP1 SWAP2 SSTORE POP POP PUSH1 0x40 MLOAD DUP3 SWAP1 PUSH1 0x0 SWAP1 PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB DUP4 AND SWAP1 DUP7 SWAP1 DUP4 DUP2 DUP2 DUP2 DUP6 DUP8 GAS CALL SWAP3 POP POP POP RETURNDATASIZE DUP1 PUSH1 0x0 DUP2 EQ PUSH2 0x16F JUMPI PUSH1 0x40 MLOAD SWAP2 POP PUSH1 0x1F NOT PUSH1 0x3F RETURNDATASIZE ADD AND DUP3 ADD PUSH1 0x40 MSTORE RETURNDATASIZE DUP3 MSTORE RETURNDATASIZE PUSH1 0x0 PUSH1 0x20 DUP5 ADD RETURNDATACOPY PUSH2 0x174 JUMP JUMPDEST PUSH1 0x60 SWAP2 POP JUMPDEST POP POP SWAP1 POP DUP1 PUSH2 0x1AB JUMPI PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB DUP5 AND PUSH1 0x0 SWAP1 DUP2 MSTORE PUSH1 0x20 DUP2 SWAP1 MSTORE PUSH1 0x40 DUP2 KECCAK256 DUP1 SLOAD DUP8 SWAP3 SWAP1 PUSH2 0x1A5 SWAP1 DUP5 SWAP1 PUSH2 0x248 JUMP JUMPDEST SWAP1 SWAP2 SSTORE POP POP JUMPDEST SWAP2 POP POP JUMPDEST SWAP3 SWAP2 POP POP JUMP JUMPDEST DUP1 CALLDATALOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB DUP2 AND DUP2 EQ PUSH2 0x1CC JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST SWAP2 SWAP1 POP JUMP JUMPDEST PUSH1 0x0 DUP1 PUSH1 0x40 DUP4 DUP6 SUB SLT ISZERO PUSH2 0x1E4 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST DUP3 CALLDATALOAD SWAP2 POP PUSH2 0x1F4 PUSH1 0x20 DUP5 ADD PUSH2 0x1B5 JUMP JUMPDEST SWAP1 POP SWAP3 POP SWAP3 SWAP1 POP JUMP JUMPDEST PUSH1 0x0 PUSH1 0x20 DUP3 DUP5 SUB SLT ISZERO PUSH2 0x20F JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST PUSH2 0x218 DUP3 PUSH2 0x1B5 JUMP JUMPDEST SWAP4 SWAP3 POP POP POP JUMP JUMPDEST PUSH4 0x4E487B71 PUSH1 0xE0 SHL PUSH1 0x0 MSTORE PUSH1 0x11 PUSH1 0x4 MSTORE PUSH1 0x24 PUSH1 0x0 REVERT JUMPDEST DUP2 DUP2 SUB DUP2 DUP2 GT ISZERO PUSH2 0x1AF JUMPI PUSH2 0x1AF PUSH2 0x21F JUMP JUMPDEST DUP1 DUP3 ADD DUP1 DUP3 GT ISZERO PUSH2 0x1AF JUMPI PUSH2 0x1AF PUSH2 0x21F JUMP INVALID LOG2 PUSH5 0x6970667358 0x22 SLT KECCAK256 SLOAD 0xD PUSH19 0x61C6E8376C09BE70A9017575FD29306029BCA5 PUSH15 0x68C10EEA3AD0F6697064736F6C6343 STOP ADDMOD SGT STOP CALLER ",
+  "pcMap": {
+    "0": {
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x80"
+    },
+    "2": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x40"
+    },
+    "4": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "MSTORE",
+      "path": "4"
+    },
+    "5": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "CALLVALUE",
+      "path": "4"
+    },
+    "6": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "DUP1",
+      "path": "4"
+    },
+    "7": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "ISZERO",
+      "path": "4"
+    },
+    "8": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "PUSH2",
+      "path": "4",
+      "value": "0x10"
+    },
+    "11": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "JUMPI",
+      "path": "4"
+    },
+    "12": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x0"
+    },
+    "14": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "DUP1",
+      "path": "4"
+    },
+    "15": {
+      "dev": "Cannot send ether to nonpayable function",
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "REVERT",
+      "path": "4"
+    },
+    "16": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "JUMPDEST",
+      "path": "4"
+    },
+    "17": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "POP",
+      "path": "4"
+    },
+    "18": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x4"
+    },
+    "20": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "CALLDATASIZE",
+      "path": "4"
+    },
+    "21": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "LT",
+      "path": "4"
+    },
+    "22": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "PUSH2",
+      "path": "4",
+      "value": "0x36"
+    },
+    "25": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "JUMPI",
+      "path": "4"
+    },
+    "26": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x0"
+    },
+    "28": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "CALLDATALOAD",
+      "path": "4"
+    },
+    "29": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0xE0"
+    },
+    "31": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "SHR",
+      "path": "4"
+    },
+    "32": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "DUP1",
+      "path": "4"
+    },
+    "33": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "PUSH4",
+      "path": "4",
+      "value": "0xD45C199"
+    },
+    "38": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "EQ",
+      "path": "4"
+    },
+    "39": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "PUSH2",
+      "path": "4",
+      "value": "0x3B"
+    },
+    "42": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "JUMPI",
+      "path": "4"
+    },
+    "43": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "DUP1",
+      "path": "4"
+    },
+    "44": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "PUSH4",
+      "path": "4",
+      "value": "0x6EF9E145"
+    },
+    "49": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "EQ",
+      "path": "4"
+    },
+    "50": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "PUSH2",
+      "path": "4",
+      "value": "0x63"
+    },
+    "53": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "JUMPI",
+      "path": "4"
+    },
+    "54": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "JUMPDEST",
+      "path": "4"
+    },
+    "55": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x0"
+    },
+    "57": {
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "DUP1",
+      "path": "4"
+    },
+    "58": {
+      "first_revert": true,
+      "fn": null,
+      "offset": [
+        269,
+        1229
+      ],
+      "op": "REVERT",
+      "path": "4"
+    },
+    "59": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        404,
+        961
+      ],
+      "op": "JUMPDEST",
+      "path": "4"
+    },
+    "60": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        404,
+        961
+      ],
+      "op": "PUSH2",
+      "path": "4",
+      "value": "0x4E"
+    },
+    "63": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        404,
+        961
+      ],
+      "op": "PUSH2",
+      "path": "4",
+      "value": "0x49"
+    },
+    "66": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        404,
+        961
+      ],
+      "op": "CALLDATASIZE",
+      "path": "4"
+    },
+    "67": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        404,
+        961
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x4"
+    },
+    "69": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        404,
+        961
+      ],
+      "op": "PUSH2",
+      "path": "4",
+      "value": "0x1D1"
+    },
+    "72": {
+      "fn": "Transferable.publicTransferFunds",
+      "jump": "i",
+      "offset": [
+        404,
+        961
+      ],
+      "op": "JUMP",
+      "path": "4"
+    },
+    "73": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        404,
+        961
+      ],
+      "op": "JUMPDEST",
+      "path": "4"
+    },
+    "74": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        404,
+        961
+      ],
+      "op": "PUSH2",
+      "path": "4",
+      "value": "0x91"
+    },
+    "77": {
+      "fn": "Transferable.publicTransferFunds",
+      "jump": "i",
+      "offset": [
+        404,
+        961
+      ],
+      "op": "JUMP",
+      "path": "4"
+    },
+    "78": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        404,
+        961
+      ],
+      "op": "JUMPDEST",
+      "path": "4"
+    },
+    "79": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        404,
+        961
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x40"
+    },
+    "81": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        404,
+        961
+      ],
+      "op": "MLOAD",
+      "path": "4"
+    },
+    "82": {
+      "op": "SWAP1"
+    },
+    "83": {
+      "op": "ISZERO"
+    },
+    "84": {
+      "op": "ISZERO"
+    },
+    "85": {
+      "op": "DUP2"
+    },
+    "86": {
+      "op": "MSTORE"
+    },
+    "87": {
+      "op": "PUSH1",
+      "value": "0x20"
+    },
+    "89": {
+      "op": "ADD"
+    },
+    "90": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        404,
+        961
+      ],
+      "op": "JUMPDEST",
+      "path": "4"
+    },
+    "91": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        404,
+        961
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x40"
+    },
+    "93": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        404,
+        961
+      ],
+      "op": "MLOAD",
+      "path": "4"
+    },
+    "94": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        404,
+        961
+      ],
+      "op": "DUP1",
+      "path": "4"
+    },
+    "95": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        404,
+        961
+      ],
+      "op": "SWAP2",
+      "path": "4"
+    },
+    "96": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        404,
+        961
+      ],
+      "op": "SUB",
+      "path": "4"
+    },
+    "97": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        404,
+        961
+      ],
+      "op": "SWAP1",
+      "path": "4"
+    },
+    "98": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        404,
+        961
+      ],
+      "op": "RETURN",
+      "path": "4"
+    },
+    "99": {
+      "offset": [
+        298,
+        341
+      ],
+      "op": "JUMPDEST",
+      "path": "4"
+    },
+    "100": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        298,
+        341
+      ],
+      "op": "PUSH2",
+      "path": "4",
+      "value": "0x83"
+    },
+    "103": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        298,
+        341
+      ],
+      "op": "PUSH2",
+      "path": "4",
+      "value": "0x71"
+    },
+    "106": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        298,
+        341
+      ],
+      "op": "CALLDATASIZE",
+      "path": "4"
+    },
+    "107": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        298,
+        341
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x4"
+    },
+    "109": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        298,
+        341
+      ],
+      "op": "PUSH2",
+      "path": "4",
+      "value": "0x1FD"
+    },
+    "112": {
+      "fn": "Transferable.publicTransferFunds",
+      "jump": "i",
+      "offset": [
+        298,
+        341
+      ],
+      "op": "JUMP",
+      "path": "4"
+    },
+    "113": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        298,
+        341
+      ],
+      "op": "JUMPDEST",
+      "path": "4"
+    },
+    "114": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        298,
+        341
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x0"
+    },
+    "116": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        298,
+        341
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x20"
+    },
+    "118": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        298,
+        341
+      ],
+      "op": "DUP2",
+      "path": "4"
+    },
+    "119": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        298,
+        341
+      ],
+      "op": "SWAP1",
+      "path": "4"
+    },
+    "120": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        298,
+        341
+      ],
+      "op": "MSTORE",
+      "path": "4"
+    },
+    "121": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        298,
+        341
+      ],
+      "op": "SWAP1",
+      "path": "4"
+    },
+    "122": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        298,
+        341
+      ],
+      "op": "DUP2",
+      "path": "4"
+    },
+    "123": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        298,
+        341
+      ],
+      "op": "MSTORE",
+      "path": "4"
+    },
+    "124": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        298,
+        341
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x40"
+    },
+    "126": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        298,
+        341
+      ],
+      "op": "SWAP1",
+      "path": "4"
+    },
+    "127": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        298,
+        341
+      ],
+      "op": "KECCAK256",
+      "path": "4"
+    },
+    "128": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        298,
+        341
+      ],
+      "op": "SLOAD",
+      "path": "4"
+    },
+    "129": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        298,
+        341
+      ],
+      "op": "DUP2",
+      "path": "4"
+    },
+    "130": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        298,
+        341
+      ],
+      "op": "JUMP",
+      "path": "4"
+    },
+    "131": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        298,
+        341
+      ],
+      "op": "JUMPDEST",
+      "path": "4"
+    },
+    "132": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        298,
+        341
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x40"
+    },
+    "134": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        298,
+        341
+      ],
+      "op": "MLOAD",
+      "path": "4"
+    },
+    "135": {
+      "op": "SWAP1"
+    },
+    "136": {
+      "op": "DUP2"
+    },
+    "137": {
+      "op": "MSTORE"
+    },
+    "138": {
+      "op": "PUSH1",
+      "value": "0x20"
+    },
+    "140": {
+      "op": "ADD"
+    },
+    "141": {
+      "offset": [
+        298,
+        341
+      ],
+      "op": "PUSH2",
+      "path": "4",
+      "value": "0x5A"
+    },
+    "144": {
+      "op": "JUMP"
+    },
+    "145": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        404,
+        961
+      ],
+      "op": "JUMPDEST",
+      "path": "4"
+    },
+    "146": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        519,
+        529
+      ],
+      "op": "CALLER",
+      "path": "4",
+      "statement": 0
+    },
+    "147": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        483,
+        487
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x0"
+    },
+    "149": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        507,
+        530
+      ],
+      "op": "SWAP1",
+      "path": "4"
+    },
+    "150": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        507,
+        530
+      ],
+      "op": "DUP2",
+      "path": "4"
+    },
+    "151": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        507,
+        530
+      ],
+      "op": "MSTORE",
+      "path": "4"
+    },
+    "152": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        507,
+        530
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x20"
+    },
+    "154": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        507,
+        530
+      ],
+      "op": "DUP2",
+      "path": "4"
+    },
+    "155": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        507,
+        530
+      ],
+      "op": "SWAP1",
+      "path": "4"
+    },
+    "156": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        507,
+        530
+      ],
+      "op": "MSTORE",
+      "path": "4"
+    },
+    "157": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        507,
+        530
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x40"
+    },
+    "159": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        507,
+        530
+      ],
+      "op": "DUP2",
+      "path": "4"
+    },
+    "160": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        507,
+        530
+      ],
+      "op": "KECCAK256",
+      "path": "4"
+    },
+    "161": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        507,
+        530
+      ],
+      "op": "SLOAD",
+      "path": "4"
+    },
+    "162": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        507,
+        540
+      ],
+      "op": "DUP4",
+      "path": "4"
+    },
+    "163": {
+      "op": "GT"
+    },
+    "164": {
+      "branch": 4,
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        507,
+        540
+      ],
+      "op": "ISZERO",
+      "path": "4"
+    },
+    "165": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        499,
+        578
+      ],
+      "op": "PUSH2",
+      "path": "4",
+      "value": "0xFE"
+    },
+    "168": {
+      "branch": 4,
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        499,
+        578
+      ],
+      "op": "JUMPI",
+      "path": "4"
+    },
+    "169": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        499,
+        578
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x40"
+    },
+    "171": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        499,
+        578
+      ],
+      "op": "MLOAD",
+      "path": "4"
+    },
+    "172": {
+      "op": "PUSH3",
+      "value": "0x461BCD"
+    },
+    "176": {
+      "op": "PUSH1",
+      "value": "0xE5"
+    },
+    "178": {
+      "op": "SHL"
+    },
+    "179": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        499,
+        578
+      ],
+      "op": "DUP2",
+      "path": "4"
+    },
+    "180": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        499,
+        578
+      ],
+      "op": "MSTORE",
+      "path": "4"
+    },
+    "181": {
+      "op": "PUSH1",
+      "value": "0x20"
+    },
+    "183": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        499,
+        578
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x4"
+    },
+    "185": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        499,
+        578
+      ],
+      "op": "DUP3",
+      "path": "4"
+    },
+    "186": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        499,
+        578
+      ],
+      "op": "ADD",
+      "path": "4"
+    },
+    "187": {
+      "op": "MSTORE"
+    },
+    "188": {
+      "op": "PUSH1",
+      "value": "0x21"
+    },
+    "190": {
+      "op": "PUSH1",
+      "value": "0x24"
+    },
+    "192": {
+      "op": "DUP3"
+    },
+    "193": {
+      "op": "ADD"
+    },
+    "194": {
+      "op": "MSTORE"
+    },
+    "195": {
+      "op": "PUSH32",
+      "value": "0x53656E64657220646F6573206E6F74206861766520656E6F7567682066756E64"
+    },
+    "228": {
+      "op": "PUSH1",
+      "value": "0x44"
+    },
+    "230": {
+      "op": "DUP3"
+    },
+    "231": {
+      "op": "ADD"
+    },
+    "232": {
+      "op": "MSTORE"
+    },
+    "233": {
+      "op": "PUSH1",
+      "value": "0x73"
+    },
+    "235": {
+      "op": "PUSH1",
+      "value": "0xF8"
+    },
+    "237": {
+      "op": "SHL"
+    },
+    "238": {
+      "op": "PUSH1",
+      "value": "0x64"
+    },
+    "240": {
+      "op": "DUP3"
+    },
+    "241": {
+      "op": "ADD"
+    },
+    "242": {
+      "op": "MSTORE"
+    },
+    "243": {
+      "op": "PUSH1",
+      "value": "0x84"
+    },
+    "245": {
+      "op": "ADD"
+    },
+    "246": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        499,
+        578
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x40"
+    },
+    "248": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        499,
+        578
+      ],
+      "op": "MLOAD",
+      "path": "4"
+    },
+    "249": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        499,
+        578
+      ],
+      "op": "DUP1",
+      "path": "4"
+    },
+    "250": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        499,
+        578
+      ],
+      "op": "SWAP2",
+      "path": "4"
+    },
+    "251": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        499,
+        578
+      ],
+      "op": "SUB",
+      "path": "4"
+    },
+    "252": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        499,
+        578
+      ],
+      "op": "SWAP1",
+      "path": "4"
+    },
+    "253": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        499,
+        578
+      ],
+      "op": "REVERT",
+      "optimizer_revert": true,
+      "path": "4"
+    },
+    "254": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        499,
+        578
+      ],
+      "op": "JUMPDEST",
+      "path": "4"
+    },
+    "255": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        600,
+        610
+      ],
+      "op": "CALLER",
+      "path": "4",
+      "statement": 1
+    },
+    "256": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        588,
+        599
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x0"
+    },
+    "258": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        588,
+        611
+      ],
+      "op": "SWAP1",
+      "path": "4"
+    },
+    "259": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        588,
+        611
+      ],
+      "op": "DUP2",
+      "path": "4"
+    },
+    "260": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        588,
+        611
+      ],
+      "op": "MSTORE",
+      "path": "4"
+    },
+    "261": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        588,
+        611
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x20"
+    },
+    "263": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        588,
+        611
+      ],
+      "op": "DUP2",
+      "path": "4"
+    },
+    "264": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        588,
+        611
+      ],
+      "op": "SWAP1",
+      "path": "4"
+    },
+    "265": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        588,
+        611
+      ],
+      "op": "MSTORE",
+      "path": "4"
+    },
+    "266": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        588,
+        611
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x40"
+    },
+    "268": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        588,
+        611
+      ],
+      "op": "DUP2",
+      "path": "4"
+    },
+    "269": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        588,
+        611
+      ],
+      "op": "KECCAK256",
+      "path": "4"
+    },
+    "270": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        588,
+        621
+      ],
+      "op": "DUP1",
+      "path": "4"
+    },
+    "271": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        588,
+        621
+      ],
+      "op": "SLOAD",
+      "path": "4"
+    },
+    "272": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        615,
+        621
+      ],
+      "op": "DUP6",
+      "path": "4"
+    },
+    "273": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        615,
+        621
+      ],
+      "op": "SWAP3",
+      "path": "4"
+    },
+    "274": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        588,
+        599
+      ],
+      "op": "SWAP1",
+      "path": "4"
+    },
+    "275": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        588,
+        621
+      ],
+      "op": "PUSH2",
+      "path": "4",
+      "value": "0x11D"
+    },
+    "278": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        588,
+        621
+      ],
+      "op": "SWAP1",
+      "path": "4"
+    },
+    "279": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        615,
+        621
+      ],
+      "op": "DUP5",
+      "path": "4"
+    },
+    "280": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        615,
+        621
+      ],
+      "op": "SWAP1",
+      "path": "4"
+    },
+    "281": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        588,
+        621
+      ],
+      "op": "PUSH2",
+      "path": "4",
+      "value": "0x235"
+    },
+    "284": {
+      "fn": "Transferable.publicTransferFunds",
+      "jump": "i",
+      "offset": [
+        588,
+        621
+      ],
+      "op": "JUMP",
+      "path": "4"
+    },
+    "285": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        588,
+        621
+      ],
+      "op": "JUMPDEST",
+      "path": "4"
+    },
+    "286": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        588,
+        621
+      ],
+      "op": "SWAP1",
+      "path": "4"
+    },
+    "287": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        588,
+        621
+      ],
+      "op": "SWAP2",
+      "path": "4"
+    },
+    "288": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        588,
+        621
+      ],
+      "op": "SSTORE",
+      "path": "4"
+    },
+    "289": {
+      "op": "POP"
+    },
+    "290": {
+      "op": "POP"
+    },
+    "291": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x40"
+    },
+    "293": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "MLOAD",
+      "path": "4"
+    },
+    "294": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        663,
+        674
+      ],
+      "op": "DUP3",
+      "path": "4"
+    },
+    "295": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        663,
+        674
+      ],
+      "op": "SWAP1",
+      "path": "4"
+    },
+    "296": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        631,
+        652
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x0"
+    },
+    "298": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        631,
+        652
+      ],
+      "op": "SWAP1",
+      "path": "4"
+    },
+    "299": {
+      "op": "PUSH1",
+      "value": "0x1"
+    },
+    "301": {
+      "op": "PUSH1",
+      "value": "0x1"
+    },
+    "303": {
+      "op": "PUSH1",
+      "value": "0xA0"
+    },
+    "305": {
+      "op": "SHL"
+    },
+    "306": {
+      "op": "SUB"
+    },
+    "307": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        722
+      ],
+      "op": "DUP4",
+      "path": "4"
+    },
+    "308": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        722
+      ],
+      "op": "AND",
+      "path": "4"
+    },
+    "309": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        722
+      ],
+      "op": "SWAP1",
+      "path": "4"
+    },
+    "310": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        730,
+        736
+      ],
+      "op": "DUP7",
+      "path": "4"
+    },
+    "311": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        730,
+        736
+      ],
+      "op": "SWAP1",
+      "path": "4"
+    },
+    "312": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        631,
+        652
+      ],
+      "op": "DUP4",
+      "path": "4"
+    },
+    "313": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "DUP2",
+      "path": "4"
+    },
+    "314": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        631,
+        652
+      ],
+      "op": "DUP2",
+      "path": "4"
+    },
+    "315": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "DUP2",
+      "path": "4"
+    },
+    "316": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        730,
+        736
+      ],
+      "op": "DUP6",
+      "path": "4"
+    },
+    "317": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        722
+      ],
+      "op": "DUP8",
+      "path": "4"
+    },
+    "318": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "GAS",
+      "path": "4"
+    },
+    "319": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "CALL",
+      "path": "4"
+    },
+    "320": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "SWAP3",
+      "path": "4"
+    },
+    "321": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "POP",
+      "path": "4"
+    },
+    "322": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "POP",
+      "path": "4"
+    },
+    "323": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "POP",
+      "path": "4"
+    },
+    "324": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "RETURNDATASIZE",
+      "path": "4"
+    },
+    "325": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "DUP1",
+      "path": "4"
+    },
+    "326": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x0"
+    },
+    "328": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "DUP2",
+      "path": "4"
+    },
+    "329": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "EQ",
+      "path": "4"
+    },
+    "330": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "PUSH2",
+      "path": "4",
+      "value": "0x16F"
+    },
+    "333": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "JUMPI",
+      "path": "4"
+    },
+    "334": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x40"
+    },
+    "336": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "MLOAD",
+      "path": "4"
+    },
+    "337": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "SWAP2",
+      "path": "4"
+    },
+    "338": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "POP",
+      "path": "4"
+    },
+    "339": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x1F"
+    },
+    "341": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "NOT",
+      "path": "4"
+    },
+    "342": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x3F"
+    },
+    "344": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "RETURNDATASIZE",
+      "path": "4"
+    },
+    "345": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "ADD",
+      "path": "4"
+    },
+    "346": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "AND",
+      "path": "4"
+    },
+    "347": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "DUP3",
+      "path": "4"
+    },
+    "348": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "ADD",
+      "path": "4"
+    },
+    "349": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x40"
+    },
+    "351": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "MSTORE",
+      "path": "4"
+    },
+    "352": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "RETURNDATASIZE",
+      "path": "4"
+    },
+    "353": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "DUP3",
+      "path": "4"
+    },
+    "354": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "MSTORE",
+      "path": "4"
+    },
+    "355": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "RETURNDATASIZE",
+      "path": "4"
+    },
+    "356": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x0"
+    },
+    "358": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x20"
+    },
+    "360": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "DUP5",
+      "path": "4"
+    },
+    "361": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "ADD",
+      "path": "4"
+    },
+    "362": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "RETURNDATACOPY",
+      "path": "4"
+    },
+    "363": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "PUSH2",
+      "path": "4",
+      "value": "0x174"
+    },
+    "366": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "JUMP",
+      "path": "4"
+    },
+    "367": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "JUMPDEST",
+      "path": "4"
+    },
+    "368": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x60"
+    },
+    "370": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "SWAP2",
+      "path": "4"
+    },
+    "371": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "POP",
+      "path": "4"
+    },
+    "372": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "JUMPDEST",
+      "path": "4"
+    },
+    "373": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        712,
+        741
+      ],
+      "op": "POP",
+      "path": "4"
+    },
+    "374": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        685,
+        741
+      ],
+      "op": "POP",
+      "path": "4"
+    },
+    "375": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        685,
+        741
+      ],
+      "op": "SWAP1",
+      "path": "4"
+    },
+    "376": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        685,
+        741
+      ],
+      "op": "POP",
+      "path": "4"
+    },
+    "377": {
+      "branch": 5,
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        756,
+        771
+      ],
+      "op": "DUP1",
+      "path": "4"
+    },
+    "378": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        751,
+        923
+      ],
+      "op": "PUSH2",
+      "path": "4",
+      "value": "0x1AB"
+    },
+    "381": {
+      "branch": 5,
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        751,
+        923
+      ],
+      "op": "JUMPI",
+      "path": "4"
+    },
+    "382": {
+      "op": "PUSH1",
+      "value": "0x1"
+    },
+    "384": {
+      "op": "PUSH1",
+      "value": "0x1"
+    },
+    "386": {
+      "op": "PUSH1",
+      "value": "0xA0"
+    },
+    "388": {
+      "op": "SHL"
+    },
+    "389": {
+      "op": "SUB"
+    },
+    "390": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        878,
+        902
+      ],
+      "op": "DUP5",
+      "path": "4",
+      "statement": 2
+    },
+    "391": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        878,
+        902
+      ],
+      "op": "AND",
+      "path": "4"
+    },
+    "392": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        878,
+        889
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x0"
+    },
+    "394": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        878,
+        902
+      ],
+      "op": "SWAP1",
+      "path": "4"
+    },
+    "395": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        878,
+        902
+      ],
+      "op": "DUP2",
+      "path": "4"
+    },
+    "396": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        878,
+        902
+      ],
+      "op": "MSTORE",
+      "path": "4"
+    },
+    "397": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        878,
+        902
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x20"
+    },
+    "399": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        878,
+        902
+      ],
+      "op": "DUP2",
+      "path": "4"
+    },
+    "400": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        878,
+        902
+      ],
+      "op": "SWAP1",
+      "path": "4"
+    },
+    "401": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        878,
+        902
+      ],
+      "op": "MSTORE",
+      "path": "4"
+    },
+    "402": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        878,
+        902
+      ],
+      "op": "PUSH1",
+      "path": "4",
+      "value": "0x40"
+    },
+    "404": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        878,
+        902
+      ],
+      "op": "DUP2",
+      "path": "4"
+    },
+    "405": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        878,
+        902
+      ],
+      "op": "KECCAK256",
+      "path": "4"
+    },
+    "406": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        878,
+        912
+      ],
+      "op": "DUP1",
+      "path": "4"
+    },
+    "407": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        878,
+        912
+      ],
+      "op": "SLOAD",
+      "path": "4"
+    },
+    "408": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        906,
+        912
+      ],
+      "op": "DUP8",
+      "path": "4"
+    },
+    "409": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        906,
+        912
+      ],
+      "op": "SWAP3",
+      "path": "4"
+    },
+    "410": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        878,
+        889
+      ],
+      "op": "SWAP1",
+      "path": "4"
+    },
+    "411": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        878,
+        912
+      ],
+      "op": "PUSH2",
+      "path": "4",
+      "value": "0x1A5"
+    },
+    "414": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        878,
+        912
+      ],
+      "op": "SWAP1",
+      "path": "4"
+    },
+    "415": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        906,
+        912
+      ],
+      "op": "DUP5",
+      "path": "4"
+    },
+    "416": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        906,
+        912
+      ],
+      "op": "SWAP1",
+      "path": "4"
+    },
+    "417": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        878,
+        912
+      ],
+      "op": "PUSH2",
+      "path": "4",
+      "value": "0x248"
+    },
+    "420": {
+      "fn": "Transferable.publicTransferFunds",
+      "jump": "i",
+      "offset": [
+        878,
+        912
+      ],
+      "op": "JUMP",
+      "path": "4"
+    },
+    "421": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        878,
+        912
+      ],
+      "op": "JUMPDEST",
+      "path": "4"
+    },
+    "422": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        878,
+        912
+      ],
+      "op": "SWAP1",
+      "path": "4"
+    },
+    "423": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        878,
+        912
+      ],
+      "op": "SWAP2",
+      "path": "4"
+    },
+    "424": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        878,
+        912
+      ],
+      "op": "SSTORE",
+      "path": "4"
+    },
+    "425": {
+      "op": "POP"
+    },
+    "426": {
+      "op": "POP"
+    },
+    "427": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        751,
+        923
+      ],
+      "op": "JUMPDEST",
+      "path": "4"
+    },
+    "428": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        939,
+        954
+      ],
+      "op": "SWAP2",
+      "path": "4",
+      "statement": 3
+    },
+    "429": {
+      "op": "POP"
+    },
+    "430": {
+      "op": "POP"
+    },
+    "431": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        404,
+        961
+      ],
+      "op": "JUMPDEST",
+      "path": "4"
+    },
+    "432": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        404,
+        961
+      ],
+      "op": "SWAP3",
+      "path": "4"
+    },
+    "433": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        404,
+        961
+      ],
+      "op": "SWAP2",
+      "path": "4"
+    },
+    "434": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        404,
+        961
+      ],
+      "op": "POP",
+      "path": "4"
+    },
+    "435": {
+      "fn": "Transferable.publicTransferFunds",
+      "offset": [
+        404,
+        961
+      ],
+      "op": "POP",
+      "path": "4"
+    },
+    "436": {
+      "fn": "Transferable.publicTransferFunds",
+      "jump": "o",
+      "offset": [
+        404,
+        961
+      ],
+      "op": "JUMP",
+      "path": "4"
+    },
+    "437": {
+      "op": "JUMPDEST"
+    },
+    "438": {
+      "op": "DUP1"
+    },
+    "439": {
+      "op": "CALLDATALOAD"
+    },
+    "440": {
+      "op": "PUSH1",
+      "value": "0x1"
+    },
+    "442": {
+      "op": "PUSH1",
+      "value": "0x1"
+    },
+    "444": {
+      "op": "PUSH1",
+      "value": "0xA0"
+    },
+    "446": {
+      "op": "SHL"
+    },
+    "447": {
+      "op": "SUB"
+    },
+    "448": {
+      "op": "DUP2"
+    },
+    "449": {
+      "op": "AND"
+    },
+    "450": {
+      "op": "DUP2"
+    },
+    "451": {
+      "op": "EQ"
+    },
+    "452": {
+      "op": "PUSH2",
+      "value": "0x1CC"
+    },
+    "455": {
+      "op": "JUMPI"
+    },
+    "456": {
+      "op": "PUSH1",
+      "value": "0x0"
+    },
+    "458": {
+      "op": "DUP1"
+    },
+    "459": {
+      "op": "REVERT"
+    },
+    "460": {
+      "op": "JUMPDEST"
+    },
+    "461": {
+      "op": "SWAP2"
+    },
+    "462": {
+      "op": "SWAP1"
+    },
+    "463": {
+      "op": "POP"
+    },
+    "464": {
+      "jump": "o",
+      "op": "JUMP"
+    },
+    "465": {
+      "op": "JUMPDEST"
+    },
+    "466": {
+      "op": "PUSH1",
+      "value": "0x0"
+    },
+    "468": {
+      "op": "DUP1"
+    },
+    "469": {
+      "op": "PUSH1",
+      "value": "0x40"
+    },
+    "471": {
+      "op": "DUP4"
+    },
+    "472": {
+      "op": "DUP6"
+    },
+    "473": {
+      "op": "SUB"
+    },
+    "474": {
+      "op": "SLT"
+    },
+    "475": {
+      "op": "ISZERO"
+    },
+    "476": {
+      "op": "PUSH2",
+      "value": "0x1E4"
+    },
+    "479": {
+      "op": "JUMPI"
+    },
+    "480": {
+      "op": "PUSH1",
+      "value": "0x0"
+    },
+    "482": {
+      "op": "DUP1"
+    },
+    "483": {
+      "op": "REVERT"
+    },
+    "484": {
+      "op": "JUMPDEST"
+    },
+    "485": {
+      "op": "DUP3"
+    },
+    "486": {
+      "op": "CALLDATALOAD"
+    },
+    "487": {
+      "op": "SWAP2"
+    },
+    "488": {
+      "op": "POP"
+    },
+    "489": {
+      "op": "PUSH2",
+      "value": "0x1F4"
+    },
+    "492": {
+      "op": "PUSH1",
+      "value": "0x20"
+    },
+    "494": {
+      "op": "DUP5"
+    },
+    "495": {
+      "op": "ADD"
+    },
+    "496": {
+      "op": "PUSH2",
+      "value": "0x1B5"
+    },
+    "499": {
+      "jump": "i",
+      "op": "JUMP"
+    },
+    "500": {
+      "op": "JUMPDEST"
+    },
+    "501": {
+      "op": "SWAP1"
+    },
+    "502": {
+      "op": "POP"
+    },
+    "503": {
+      "op": "SWAP3"
+    },
+    "504": {
+      "op": "POP"
+    },
+    "505": {
+      "op": "SWAP3"
+    },
+    "506": {
+      "op": "SWAP1"
+    },
+    "507": {
+      "op": "POP"
+    },
+    "508": {
+      "jump": "o",
+      "op": "JUMP"
+    },
+    "509": {
+      "op": "JUMPDEST"
+    },
+    "510": {
+      "op": "PUSH1",
+      "value": "0x0"
+    },
+    "512": {
+      "op": "PUSH1",
+      "value": "0x20"
+    },
+    "514": {
+      "op": "DUP3"
+    },
+    "515": {
+      "op": "DUP5"
+    },
+    "516": {
+      "op": "SUB"
+    },
+    "517": {
+      "op": "SLT"
+    },
+    "518": {
+      "op": "ISZERO"
+    },
+    "519": {
+      "op": "PUSH2",
+      "value": "0x20F"
+    },
+    "522": {
+      "op": "JUMPI"
+    },
+    "523": {
+      "op": "PUSH1",
+      "value": "0x0"
+    },
+    "525": {
+      "op": "DUP1"
+    },
+    "526": {
+      "op": "REVERT"
+    },
+    "527": {
+      "op": "JUMPDEST"
+    },
+    "528": {
+      "op": "PUSH2",
+      "value": "0x218"
+    },
+    "531": {
+      "op": "DUP3"
+    },
+    "532": {
+      "op": "PUSH2",
+      "value": "0x1B5"
+    },
+    "535": {
+      "jump": "i",
+      "op": "JUMP"
+    },
+    "536": {
+      "op": "JUMPDEST"
+    },
+    "537": {
+      "op": "SWAP4"
+    },
+    "538": {
+      "op": "SWAP3"
+    },
+    "539": {
+      "op": "POP"
+    },
+    "540": {
+      "op": "POP"
+    },
+    "541": {
+      "op": "POP"
+    },
+    "542": {
+      "jump": "o",
+      "op": "JUMP"
+    },
+    "543": {
+      "op": "JUMPDEST"
+    },
+    "544": {
+      "op": "PUSH4",
+      "value": "0x4E487B71"
+    },
+    "549": {
+      "op": "PUSH1",
+      "value": "0xE0"
+    },
+    "551": {
+      "op": "SHL"
+    },
+    "552": {
+      "op": "PUSH1",
+      "value": "0x0"
+    },
+    "554": {
+      "op": "MSTORE"
+    },
+    "555": {
+      "op": "PUSH1",
+      "value": "0x11"
+    },
+    "557": {
+      "op": "PUSH1",
+      "value": "0x4"
+    },
+    "559": {
+      "op": "MSTORE"
+    },
+    "560": {
+      "op": "PUSH1",
+      "value": "0x24"
+    },
+    "562": {
+      "op": "PUSH1",
+      "value": "0x0"
+    },
+    "564": {
+      "op": "REVERT"
+    },
+    "565": {
+      "op": "JUMPDEST"
+    },
+    "566": {
+      "op": "DUP2"
+    },
+    "567": {
+      "op": "DUP2"
+    },
+    "568": {
+      "op": "SUB"
+    },
+    "569": {
+      "op": "DUP2"
+    },
+    "570": {
+      "op": "DUP2"
+    },
+    "571": {
+      "op": "GT"
+    },
+    "572": {
+      "op": "ISZERO"
+    },
+    "573": {
+      "op": "PUSH2",
+      "value": "0x1AF"
+    },
+    "576": {
+      "op": "JUMPI"
+    },
+    "577": {
+      "op": "PUSH2",
+      "value": "0x1AF"
+    },
+    "580": {
+      "op": "PUSH2",
+      "value": "0x21F"
+    },
+    "583": {
+      "jump": "i",
+      "op": "JUMP"
+    },
+    "584": {
+      "op": "JUMPDEST"
+    },
+    "585": {
+      "op": "DUP1"
+    },
+    "586": {
+      "op": "DUP3"
+    },
+    "587": {
+      "op": "ADD"
+    },
+    "588": {
+      "op": "DUP1"
+    },
+    "589": {
+      "op": "DUP3"
+    },
+    "590": {
+      "op": "GT"
+    },
+    "591": {
+      "op": "ISZERO"
+    },
+    "592": {
+      "op": "PUSH2",
+      "value": "0x1AF"
+    },
+    "595": {
+      "op": "JUMPI"
+    },
+    "596": {
+      "op": "PUSH2",
+      "value": "0x1AF"
+    },
+    "599": {
+      "op": "PUSH2",
+      "value": "0x21F"
+    },
+    "602": {
+      "jump": "i",
+      "op": "JUMP"
+    }
+  },
+  "sha1": "292cbf45e3b0128e1ab0c64f8cd339e83034fcaa",
+  "source": "// SPDX-License-Identifier: GPL-3.0\n\npragma solidity >=0.7.0 <0.9.0;\n\n// This contract is a safeguard to avoid funds being locked in a contract, if the receiver of funds has an error in their receive or fallback function, they can transfer the funds to another account\ncontract Transferable {\n\n    mapping(address => uint) public weiBalances;\n\n    // To be used by consumers to retrieve locked funds\n    function publicTransferFunds(uint amount, address destination) public returns (bool) {\n        require(weiBalances[msg.sender] >= amount, \"Sender does not have enough funds\");\n        weiBalances[msg.sender] -= amount;\n        address payable payee = payable(destination);\n        (bool transferSuccess, ) = payee.call{value: amount}(\"\");\n        if (!transferSuccess) {  // if I cant send them the funds, make them available for the payee to perform a transfer\n            weiBalances[destination] += amount;\n        }\n        return transferSuccess;\n    }\n\n    // To be used by child contracts to attempt fund transfers\n    function _internalTransferFunds(uint amount, address destination) internal returns (bool) {\n        weiBalances[msg.sender] += amount;\n        return publicTransferFunds(amount, destination);\n    }\n}",
+  "sourceMap": "269:960:4:-:0;;;;;;;;;;;;;;;;;;;",
+  "sourcePath": "contracts/Transferable.sol",
+  "type": "contract"
+}

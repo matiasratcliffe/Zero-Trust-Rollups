@@ -1,7 +1,8 @@
 from random import randint
+from scripts.classes.utils.logger import Logger
 
 
-
+@Logger.LogClassMethods()
 class Requestor:
 
     def __init__(self, broker, account) -> None:
