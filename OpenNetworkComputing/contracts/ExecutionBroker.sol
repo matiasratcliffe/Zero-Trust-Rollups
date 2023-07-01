@@ -15,8 +15,17 @@ struct Executor {
     uint timesPunished;
 }
 
+enum CategoryIdentifiers {
+    STANDARD
+}
+
+struct ExecutorCategory {
+    Executor[5] activeExecutors; //TODO inicializarlas en el constructor
+}
+
 struct ExecutorsCollection {
-    Executor[] activeExecutors;  // Not in a mapping because I need to be able to index them by uint to pick random
+    ExecutorCategory[] executorCategories;
+    Executor[] activeExecutors;  // Not in a mapping because I need to be able to index them by uint to pick random TODO hacer una matriz de catergorias? un arreglo de arreglos
     mapping (address => uint) activeIndexOf;
     mapping (address => Executor) inactiveExecutors;
     mapping (address => Executor) busyExecutors;
@@ -57,6 +66,11 @@ struct Result {
     address issuer;
 }
 
+enum PunishmentCase {
+    REGULAR,
+    TRUNCATED,
+    INACCURATE_SOLVING
+}
 
 contract ExecutionBroker is Transferable {
 
@@ -266,7 +280,7 @@ contract ExecutionBroker is Transferable {
         return _submitRequest(msg.sender, executionPowerPrice, executionPowerPaidFor, inputState, codeReference, amountOfExecutors, randomSeed, criteria);
     }
 
-    function rotateExecutors(uint requestID, uint256 randomSeed) public returns (bool) {
+    function rotateExecutors(uint requestID, uint256 randomSeed) public returns (bool transferSuccess) {
         uint initialGas = gasleft();
         require(requests[requestID].clientAddress == msg.sender, "You cant rotate a request that was not made by you");
         require(requests[requestID].submissionsLocked == false, "All executors for this request have already delivered");
@@ -299,26 +313,22 @@ contract ExecutionBroker is Transferable {
             return false;
         }
 
-        uint constantGasOverHead = 12345; //TODO
-        uint estimatedGasSpent = ((initialGas - gasleft()) + (PUNISH_GAS * effectiveAmountOfPunishedExecutors) + constantGasOverHead) * tx.gasprice;  // This is just an aproximation, make it generous to favor the client
-        uint punishAmount = estimatedGasSpent / effectiveAmountOfPunishedExecutors;
-        for (uint8 i = 0; i < effectiveAmountOfPunishedExecutors; i++) {
-            _punishExecutor(punishedExecutorsAddresses[i], punishAmount);
-        }            
-        bool transferSuccess = _internalTransferFunds(punishAmount * effectiveAmountOfPunishedExecutors, msg.sender);
-        return transferSuccess;
+        return _punishmentRound(requestID, PunishmentCase.REGULAR, initialGas, effectiveAmountOfPunishedExecutors, punishedExecutorsAddresses, 0);  // aca no hay refund porque se rotan? a menos que no haya suficientes, pero si no hay suficientes available se espera, no se rota asique no hay refund regardless
     }
 
-    function truncateExecutors(uint requestID) public returns (bool) {
+    function truncateExecutors(uint requestID) public returns (bool transferSuccess) {
         uint initialGas = gasleft();
         require(requests[requestID].clientAddress == msg.sender, "You cant truncate a request that was not made by you"); //TODO test in python
         require(requests[requestID].submissionsLocked == false, "All executors for this request have already delivered");
         uint amountOfPunishedExecutors = 0;
-        uint[] memory punishedExecutorsTaskIDs = new uint[](taskAssignmentsMap[requestID].length);  // Me van a quedar algunos en cero capaz, no importa
+        address[] memory punishedExecutorsAddresses = new address[](taskAssignmentsMap[requestID].length);
         for (uint8 i = 0; i < taskAssignmentsMap[requestID].length; i++) {
             if (!taskAssignmentsMap[requestID][i].submitted) {
                 if (block.timestamp >= (taskAssignmentsMap[requestID][i].timestamp + EXECUTION_TIME_FRAME_SECONDS)) {
-                    punishedExecutorsTaskIDs[amountOfPunishedExecutors++] = i;
+                    punishedExecutorsAddresses[amountOfPunishedExecutors++] = taskAssignmentsMap[requestID][i].executorAddress;
+                    delete taskAssignmentsMap[requestID][i];
+                    taskAssignmentsMap[requestID][i].submitted = true;  // Para que no obstruya la liberacion
+                    taskAssignmentsMap[requestID][i].liberated = true;  // Para que no obstruya el cierre
                 } else {
                     revert("There are still some unexpired executors who have not delivered"); //TODO test in python. Esto seria si los trunca de entrada, o si primero los rota y despues los trunca rapido, testear ambos casos
                 }
@@ -329,18 +339,10 @@ contract ExecutionBroker is Transferable {
             return false;
         }
 
-        uint constantGasOverHead = 12345; //TODO
-        uint estimatedGasSpent = ((initialGas - gasleft()) + (PUNISH_GAS * amountOfPunishedExecutors) + constantGasOverHead) * tx.gasprice;  // This is just an aproximation, make it generous to favor the client
-        uint punishAmount = estimatedGasSpent / amountOfPunishedExecutors;
-        for (uint8 i = 0; i < amountOfPunishedExecutors; i++) {
-            _punishExecutor(taskAssignmentsMap[requestID][punishedExecutorsTaskIDs[i]].executorAddress, punishAmount);
-            delete taskAssignmentsMap[requestID][punishedExecutorsTaskIDs[i]];
-            taskAssignmentsMap[requestID][punishedExecutorsTaskIDs[i]].submitted = true;  // Para que no obstruya la liberacion
-            taskAssignmentsMap[requestID][punishedExecutorsTaskIDs[i]].liberated = true;  // Para que no obstruya el cierre
-        }
         requests[requestID].submissionsLocked = true; //TODO test in python
-        bool transferSuccess = _internalTransferFunds(punishAmount * amountOfPunishedExecutors, msg.sender);
-        return transferSuccess;
+        
+        uint refundAmount = requests[requestID].executionPowerPrice * requests[requestID].executionPowerPaidFor * amountOfPunishedExecutors; // porque en close request solo hago refund por los marcados pero no los truncados
+        return _punishmentRound(requestID, PunishmentCase.REGULAR, initialGas, amountOfPunishedExecutors, punishedExecutorsAddresses, refundAmount);
     }
 
     //TODO fijarse que capaz un ejecutor truncado o un ejecutor marcado capaz todavia puede submitear o liberar????? mirar que onda las banderas y los index cacheados en el executor en si
@@ -397,42 +399,40 @@ contract ExecutionBroker is Transferable {
                 break;
             }
         }
-        if (lastOne) { // TODO Hacer que el cliente ponga una prima para devolverle el gas al ultimo ejecutor en liberar, que es el que paga toda esta logica extra. El resto debe estar contemplado en el pago. TAMBIEN DEVOLVER DICHA PRIMA AL FINAL DE ESTA FUNCION, SI Y SOLO SI EL ULTIMO FUE ACCURATE
+        if (lastOne) { // TODO Hacer que el cliente ponga una prima para devolverle el gas al ultimo ejecutor en liberar, que es el que paga toda esta logica extra. El resto debe estar contemplado en el pago. TAMBIEN DEVOLVER DICHA PRIMA AL FINAL DE ESTA FUNCION, SI Y SOLO SI EL ULTIMO FUE ACCURATE, naah mejor devolver la prima siempre
             uint markedCount = 0;
+            uint nonTruncatedExecutors = 0;
             address[] memory executorsMarked = new address[](taskAssignmentsMap[requestID].length);  // Para los castigos de aca y de close, uso address[] en vez de taskAssignmentIDs porque ya no me interesa el task assignment, ya que la request se va a cerrar
             for (uint8 i = 0; i < taskAssignmentsMap[requestID].length; i++) {
-                if (taskAssignmentsMap[requestID][i].result.issuer == address(0x0)) {
-                    executorsMarked[markedCount++] = taskAssignmentsMap[requestID][i].executorAddress;
+                if (taskAssignmentsMap[requestID][i].executorAddress != address(0x0)) {
+                    nonTruncatedExecutors++;
+                    if (taskAssignmentsMap[requestID][i].result.issuer == address(0x0)) {
+                        executorsMarked[markedCount++] = taskAssignmentsMap[requestID][i].executorAddress;
+                    }
                 }
             }
-            if (markedCount < taskAssignmentsMap[requestID].length) {  // if there is at least one valid submission
+            if (markedCount < nonTruncatedExecutors) {  // if there is at least one valid submission
                 _closeRequest(requestID, initialGas);
-            } else {
-                // TODO si solidity no me deja, puedo extraer esto y ponerlo en otra funcion que se llame _negateRequest o algo asi
-                uint refundAmount = 0;
-                requests[requestID].closed = true;
-                emit requestClosed(requestID, 0);
-                if (getAmountOfActiveExecutorsWithCriteria(requests[requestID].executorCriteria) >= taskAssignmentsMap[requestID].length) {
-                    _submitRequest(requests[requestID].clientAddress, requests[requestID].executionPowerPrice, requests[requestID].executionPowerPaidFor, requests[requestID].inputState, requests[requestID].codeReference, taskAssignmentsMap[requestID].length, uint256(blockhash(block.number-1)), requests[requestID].executorCriteria);
-                } else {
-                    refundAmount = requests[requestID].executionPowerPrice * requests[requestID].executionPowerPaidFor * taskAssignmentsMap[requestID].length;
-                }
-                
-                uint constantGasOverHead = 12345; //TODO
-                uint estimatedGasSpent = ((initialGas - gasleft()) + ((PUNISH_GAS + 1/*little loop overhead TODO*/) * markedCount) + constantGasOverHead) * tx.gasprice;  // This is just an aproximation, make it generous to favor the client
-                uint punishAmount = estimatedGasSpent / markedCount;
-                for (uint8 i = 0; i < markedCount; i++) {
-                    executorsCollection.busyExecutors[executorsMarked[i]].inaccurateSolvings++;
-                    _punishExecutor(executorsMarked[i], punishAmount);
-                }
-                _internalTransferFunds((punishAmount * markedCount) + refundAmount, requests[requestID].clientAddress);
+            } else {  // markedCount == nonTruncatedExecutors meaning all non truncated executors submitted an invalid hash, so, no valid submissions found
+                _recycleRequest(requestID, initialGas, markedCount, executorsMarked);
             }
         }
         return hashMatched;
     }
 
+    function _recycleRequest(uint requestID, uint initialGas, uint markedCount, address[] memory executorsMarked) private {
+        uint refundAmount = 0;
+        requests[requestID].closed = true;
+        emit requestClosed(requestID, 0);
+        if (getAmountOfActiveExecutorsWithCriteria(requests[requestID].executorCriteria) >= taskAssignmentsMap[requestID].length) {
+            _submitRequest(requests[requestID].clientAddress, requests[requestID].executionPowerPrice, requests[requestID].executionPowerPaidFor, requests[requestID].inputState, requests[requestID].codeReference, taskAssignmentsMap[requestID].length, uint256(blockhash(block.number-1)), requests[requestID].executorCriteria);
+        } else {
+            refundAmount = requests[requestID].executionPowerPrice * requests[requestID].executionPowerPaidFor * markedCount;
+        }
+        _punishmentRound(requestID, PunishmentCase.INACCURATE_SOLVING, initialGas, markedCount, executorsMarked, refundAmount);
+    }
+
     function forceResultLiberation(uint requestID) public {
-        //TODO marcar el result.issuer en cero porque es mas severo que punishear directamente, o lo puedo forzar con el constantgasoverhead
         uint initialGas = gasleft();
         require(requests[requestID].closed == false, "This request has already been closed"); //TODO test in python
         require(requests[requestID].clientAddress == msg.sender, "You cant force the liberation of a request that was not made by you"); //TODO test in python
@@ -549,17 +549,29 @@ contract ExecutionBroker is Transferable {
             executorsCollection.busyExecutors[executorsToBeRewarded[i]].accurateSolvings++;
             _unlockExecutor(executorsToBeRewarded[i]);
         }
-        
-        uint constantGasOverHead = 12345; //TODO
-        uint estimatedGasSpent = ((initialGas - gasleft()) + ((PUNISH_GAS + 1/*little loop overhead TODO*/) * punishedCount) + constantGasOverHead) * tx.gasprice;  // This is just an aproximation, make it generous to favor the client
+
+        uint refundAmount = requests[requestID].executionPowerPaidFor * requests[requestID].executionPowerPrice * punishedCount;
+        _punishmentRound(requestID, PunishmentCase.INACCURATE_SOLVING, initialGas, punishedCount, executorsToBePunished, refundAmount);
+    }
+
+    function _punishmentRound(uint requestID, PunishmentCase punishmentCase, uint initialGas, uint punishedCount, address[] memory executorsToBePunished, uint refundAmount) private returns (bool transferSuccess) {
+        uint loopGasOverhead;
+        if (punishmentCase == PunishmentCase.INACCURATE_SOLVING) {
+            loopGasOverhead = 1; // TODO lo puedo hacer constante regardless del caso?
+        } else {  // PunishmentCase.REGULAR
+            loopGasOverhead = 1; // TODO
+        }
+        uint constantGasOverhead = 12345; // TODO
+        uint estimatedGasSpent = ((initialGas - gasleft()) + ((PUNISH_GAS + loopGasOverhead) * punishedCount) + constantGasOverhead) * tx.gasprice;  // This is just an aproximation, make it generous to favor the client
         uint punishAmount = estimatedGasSpent / punishedCount;
         for (uint8 i = 0; i < punishedCount; i++) {
             // update reputation
-            executorsCollection.busyExecutors[executorsToBePunished[i]].inaccurateSolvings++;
+            if (punishmentCase == PunishmentCase.INACCURATE_SOLVING) {
+                executorsCollection.busyExecutors[executorsToBePunished[i]].inaccurateSolvings++;
+            }
             _punishExecutor(executorsToBePunished[i], punishAmount);
         }
-        uint refundAmount = requests[requestID].executionPowerPaidFor * requests[requestID].executionPowerPrice * punishedCount;
-        _internalTransferFunds((punishAmount * punishedCount) + refundAmount, requests[requestID].clientAddress);
+        return _internalTransferFunds((punishAmount * punishedCount) + refundAmount, requests[requestID].clientAddress);
     }
 
     function _punishExecutor(address executorAddress, uint punishAmount) private {

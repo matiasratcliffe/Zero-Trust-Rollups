@@ -5,7 +5,6 @@
 **/.hypothesis
 **/reports/
 **/logs.txt
-**/5777
 **/.pytest_cache
 **/text_file
 **/text_file.encrypted
