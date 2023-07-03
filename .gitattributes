@@ -1,2 +1,3 @@
 *.sol linguist-language=Solidity
+*.py linguist-language=Python
 *.vy linguist-language=Python
