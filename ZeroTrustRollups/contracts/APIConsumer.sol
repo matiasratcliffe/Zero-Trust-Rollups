@@ -3,13 +3,20 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 import "./APIProvider.sol";
+import "./BaseClient.sol";
 
-contract APIConsumer {
+
+struct APIResponse {
+    bytes message;
+    bytes signature;
+}
+
+contract APIConsumer is BaseClient {
     // TODO esto es un ejemplo de ZT rollup, o ZT Oracle
     // TODO el turbosnitch 3000 es otro ejemplo, que ademas el post process genere el nuevo bloque a minar, y capaz haga uso de api consumer para obtener los bloques? o mejor los guardo en el cliente?
     APIProvider public provider;
     //web3.personal.sign(hash, web3.eth.defaultAccount, console.log)
-    constructor(address apiProviderAddress) {
+    constructor(address brokerAddress, address apiProviderAddress) BaseClient(brokerAddress) {
         provider = APIProvider(apiProviderAddress);
     }
 
