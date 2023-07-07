@@ -50,7 +50,7 @@ class AESCipher(object):
         return s[:-i] if i > 0 else s
 
 @Logger.LogClassMethods()
-class Requestor:
+class TS3000Requestor:
 
     def __init__(self, broker, account, paymentPerFragment, textFileToEncrypt, numberOfKeyFragments: int = 50, difficulty: int = 10):
         self.broker = broker
@@ -73,4 +73,4 @@ class Requestor:
 
 def main():
     broker = BrokerFactory.getInstance()
-    requestor = Requestor(broker, Accounts.getAccount(), 1e14, "text_file")
+    requestor = TS3000Requestor(broker, Accounts.getAccount(), 1e14, "text_file")
