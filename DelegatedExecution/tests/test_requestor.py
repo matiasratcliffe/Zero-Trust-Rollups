@@ -74,7 +74,7 @@ class TestRequestor:
         data = [10]
         encoded_tuple = requestor._encodeInput(function, data)
         assert encoded_tuple[0] == function
-        assert tuple(data) == decode(requestor._getFunctionTypes(function), encoded_tuple[1])
+        assert (tuple(data),) == decode(requestor._getFunctionTypes(function), encoded_tuple[1])
     
     def test_encode_input_non_existing_function(self):
         requestor = Requestor(ClientFactory.getInstance())
@@ -95,7 +95,7 @@ class TestRequestor:
         request = dict(broker.requests(reqID))
         assert request["id"] == reqID
         assert dict(request["input"])["functionToRun"] == functionToRun
-        assert decode(requestor._getFunctionTypes(functionToRun), dict(request["input"])["data"]) == tuple(dataArray)
+        assert decode(requestor._getFunctionTypes(functionToRun), dict(request["input"])["data"]) == (tuple(dataArray),)
         assert request["payment"] == payment
         assert request["postProcessingGas"] == postProcessingGas
         assert request["challengeInsurance"] == requestedInsurance
@@ -138,7 +138,7 @@ class TestRequestor:
 
     def test_cancel_request(self):
         requestor = Requestor(ClientFactory.getInstance())
-        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e16)
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
         assert dict(broker.requests(reqID))["cancelled"] == False
         requestor.cancelRequest(reqID)
@@ -158,20 +158,20 @@ class TestRequestor:
         broker = BrokerFactory.getInstance()
         requestor1 = Requestor(ClientFactory.create(owner=account1, broker=broker))
         requestor2 = Requestor(ClientFactory.create(owner=account2, broker=broker))
-        reqID = requestor1.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        reqID = requestor1.createRequest(functionToRun=1, dataArray=[10], funds=1e16)
         with pytest.raises(Exception, match="You cant cancel a request that was not made by you"):
             requestor2.cancelRequest(reqID)
 
     def test_cancel_cancelled_request(self):
         requestor = Requestor(ClientFactory.getInstance())
-        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e16)
         requestor.cancelRequest(reqID)
         with pytest.raises(Exception, match="The request was already cancelled"):
             requestor.cancelRequest(reqID)
 
     def test_cancel_accepted_request(self):
         requestor = Requestor(ClientFactory.getInstance())
-        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e16)
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
         assert dict(broker.requests(reqID))["cancelled"] == False
         executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
@@ -183,7 +183,7 @@ class TestRequestor:
 
     def test_cancel_accepted_then_unnacept_request(self):
         requestor = Requestor(ClientFactory.getInstance())
-        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1)
         time.sleep(2)
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
         assert dict(broker.requests(reqID))["cancelled"] == False
@@ -200,7 +200,7 @@ class TestRequestor:
 
     def test_publicize_request(self):
         requestor = Requestor(ClientFactory.getInstance())
-        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e+18)
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e16)
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
         executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
         assert reqID not in executor.unacceptedRequests
@@ -225,7 +225,7 @@ class TestRequestor:
         account2 = Accounts.getFromIndex(1)
         broker = BrokerFactory.getInstance()
         requestor = Requestor(ClientFactory.create(owner=account1, broker=broker))
-        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e16)
         with pytest.raises(Exception, match="Function accessible only by the owner"):
             requestor.client.cancelRequest(reqID, {'from': account2})
 
@@ -242,7 +242,7 @@ class TestRequestor:
                 2e13,
                 1e+17,
                 100,
-                {'from': account2, 'value': 1e+18}
+                {'from': account2, 'value': 1}
             )
 
     def test_process_result_only_broker(self):

@@ -15,12 +15,13 @@ class Requestor:
     def _getFunctionTypes(self, function):
         memberRegex = r"([A-Za-z][A-Za-z0-9]*)\s+[_A-Za-z][_A-Za-z0-9]*;"
         dataStruct = self.client.getInputStructure(function)
-        return re.findall(memberRegex, dataStruct)
+        return ["("+",".join(re.findall(memberRegex, dataStruct))+")"]
+
 
     def _encodeInput(self, functionToRun, data):
-        return (functionToRun, HexString(encode(self._getFunctionTypes(functionToRun), data), "bytes"))
+        return (functionToRun, HexString(encode(self._getFunctionTypes(functionToRun), [tuple(data)]), "bytes"))
 
-    def createRequest(self, functionToRun, dataArray, payment=1e+16, postProcessingGas=2e13, requestedInsurance=1e+18, claimDelay=0, funds=0, gasPrice=None):
+    def createRequest(self, functionToRun, dataArray, payment=1e+10, postProcessingGas=2e13, requestedInsurance=1e+15, claimDelay=0, funds=0, gasPrice=None):
         transactionData = { "from": self.owner, "value": funds }
         if (gasPrice != None):
             transactionData["gas_price"] = gasPrice

@@ -401,7 +401,7 @@ class TestExecutor:
         executor2 = Executor(Accounts.getAccount(), broker, populateBuffers=True)
         assert reqID in executor2.unacceptedRequests
         executor1._acceptRequest(reqID)
-        time.sleep(2)
+        time.sleep(3)
         assert reqID not in executor2.unacceptedRequests
 
     def test_listen_to_result_submitted_event(self):

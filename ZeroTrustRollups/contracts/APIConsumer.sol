@@ -6,30 +6,41 @@ import "./APIProvider.sol";
 import "./BaseClient.sol";
 
 
+struct Input {
+    string apiIdentifier;
+}
+
 struct APIResponse {
     bytes message;
     bytes signature;
 }
 
 contract APIConsumer is BaseClient {
-    // TODO esto es un ejemplo de ZT rollup, o ZT Oracle
-    // TODO el turbosnitch 3000 es otro ejemplo, que ademas el post process genere el nuevo bloque a minar, y capaz haga uso de api consumer para obtener los bloques? o mejor los guardo en el cliente?
+    
     APIProvider public provider;
+    
     //web3.personal.sign(hash, web3.eth.defaultAccount, console.log)
     constructor(address brokerAddress, address apiProviderAddress) BaseClient(brokerAddress) {
         provider = APIProvider(apiProviderAddress);
     }
 
-    function verifySignature(
-        bytes32 signedHash, bytes calldata signature, address signer
-    ) public pure returns (bool) {
-        (bytes32 r, bytes32 s, uint8 v) = splitSignature(signature);
-        return (ecrecover(signedHash, v, r, s) == signer);
+    function checkResult(bytes calldata inputData, bytes calldata resultData) external override view returns (bool) {
+        Input memory input = abi.decode(inputData, (Input));
+        APIResponse memory apiResponse = abi.decode(resultData, (APIResponse));
+        return _verifySignature(apiResponse, provider.getAddress(input.apiIdentifier));
+    }
+    
+    function getInputDataStructure() external override pure returns (string memory) {
+        return "{string apiIdentifier;}";
     }
 
-    function splitSignature(
-        bytes memory signature
-    ) public pure returns (bytes32 r, bytes32 s, uint8 v) {
+    function _verifySignature(APIResponse memory apiResponse, address signer) private pure returns (bool) {
+        bytes32 prefixedHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", keccak256(apiResponse.message)));
+        (bytes32 r, bytes32 s, uint8 v) = _splitSignature(apiResponse.signature);
+        return (ecrecover(prefixedHash, v, r, s) == signer);
+    }
+
+    function _splitSignature(bytes memory signature) private pure returns (bytes32 r, bytes32 s, uint8 v) {
         require(signature.length == 65, "invalid signature length");
         assembly {
             r := mload(add(signature, 32))

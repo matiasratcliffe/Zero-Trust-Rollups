@@ -21,9 +21,8 @@ abstract contract BaseClient is Ownable {
         brokerContract = ExecutionBroker(brokerAddress);
     }
 
-    function checkResult(bytes calldata inputData, bytes calldata resultData) external virtual pure returns (bool); //TODO revisar estas funciones en DelegatedExecution
-    //function getInputDataStructure() external virtual pure returns (string memory);//TODO revisar estas funciones en DelegatedExecution
-    //function getResultDataStructure() external virtual pure returns (string memory);//TODO revisar estas funciones en DelegatedExecution
+    function checkResult(bytes calldata inputData, bytes calldata resultData) external virtual view returns (bool);
+    function getInputDataStructure() external virtual pure returns (string memory);
     function processResult(bytes calldata resultData) external virtual onlyBroker {}
 
     function submitRequest(uint payment, bytes memory input, uint postProcessingGas) public onlyOwner payable returns (uint) {

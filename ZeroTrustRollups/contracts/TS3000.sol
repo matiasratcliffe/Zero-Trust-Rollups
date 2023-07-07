@@ -82,4 +82,8 @@ contract TS3000 is BaseClient {
     function togglePostProcessing() external onlyOwner {
         postProcessingEnabled = postProcessingEnabled ? false : true;
     }
+
+    function getInputDataStructure() external override pure returns (string memory) {
+        return "{uint fragmentIndex; bytes32 globalHash; bytes32 localHash;}";
+    }
 }
