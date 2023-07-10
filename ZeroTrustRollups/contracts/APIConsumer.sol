@@ -5,21 +5,22 @@ pragma solidity >=0.7.0 <0.9.0;
 import "./APIProvider.sol";
 import "./BaseClient.sol";
 
+import "@openzeppelin/contracts/utils/Strings.sol";
+
 
 struct Input {
     string apiIdentifier;
 }
 
 struct APIResponse {
-    bytes message;
+    bytes response;
     bytes signature;
 }
 
 contract APIConsumer is BaseClient {
-    
+
     APIProvider public provider;
     
-    //web3.personal.sign(hash, web3.eth.defaultAccount, console.log)
     constructor(address brokerAddress, address apiProviderAddress) BaseClient(brokerAddress) {
         provider = APIProvider(apiProviderAddress);
     }
@@ -35,7 +36,7 @@ contract APIConsumer is BaseClient {
     }
 
     function _verifySignature(APIResponse memory apiResponse, address signer) private pure returns (bool) {
-        bytes32 prefixedHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", keccak256(apiResponse.message)));
+        bytes32 prefixedHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n", Strings.toString(apiResponse.response.length), apiResponse.response));
         (bytes32 r, bytes32 s, uint8 v) = _splitSignature(apiResponse.signature);
         return (ecrecover(prefixedHash, v, r, s) == signer);
     }

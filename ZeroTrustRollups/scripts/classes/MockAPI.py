@@ -1,5 +1,0 @@
-
-
-
-class MockAPI:
-    pass

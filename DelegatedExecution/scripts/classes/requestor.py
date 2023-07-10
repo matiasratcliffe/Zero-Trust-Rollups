@@ -17,7 +17,6 @@ class Requestor:
         dataStruct = self.client.getInputStructure(function)
         return ["("+",".join(re.findall(memberRegex, dataStruct))+")"]
 
-
     def _encodeInput(self, functionToRun, data):
         return (functionToRun, HexString(encode(self._getFunctionTypes(functionToRun), [tuple(data)]), "bytes"))
 
