@@ -41,7 +41,7 @@ class ClientFactory:
         elif (ClientFactory.count() > 0):
             return ClientFactory.at(index=-1)
         else:
-            return ClientFactory.create(owner=Accounts.getAccount(), broker=BrokerFactory.getInstance())
+            return ClientFactory.create(broker=BrokerFactory.getInstance(), owner=Accounts.getAccount())
 
     def create(broker, owner=None):
         if owner == None:

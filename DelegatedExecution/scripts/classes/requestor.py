@@ -9,7 +9,7 @@ import re
 @Logger.LogClassMethods()
 class Requestor:
     def __init__(self, clientContract):
-        self.client = ClientFactory.at(address=clientContract)
+        self.client = ClientFactory.at(address=clientContract.address)
         self.owner = Accounts.getFromKey(self.client.owner())
 
     def _getFunctionTypes(self, function):

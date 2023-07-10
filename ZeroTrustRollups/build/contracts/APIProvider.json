@@ -96,18 +96,18 @@
     "absolutePath": "contracts/APIProvider.sol",
     "exportedSymbols": {
       "APIProvider": [
-        439
+        237
       ],
       "Ownable": [
-        1620
+        676
       ]
     },
-    "id": 440,
+    "id": 238,
     "license": "GPL-3.0",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 385,
+        "id": 183,
         "literals": [
           "solidity",
           ">=",
@@ -123,11 +123,11 @@
       {
         "absolutePath": "contracts/Ownable.sol",
         "file": "./Ownable.sol",
-        "id": 386,
+        "id": 184,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 440,
-        "sourceUnit": 1621,
+        "scope": 238,
+        "sourceUnit": 677,
         "src": "70:23:4",
         "symbolAliases": [],
         "unitAlias": ""
@@ -137,16 +137,16 @@
         "baseContracts": [
           {
             "baseName": {
-              "id": 387,
+              "id": 185,
               "name": "Ownable",
               "nameLocations": [
                 "120:7:4"
               ],
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 1620,
+              "referencedDeclaration": 676,
               "src": "120:7:4"
             },
-            "id": 388,
+            "id": 186,
             "nodeType": "InheritanceSpecifier",
             "src": "120:7:4"
           }
@@ -155,10 +155,10 @@
         "contractDependencies": [],
         "contractKind": "contract",
         "fullyImplemented": true,
-        "id": 439,
+        "id": 237,
         "linearizedBaseContracts": [
-          439,
-          1620
+          237,
+          676
         ],
         "name": "APIProvider",
         "nameLocation": "105:11:4",
@@ -167,12 +167,12 @@
           {
             "constant": false,
             "functionSelector": "5346eb83",
-            "id": 392,
+            "id": 190,
             "mutability": "mutable",
             "name": "RegisteredAPIs",
             "nameLocation": "169:14:4",
             "nodeType": "VariableDeclaration",
-            "scope": 439,
+            "scope": 237,
             "src": "135:48:4",
             "stateVariable": true,
             "storageLocation": "default",
@@ -181,11 +181,11 @@
               "typeString": "mapping(string => address)"
             },
             "typeName": {
-              "id": 391,
+              "id": 189,
               "keyName": "",
               "keyNameLocation": "-1:-1:-1",
               "keyType": {
-                "id": 389,
+                "id": 187,
                 "name": "string",
                 "nodeType": "ElementaryTypeName",
                 "src": "143:6:4",
@@ -203,7 +203,7 @@
               "valueName": "",
               "valueNameLocation": "-1:-1:-1",
               "valueType": {
-                "id": 390,
+                "id": 188,
                 "name": "address",
                 "nodeType": "ElementaryTypeName",
                 "src": "153:7:4",
@@ -218,27 +218,27 @@
           },
           {
             "body": {
-              "id": 397,
+              "id": 195,
               "nodeType": "Block",
               "src": "215:2:4",
               "statements": []
             },
-            "id": 398,
+            "id": 196,
             "implemented": true,
             "kind": "constructor",
             "modifiers": [
               {
                 "arguments": [],
-                "id": 395,
+                "id": 193,
                 "kind": "baseConstructorSpecifier",
                 "modifierName": {
-                  "id": 394,
+                  "id": 192,
                   "name": "Ownable",
                   "nameLocations": [
                     "205:7:4"
                   ],
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 1620,
+                  "referencedDeclaration": 676,
                   "src": "205:7:4"
                 },
                 "nodeType": "ModifierInvocation",
@@ -249,18 +249,18 @@
             "nameLocation": "-1:-1:-1",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 393,
+              "id": 191,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "202:2:4"
             },
             "returnParameters": {
-              "id": 396,
+              "id": 194,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "215:0:4"
             },
-            "scope": 439,
+            "scope": 237,
             "src": "190:27:4",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -268,37 +268,37 @@
           },
           {
             "body": {
-              "id": 413,
+              "id": 211,
               "nodeType": "Block",
               "src": "314:59:4",
               "statements": [
                 {
                   "expression": {
-                    "id": 411,
+                    "id": 209,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "baseExpression": {
-                        "id": 407,
+                        "id": 205,
                         "name": "RegisteredAPIs",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 392,
+                        "referencedDeclaration": 190,
                         "src": "324:14:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_mapping$_t_string_memory_ptr_$_t_address_$",
                           "typeString": "mapping(string memory => address)"
                         }
                       },
-                      "id": 409,
+                      "id": 207,
                       "indexExpression": {
-                        "id": 408,
+                        "id": 206,
                         "name": "apiIdentifier",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 400,
+                        "referencedDeclaration": 198,
                         "src": "339:13:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_calldata_ptr",
@@ -319,11 +319,11 @@
                     "nodeType": "Assignment",
                     "operator": "=",
                     "rightHandSide": {
-                      "id": 410,
+                      "id": 208,
                       "name": "apiAddress",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 402,
+                      "referencedDeclaration": 200,
                       "src": "356:10:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
@@ -336,28 +336,28 @@
                       "typeString": "address"
                     }
                   },
-                  "id": 412,
+                  "id": 210,
                   "nodeType": "ExpressionStatement",
                   "src": "324:42:4"
                 }
               ]
             },
             "functionSelector": "a226039c",
-            "id": 414,
+            "id": 212,
             "implemented": true,
             "kind": "function",
             "modifiers": [
               {
-                "id": 405,
+                "id": 203,
                 "kind": "modifierInvocation",
                 "modifierName": {
-                  "id": 404,
+                  "id": 202,
                   "name": "onlyOwner",
                   "nameLocations": [
                     "304:9:4"
                   ],
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 1589,
+                  "referencedDeclaration": 645,
                   "src": "304:9:4"
                 },
                 "nodeType": "ModifierInvocation",
@@ -368,17 +368,17 @@
             "nameLocation": "232:13:4",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 403,
+              "id": 201,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 400,
+                  "id": 198,
                   "mutability": "mutable",
                   "name": "apiIdentifier",
                   "nameLocation": "262:13:4",
                   "nodeType": "VariableDeclaration",
-                  "scope": 414,
+                  "scope": 212,
                   "src": "246:29:4",
                   "stateVariable": false,
                   "storageLocation": "calldata",
@@ -387,7 +387,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 399,
+                    "id": 197,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "246:6:4",
@@ -400,12 +400,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 402,
+                  "id": 200,
                   "mutability": "mutable",
                   "name": "apiAddress",
                   "nameLocation": "285:10:4",
                   "nodeType": "VariableDeclaration",
-                  "scope": 414,
+                  "scope": 212,
                   "src": "277:18:4",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -414,7 +414,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 401,
+                    "id": 199,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "277:7:4",
@@ -430,12 +430,12 @@
               "src": "245:51:4"
             },
             "returnParameters": {
-              "id": 406,
+              "id": 204,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "314:0:4"
             },
-            "scope": 439,
+            "scope": 237,
             "src": "223:150:4",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -443,7 +443,7 @@
           },
           {
             "body": {
-              "id": 437,
+              "id": 235,
               "nodeType": "Block",
               "src": "460:160:4",
               "statements": [
@@ -455,31 +455,31 @@
                           "typeIdentifier": "t_address",
                           "typeString": "address"
                         },
-                        "id": 429,
+                        "id": 227,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
                         "lValueRequested": false,
                         "leftExpression": {
                           "baseExpression": {
-                            "id": 422,
+                            "id": 220,
                             "name": "RegisteredAPIs",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 392,
+                            "referencedDeclaration": 190,
                             "src": "478:14:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_mapping$_t_string_memory_ptr_$_t_address_$",
                               "typeString": "mapping(string memory => address)"
                             }
                           },
-                          "id": 424,
+                          "id": 222,
                           "indexExpression": {
-                            "id": 423,
+                            "id": 221,
                             "name": "apiIdentifier",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 416,
+                            "referencedDeclaration": 214,
                             "src": "493:13:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_string_calldata_ptr",
@@ -498,12 +498,12 @@
                           }
                         },
                         "nodeType": "BinaryOperation",
-                        "operator": "==",
+                        "operator": "!=",
                         "rightExpression": {
                           "arguments": [
                             {
                               "hexValue": "307830",
-                              "id": 427,
+                              "id": 225,
                               "isConstant": false,
                               "isLValue": false,
                               "isPure": true,
@@ -525,7 +525,7 @@
                                 "typeString": "int_const 0"
                               }
                             ],
-                            "id": 426,
+                            "id": 224,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
@@ -537,14 +537,14 @@
                               "typeString": "type(address)"
                             },
                             "typeName": {
-                              "id": 425,
+                              "id": 223,
                               "name": "address",
                               "nodeType": "ElementaryTypeName",
                               "src": "511:7:4",
                               "typeDescriptions": {}
                             }
                           },
-                          "id": 428,
+                          "id": 226,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -568,7 +568,7 @@
                       },
                       {
                         "hexValue": "54686973206964656e74696669657220686173206e6f74206265656e2072656769737465726564",
-                        "id": 430,
+                        "id": 228,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -594,7 +594,7 @@
                           "typeString": "literal_string \"This identifier has not been registered\""
                         }
                       ],
-                      "id": 421,
+                      "id": 219,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -608,7 +608,7 @@
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 431,
+                    "id": 229,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -624,31 +624,31 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 432,
+                  "id": 230,
                   "nodeType": "ExpressionStatement",
                   "src": "470:97:4"
                 },
                 {
                   "expression": {
                     "baseExpression": {
-                      "id": 433,
+                      "id": 231,
                       "name": "RegisteredAPIs",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 392,
+                      "referencedDeclaration": 190,
                       "src": "584:14:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_mapping$_t_string_memory_ptr_$_t_address_$",
                         "typeString": "mapping(string memory => address)"
                       }
                     },
-                    "id": 435,
+                    "id": 233,
                     "indexExpression": {
-                      "id": 434,
+                      "id": 232,
                       "name": "apiIdentifier",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 416,
+                      "referencedDeclaration": 214,
                       "src": "599:13:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_string_calldata_ptr",
@@ -666,15 +666,15 @@
                       "typeString": "address"
                     }
                   },
-                  "functionReturnParameters": 420,
-                  "id": 436,
+                  "functionReturnParameters": 218,
+                  "id": 234,
                   "nodeType": "Return",
                   "src": "577:36:4"
                 }
               ]
             },
             "functionSelector": "bf40fac1",
-            "id": 438,
+            "id": 236,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -682,17 +682,17 @@
             "nameLocation": "388:10:4",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 417,
+              "id": 215,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 416,
+                  "id": 214,
                   "mutability": "mutable",
                   "name": "apiIdentifier",
                   "nameLocation": "415:13:4",
                   "nodeType": "VariableDeclaration",
-                  "scope": 438,
+                  "scope": 236,
                   "src": "399:29:4",
                   "stateVariable": false,
                   "storageLocation": "calldata",
@@ -701,7 +701,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 415,
+                    "id": 213,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "399:6:4",
@@ -716,17 +716,17 @@
               "src": "398:31:4"
             },
             "returnParameters": {
-              "id": 420,
+              "id": 218,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 419,
+                  "id": 217,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 438,
+                  "scope": 236,
                   "src": "451:7:4",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -735,7 +735,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 418,
+                    "id": 216,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "451:7:4",
@@ -750,22 +750,22 @@
               ],
               "src": "450:9:4"
             },
-            "scope": 439,
+            "scope": 237,
             "src": "379:241:4",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "public"
           }
         ],
-        "scope": 440,
+        "scope": 238,
         "src": "96:527:4",
         "usedErrors": []
       }
     ],
     "src": "37:586:4"
   },
-  "bytecode": "608060405234801561001057600080fd5b50600080546001600160a01b0319163317905561047d806100326000396000f3fe608060405234801561001057600080fd5b50600436106100575760003560e01c80635346eb831461005c5780638da5cb5b146100ad5780638f32d59b146100be578063a226039c146100dc578063bf40fac1146100f1575b600080fd5b61009061006a366004610298565b80516020818301810180516001825292820191909301209152546001600160a01b031681565b6040516001600160a01b0390911681526020015b60405180910390f35b6000546001600160a01b0316610090565b6000546001600160a01b0316331460405190151581526020016100a4565b6100ef6100ea366004610392565b610104565b005b6100906100ff3660046103f5565b6101bb565b6000546001600160a01b031633146101745760405162461bcd60e51b815260206004820152602860248201527f46756e6374696f6e2061636365737369626c65206f6e6c7920627920746865206044820152676f776e657220212160c01b60648201526084015b60405180910390fd5b8060018484604051610187929190610437565b90815260405190819003602001902080546001600160a01b03929092166001600160a01b0319909216919091179055505050565b6000806001600160a01b0316600184846040516101d9929190610437565b908152604051908190036020019020546001600160a01b03161461024f5760405162461bcd60e51b815260206004820152602760248201527f54686973206964656e74696669657220686173206e6f74206265656e207265676044820152661a5cdd195c995960ca1b606482015260840161016b565b60018383604051610261929190610437565b908152604051908190036020019020546001600160a01b0316905092915050565b634e487b7160e01b600052604160045260246000fd5b6000602082840312156102aa57600080fd5b813567ffffffffffffffff808211156102c257600080fd5b818401915084601f8301126102d657600080fd5b8135818111156102e8576102e8610282565b604051601f8201601f19908116603f0116810190838211818310171561031057610310610282565b8160405282815287602084870101111561032957600080fd5b826020860160208301376000928101602001929092525095945050505050565b60008083601f84011261035b57600080fd5b50813567ffffffffffffffff81111561037357600080fd5b60208301915083602082850101111561038b57600080fd5b9250929050565b6000806000604084860312156103a757600080fd5b833567ffffffffffffffff8111156103be57600080fd5b6103ca86828701610349565b90945092505060208401356001600160a01b03811681146103ea57600080fd5b809150509250925092565b6000806020838503121561040857600080fd5b823567ffffffffffffffff81111561041f57600080fd5b61042b85828601610349565b90969095509350505050565b818382376000910190815291905056fea2646970667358221220111f704659cbc3873351e89331c76f51192fc7c33bac8a69b235746d32bb0ae564736f6c63430008130033",
-  "bytecodeSha1": "8f72f6e51cf143c872fcc673814ec8b9fd9df8d0",
+  "bytecode": "608060405234801561001057600080fd5b50600080546001600160a01b0319163317905561047d806100326000396000f3fe608060405234801561001057600080fd5b50600436106100575760003560e01c80635346eb831461005c5780638da5cb5b146100ad5780638f32d59b146100be578063a226039c146100dc578063bf40fac1146100f1575b600080fd5b61009061006a366004610298565b80516020818301810180516001825292820191909301209152546001600160a01b031681565b6040516001600160a01b0390911681526020015b60405180910390f35b6000546001600160a01b0316610090565b6000546001600160a01b0316331460405190151581526020016100a4565b6100ef6100ea366004610392565b610104565b005b6100906100ff3660046103f5565b6101bb565b6000546001600160a01b031633146101745760405162461bcd60e51b815260206004820152602860248201527f46756e6374696f6e2061636365737369626c65206f6e6c7920627920746865206044820152676f776e657220212160c01b60648201526084015b60405180910390fd5b8060018484604051610187929190610437565b90815260405190819003602001902080546001600160a01b03929092166001600160a01b0319909216919091179055505050565b6000806001600160a01b0316600184846040516101d9929190610437565b908152604051908190036020019020546001600160a01b03160361024f5760405162461bcd60e51b815260206004820152602760248201527f54686973206964656e74696669657220686173206e6f74206265656e207265676044820152661a5cdd195c995960ca1b606482015260840161016b565b60018383604051610261929190610437565b908152604051908190036020019020546001600160a01b0316905092915050565b634e487b7160e01b600052604160045260246000fd5b6000602082840312156102aa57600080fd5b813567ffffffffffffffff808211156102c257600080fd5b818401915084601f8301126102d657600080fd5b8135818111156102e8576102e8610282565b604051601f8201601f19908116603f0116810190838211818310171561031057610310610282565b8160405282815287602084870101111561032957600080fd5b826020860160208301376000928101602001929092525095945050505050565b60008083601f84011261035b57600080fd5b50813567ffffffffffffffff81111561037357600080fd5b60208301915083602082850101111561038b57600080fd5b9250929050565b6000806000604084860312156103a757600080fd5b833567ffffffffffffffff8111156103be57600080fd5b6103ca86828701610349565b90945092505060208401356001600160a01b03811681146103ea57600080fd5b809150509250925092565b6000806020838503121561040857600080fd5b823567ffffffffffffffff81111561041f57600080fd5b61042b85828601610349565b90969095509350505050565b818382376000910190815291905056fea264697066735822122001f2f01b454bd3dbecfbe7e2971e79774ef81bb0f3a59baf3463bc77f5f8ea1264736f6c63430008130033",
+  "bytecodeSha1": "389c15e45df6f0a1d423cbf76509afe7548ab7ba",
   "compiler": {
     "evm_version": "istanbul",
     "optimizer": {
@@ -826,7 +826,7 @@
   "dependencies": [
     "Ownable"
   ],
-  "deployedBytecode": "608060405234801561001057600080fd5b50600436106100575760003560e01c80635346eb831461005c5780638da5cb5b146100ad5780638f32d59b146100be578063a226039c146100dc578063bf40fac1146100f1575b600080fd5b61009061006a366004610298565b80516020818301810180516001825292820191909301209152546001600160a01b031681565b6040516001600160a01b0390911681526020015b60405180910390f35b6000546001600160a01b0316610090565b6000546001600160a01b0316331460405190151581526020016100a4565b6100ef6100ea366004610392565b610104565b005b6100906100ff3660046103f5565b6101bb565b6000546001600160a01b031633146101745760405162461bcd60e51b815260206004820152602860248201527f46756e6374696f6e2061636365737369626c65206f6e6c7920627920746865206044820152676f776e657220212160c01b60648201526084015b60405180910390fd5b8060018484604051610187929190610437565b90815260405190819003602001902080546001600160a01b03929092166001600160a01b0319909216919091179055505050565b6000806001600160a01b0316600184846040516101d9929190610437565b908152604051908190036020019020546001600160a01b03161461024f5760405162461bcd60e51b815260206004820152602760248201527f54686973206964656e74696669657220686173206e6f74206265656e207265676044820152661a5cdd195c995960ca1b606482015260840161016b565b60018383604051610261929190610437565b908152604051908190036020019020546001600160a01b0316905092915050565b634e487b7160e01b600052604160045260246000fd5b6000602082840312156102aa57600080fd5b813567ffffffffffffffff808211156102c257600080fd5b818401915084601f8301126102d657600080fd5b8135818111156102e8576102e8610282565b604051601f8201601f19908116603f0116810190838211818310171561031057610310610282565b8160405282815287602084870101111561032957600080fd5b826020860160208301376000928101602001929092525095945050505050565b60008083601f84011261035b57600080fd5b50813567ffffffffffffffff81111561037357600080fd5b60208301915083602082850101111561038b57600080fd5b9250929050565b6000806000604084860312156103a757600080fd5b833567ffffffffffffffff8111156103be57600080fd5b6103ca86828701610349565b90945092505060208401356001600160a01b03811681146103ea57600080fd5b809150509250925092565b6000806020838503121561040857600080fd5b823567ffffffffffffffff81111561041f57600080fd5b61042b85828601610349565b90969095509350505050565b818382376000910190815291905056fea2646970667358221220111f704659cbc3873351e89331c76f51192fc7c33bac8a69b235746d32bb0ae564736f6c63430008130033",
+  "deployedBytecode": "608060405234801561001057600080fd5b50600436106100575760003560e01c80635346eb831461005c5780638da5cb5b146100ad5780638f32d59b146100be578063a226039c146100dc578063bf40fac1146100f1575b600080fd5b61009061006a366004610298565b80516020818301810180516001825292820191909301209152546001600160a01b031681565b6040516001600160a01b0390911681526020015b60405180910390f35b6000546001600160a01b0316610090565b6000546001600160a01b0316331460405190151581526020016100a4565b6100ef6100ea366004610392565b610104565b005b6100906100ff3660046103f5565b6101bb565b6000546001600160a01b031633146101745760405162461bcd60e51b815260206004820152602860248201527f46756e6374696f6e2061636365737369626c65206f6e6c7920627920746865206044820152676f776e657220212160c01b60648201526084015b60405180910390fd5b8060018484604051610187929190610437565b90815260405190819003602001902080546001600160a01b03929092166001600160a01b0319909216919091179055505050565b6000806001600160a01b0316600184846040516101d9929190610437565b908152604051908190036020019020546001600160a01b03160361024f5760405162461bcd60e51b815260206004820152602760248201527f54686973206964656e74696669657220686173206e6f74206265656e207265676044820152661a5cdd195c995960ca1b606482015260840161016b565b60018383604051610261929190610437565b908152604051908190036020019020546001600160a01b0316905092915050565b634e487b7160e01b600052604160045260246000fd5b6000602082840312156102aa57600080fd5b813567ffffffffffffffff808211156102c257600080fd5b818401915084601f8301126102d657600080fd5b8135818111156102e8576102e8610282565b604051601f8201601f19908116603f0116810190838211818310171561031057610310610282565b8160405282815287602084870101111561032957600080fd5b826020860160208301376000928101602001929092525095945050505050565b60008083601f84011261035b57600080fd5b50813567ffffffffffffffff81111561037357600080fd5b60208301915083602082850101111561038b57600080fd5b9250929050565b6000806000604084860312156103a757600080fd5b833567ffffffffffffffff8111156103be57600080fd5b6103ca86828701610349565b90945092505060208401356001600160a01b03811681146103ea57600080fd5b809150509250925092565b6000806020838503121561040857600080fd5b823567ffffffffffffffff81111561041f57600080fd5b61042b85828601610349565b90969095509350505050565b818382376000910190815291905056fea264697066735822122001f2f01b454bd3dbecfbe7e2971e79774ef81bb0f3a59baf3463bc77f5f8ea1264736f6c63430008130033",
   "deployedSourceMap": "96:527:4:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;135:48;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;135:48:4;;;;;;-1:-1:-1;;;;;1237:32:9;;;1219:51;;1207:2;1192:18;135:48:4;;;;;;;;262:64:7;299:7;317:6;-1:-1:-1;;;;;317:6:7;262:64;;331:77;370:4;399:6;-1:-1:-1;;;;;399:6:7;385:10;:20;331:77;;1446:14:9;;1439:22;1421:41;;1409:2;1394:18;331:77:7;1281:187:9;223:150:4;;;;;;:::i;:::-;;:::i;:::-;;379:241;;;;;;:::i;:::-;;:::i;223:150::-;370:4:7;399:6;-1:-1:-1;;;;;399:6:7;385:10;:20;118:62;;;;-1:-1:-1;;;118:62:7;;3034:2:9;118:62:7;;;3016:21:9;3073:2;3053:18;;;3046:30;3112:34;3092:18;;;3085:62;-1:-1:-1;;;3163:18:9;;;3156:38;3211:19;;118:62:7;;;;;;;;;356:10:4::1;324:14;339:13;;324:29;;;;;;;:::i;:::-;::::0;;;::::1;::::0;;;;;::::1;::::0;;;:42;;-1:-1:-1;;;;;324:42:4;;;::::1;-1:-1:-1::0;;;;;;324:42:4;;::::1;::::0;;;::::1;::::0;;-1:-1:-1;;;223:150:4:o;379:241::-;451:7;519:3;-1:-1:-1;;;;;478:45:4;:14;493:13;;478:29;;;;;;;:::i;:::-;;;;;;;;;;;;;;;-1:-1:-1;;;;;478:29:4;:45;470:97;;;;-1:-1:-1;;;470:97:4;;3721:2:9;470:97:4;;;3703:21:9;3760:2;3740:18;;;3733:30;3799:34;3779:18;;;3772:62;-1:-1:-1;;;3850:18:9;;;3843:37;3897:19;;470:97:4;3519:403:9;470:97:4;584:14;599:13;;584:29;;;;;;;:::i;:::-;;;;;;;;;;;;;;;-1:-1:-1;;;;;584:29:4;;-1:-1:-1;379:241:4;;;;:::o;14:127:9:-;75:10;70:3;66:20;63:1;56:31;106:4;103:1;96:15;130:4;127:1;120:15;146:922;215:6;268:2;256:9;247:7;243:23;239:32;236:52;;;284:1;281;274:12;236:52;324:9;311:23;353:18;394:2;386:6;383:14;380:34;;;410:1;407;400:12;380:34;448:6;437:9;433:22;423:32;;493:7;486:4;482:2;478:13;474:27;464:55;;515:1;512;505:12;464:55;551:2;538:16;573:2;569;566:10;563:36;;;579:18;;:::i;:::-;654:2;648:9;622:2;708:13;;-1:-1:-1;;704:22:9;;;728:2;700:31;696:40;684:53;;;752:18;;;772:22;;;749:46;746:72;;;798:18;;:::i;:::-;838:10;834:2;827:22;873:2;865:6;858:18;913:7;908:2;903;899;895:11;891:20;888:33;885:53;;;934:1;931;924:12;885:53;990:2;985;981;977:11;972:2;964:6;960:15;947:46;1035:1;1013:15;;;1030:2;1009:24;1002:35;;;;-1:-1:-1;1017:6:9;146:922;-1:-1:-1;;;;;146:922:9:o;1473:348::-;1525:8;1535:6;1589:3;1582:4;1574:6;1570:17;1566:27;1556:55;;1607:1;1604;1597:12;1556:55;-1:-1:-1;1630:20:9;;1673:18;1662:30;;1659:50;;;1705:1;1702;1695:12;1659:50;1742:4;1734:6;1730:17;1718:29;;1794:3;1787:4;1778:6;1770;1766:19;1762:30;1759:39;1756:59;;;1811:1;1808;1801:12;1756:59;1473:348;;;;;:::o;1826:585::-;1906:6;1914;1922;1975:2;1963:9;1954:7;1950:23;1946:32;1943:52;;;1991:1;1988;1981:12;1943:52;2031:9;2018:23;2064:18;2056:6;2053:30;2050:50;;;2096:1;2093;2086:12;2050:50;2135:59;2186:7;2177:6;2166:9;2162:22;2135:59;:::i;:::-;2213:8;;-1:-1:-1;2109:85:9;-1:-1:-1;;2298:2:9;2283:18;;2270:32;-1:-1:-1;;;;;2331:31:9;;2321:42;;2311:70;;2377:1;2374;2367:12;2311:70;2400:5;2390:15;;;1826:585;;;;;:::o;2416:411::-;2487:6;2495;2548:2;2536:9;2527:7;2523:23;2519:32;2516:52;;;2564:1;2561;2554:12;2516:52;2604:9;2591:23;2637:18;2629:6;2626:30;2623:50;;;2669:1;2666;2659:12;2623:50;2708:59;2759:7;2750:6;2739:9;2735:22;2708:59;:::i;:::-;2786:8;;2682:85;;-1:-1:-1;2416:411:9;-1:-1:-1;;;;2416:411:9:o;3241:273::-;3426:6;3418;3413:3;3400:33;3382:3;3452:16;;3477:13;;;3452:16;3241:273;-1:-1:-1;3241:273:9:o",
   "language": "Solidity",
   "natspec": {
@@ -838,7 +838,7 @@
     96,
     623
   ],
-  "opcodes": "PUSH1 0x80 PUSH1 0x40 MSTORE CALLVALUE DUP1 ISZERO PUSH2 0x10 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST POP PUSH1 0x4 CALLDATASIZE LT PUSH2 0x57 JUMPI PUSH1 0x0 CALLDATALOAD PUSH1 0xE0 SHR DUP1 PUSH4 0x5346EB83 EQ PUSH2 0x5C JUMPI DUP1 PUSH4 0x8DA5CB5B EQ PUSH2 0xAD JUMPI DUP1 PUSH4 0x8F32D59B EQ PUSH2 0xBE JUMPI DUP1 PUSH4 0xA226039C EQ PUSH2 0xDC JUMPI DUP1 PUSH4 0xBF40FAC1 EQ PUSH2 0xF1 JUMPI JUMPDEST PUSH1 0x0 DUP1 REVERT JUMPDEST PUSH2 0x90 PUSH2 0x6A CALLDATASIZE PUSH1 0x4 PUSH2 0x298 JUMP JUMPDEST DUP1 MLOAD PUSH1 0x20 DUP2 DUP4 ADD DUP2 ADD DUP1 MLOAD PUSH1 0x1 DUP3 MSTORE SWAP3 DUP3 ADD SWAP2 SWAP1 SWAP4 ADD KECCAK256 SWAP2 MSTORE SLOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB AND DUP2 JUMP JUMPDEST PUSH1 0x40 MLOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB SWAP1 SWAP2 AND DUP2 MSTORE PUSH1 0x20 ADD JUMPDEST PUSH1 0x40 MLOAD DUP1 SWAP2 SUB SWAP1 RETURN JUMPDEST PUSH1 0x0 SLOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB AND PUSH2 0x90 JUMP JUMPDEST PUSH1 0x0 SLOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB AND CALLER EQ PUSH1 0x40 MLOAD SWAP1 ISZERO ISZERO DUP2 MSTORE PUSH1 0x20 ADD PUSH2 0xA4 JUMP JUMPDEST PUSH2 0xEF PUSH2 0xEA CALLDATASIZE PUSH1 0x4 PUSH2 0x392 JUMP JUMPDEST PUSH2 0x104 JUMP JUMPDEST STOP JUMPDEST PUSH2 0x90 PUSH2 0xFF CALLDATASIZE PUSH1 0x4 PUSH2 0x3F5 JUMP JUMPDEST PUSH2 0x1BB JUMP JUMPDEST PUSH1 0x0 SLOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB AND CALLER EQ PUSH2 0x174 JUMPI PUSH1 0x40 MLOAD PUSH3 0x461BCD PUSH1 0xE5 SHL DUP2 MSTORE PUSH1 0x20 PUSH1 0x4 DUP3 ADD MSTORE PUSH1 0x28 PUSH1 0x24 DUP3 ADD MSTORE PUSH32 0x46756E6374696F6E2061636365737369626C65206F6E6C792062792074686520 PUSH1 0x44 DUP3 ADD MSTORE PUSH8 0x6F776E6572202121 PUSH1 0xC0 SHL PUSH1 0x64 DUP3 ADD MSTORE PUSH1 0x84 ADD JUMPDEST PUSH1 0x40 MLOAD DUP1 SWAP2 SUB SWAP1 REVERT JUMPDEST DUP1 PUSH1 0x1 DUP5 DUP5 PUSH1 0x40 MLOAD PUSH2 0x187 SWAP3 SWAP2 SWAP1 PUSH2 0x437 JUMP JUMPDEST SWAP1 DUP2 MSTORE PUSH1 0x40 MLOAD SWAP1 DUP2 SWAP1 SUB PUSH1 0x20 ADD SWAP1 KECCAK256 DUP1 SLOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB SWAP3 SWAP1 SWAP3 AND PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB NOT SWAP1 SWAP3 AND SWAP2 SWAP1 SWAP2 OR SWAP1 SSTORE POP POP POP JUMP JUMPDEST PUSH1 0x0 DUP1 PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB AND PUSH1 0x1 DUP5 DUP5 PUSH1 0x40 MLOAD PUSH2 0x1D9 SWAP3 SWAP2 SWAP1 PUSH2 0x437 JUMP JUMPDEST SWAP1 DUP2 MSTORE PUSH1 0x40 MLOAD SWAP1 DUP2 SWAP1 SUB PUSH1 0x20 ADD SWAP1 KECCAK256 SLOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB AND EQ PUSH2 0x24F JUMPI PUSH1 0x40 MLOAD PUSH3 0x461BCD PUSH1 0xE5 SHL DUP2 MSTORE PUSH1 0x20 PUSH1 0x4 DUP3 ADD MSTORE PUSH1 0x27 PUSH1 0x24 DUP3 ADD MSTORE PUSH32 0x54686973206964656E74696669657220686173206E6F74206265656E20726567 PUSH1 0x44 DUP3 ADD MSTORE PUSH7 0x1A5CDD195C9959 PUSH1 0xCA SHL PUSH1 0x64 DUP3 ADD MSTORE PUSH1 0x84 ADD PUSH2 0x16B JUMP JUMPDEST PUSH1 0x1 DUP4 DUP4 PUSH1 0x40 MLOAD PUSH2 0x261 SWAP3 SWAP2 SWAP1 PUSH2 0x437 JUMP JUMPDEST SWAP1 DUP2 MSTORE PUSH1 0x40 MLOAD SWAP1 DUP2 SWAP1 SUB PUSH1 0x20 ADD SWAP1 KECCAK256 SLOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB AND SWAP1 POP SWAP3 SWAP2 POP POP JUMP JUMPDEST PUSH4 0x4E487B71 PUSH1 0xE0 SHL PUSH1 0x0 MSTORE PUSH1 0x41 PUSH1 0x4 MSTORE PUSH1 0x24 PUSH1 0x0 REVERT JUMPDEST PUSH1 0x0 PUSH1 0x20 DUP3 DUP5 SUB SLT ISZERO PUSH2 0x2AA JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST DUP2 CALLDATALOAD PUSH8 0xFFFFFFFFFFFFFFFF DUP1 DUP3 GT ISZERO PUSH2 0x2C2 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST DUP2 DUP5 ADD SWAP2 POP DUP5 PUSH1 0x1F DUP4 ADD SLT PUSH2 0x2D6 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST DUP2 CALLDATALOAD DUP2 DUP2 GT ISZERO PUSH2 0x2E8 JUMPI PUSH2 0x2E8 PUSH2 0x282 JUMP JUMPDEST PUSH1 0x40 MLOAD PUSH1 0x1F DUP3 ADD PUSH1 0x1F NOT SWAP1 DUP2 AND PUSH1 0x3F ADD AND DUP2 ADD SWAP1 DUP4 DUP3 GT DUP2 DUP4 LT OR ISZERO PUSH2 0x310 JUMPI PUSH2 0x310 PUSH2 0x282 JUMP JUMPDEST DUP2 PUSH1 0x40 MSTORE DUP3 DUP2 MSTORE DUP8 PUSH1 0x20 DUP5 DUP8 ADD ADD GT ISZERO PUSH2 0x329 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST DUP3 PUSH1 0x20 DUP7 ADD PUSH1 0x20 DUP4 ADD CALLDATACOPY PUSH1 0x0 SWAP3 DUP2 ADD PUSH1 0x20 ADD SWAP3 SWAP1 SWAP3 MSTORE POP SWAP6 SWAP5 POP POP POP POP POP JUMP JUMPDEST PUSH1 0x0 DUP1 DUP4 PUSH1 0x1F DUP5 ADD SLT PUSH2 0x35B JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST POP DUP2 CALLDATALOAD PUSH8 0xFFFFFFFFFFFFFFFF DUP2 GT ISZERO PUSH2 0x373 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST PUSH1 0x20 DUP4 ADD SWAP2 POP DUP4 PUSH1 0x20 DUP3 DUP6 ADD ADD GT ISZERO PUSH2 0x38B JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST SWAP3 POP SWAP3 SWAP1 POP JUMP JUMPDEST PUSH1 0x0 DUP1 PUSH1 0x0 PUSH1 0x40 DUP5 DUP7 SUB SLT ISZERO PUSH2 0x3A7 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST DUP4 CALLDATALOAD PUSH8 0xFFFFFFFFFFFFFFFF DUP2 GT ISZERO PUSH2 0x3BE JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST PUSH2 0x3CA DUP7 DUP3 DUP8 ADD PUSH2 0x349 JUMP JUMPDEST SWAP1 SWAP5 POP SWAP3 POP POP PUSH1 0x20 DUP5 ADD CALLDATALOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB DUP2 AND DUP2 EQ PUSH2 0x3EA JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST DUP1 SWAP2 POP POP SWAP3 POP SWAP3 POP SWAP3 JUMP JUMPDEST PUSH1 0x0 DUP1 PUSH1 0x20 DUP4 DUP6 SUB SLT ISZERO PUSH2 0x408 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST DUP3 CALLDATALOAD PUSH8 0xFFFFFFFFFFFFFFFF DUP2 GT ISZERO PUSH2 0x41F JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST PUSH2 0x42B DUP6 DUP3 DUP7 ADD PUSH2 0x349 JUMP JUMPDEST SWAP1 SWAP7 SWAP1 SWAP6 POP SWAP4 POP POP POP POP JUMP JUMPDEST DUP2 DUP4 DUP3 CALLDATACOPY PUSH1 0x0 SWAP2 ADD SWAP1 DUP2 MSTORE SWAP2 SWAP1 POP JUMP INVALID LOG2 PUSH5 0x6970667358 0x22 SLT KECCAK256 GT 0x1F PUSH17 0x4659CBC3873351E89331C76F51192FC7C3 EXTCODESIZE 0xAC DUP11 PUSH10 0xB235746D32BB0AE56473 PUSH16 0x6C634300081300330000000000000000 ",
+  "opcodes": "PUSH1 0x80 PUSH1 0x40 MSTORE CALLVALUE DUP1 ISZERO PUSH2 0x10 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST POP PUSH1 0x4 CALLDATASIZE LT PUSH2 0x57 JUMPI PUSH1 0x0 CALLDATALOAD PUSH1 0xE0 SHR DUP1 PUSH4 0x5346EB83 EQ PUSH2 0x5C JUMPI DUP1 PUSH4 0x8DA5CB5B EQ PUSH2 0xAD JUMPI DUP1 PUSH4 0x8F32D59B EQ PUSH2 0xBE JUMPI DUP1 PUSH4 0xA226039C EQ PUSH2 0xDC JUMPI DUP1 PUSH4 0xBF40FAC1 EQ PUSH2 0xF1 JUMPI JUMPDEST PUSH1 0x0 DUP1 REVERT JUMPDEST PUSH2 0x90 PUSH2 0x6A CALLDATASIZE PUSH1 0x4 PUSH2 0x298 JUMP JUMPDEST DUP1 MLOAD PUSH1 0x20 DUP2 DUP4 ADD DUP2 ADD DUP1 MLOAD PUSH1 0x1 DUP3 MSTORE SWAP3 DUP3 ADD SWAP2 SWAP1 SWAP4 ADD KECCAK256 SWAP2 MSTORE SLOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB AND DUP2 JUMP JUMPDEST PUSH1 0x40 MLOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB SWAP1 SWAP2 AND DUP2 MSTORE PUSH1 0x20 ADD JUMPDEST PUSH1 0x40 MLOAD DUP1 SWAP2 SUB SWAP1 RETURN JUMPDEST PUSH1 0x0 SLOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB AND PUSH2 0x90 JUMP JUMPDEST PUSH1 0x0 SLOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB AND CALLER EQ PUSH1 0x40 MLOAD SWAP1 ISZERO ISZERO DUP2 MSTORE PUSH1 0x20 ADD PUSH2 0xA4 JUMP JUMPDEST PUSH2 0xEF PUSH2 0xEA CALLDATASIZE PUSH1 0x4 PUSH2 0x392 JUMP JUMPDEST PUSH2 0x104 JUMP JUMPDEST STOP JUMPDEST PUSH2 0x90 PUSH2 0xFF CALLDATASIZE PUSH1 0x4 PUSH2 0x3F5 JUMP JUMPDEST PUSH2 0x1BB JUMP JUMPDEST PUSH1 0x0 SLOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB AND CALLER EQ PUSH2 0x174 JUMPI PUSH1 0x40 MLOAD PUSH3 0x461BCD PUSH1 0xE5 SHL DUP2 MSTORE PUSH1 0x20 PUSH1 0x4 DUP3 ADD MSTORE PUSH1 0x28 PUSH1 0x24 DUP3 ADD MSTORE PUSH32 0x46756E6374696F6E2061636365737369626C65206F6E6C792062792074686520 PUSH1 0x44 DUP3 ADD MSTORE PUSH8 0x6F776E6572202121 PUSH1 0xC0 SHL PUSH1 0x64 DUP3 ADD MSTORE PUSH1 0x84 ADD JUMPDEST PUSH1 0x40 MLOAD DUP1 SWAP2 SUB SWAP1 REVERT JUMPDEST DUP1 PUSH1 0x1 DUP5 DUP5 PUSH1 0x40 MLOAD PUSH2 0x187 SWAP3 SWAP2 SWAP1 PUSH2 0x437 JUMP JUMPDEST SWAP1 DUP2 MSTORE PUSH1 0x40 MLOAD SWAP1 DUP2 SWAP1 SUB PUSH1 0x20 ADD SWAP1 KECCAK256 DUP1 SLOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB SWAP3 SWAP1 SWAP3 AND PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB NOT SWAP1 SWAP3 AND SWAP2 SWAP1 SWAP2 OR SWAP1 SSTORE POP POP POP JUMP JUMPDEST PUSH1 0x0 DUP1 PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB AND PUSH1 0x1 DUP5 DUP5 PUSH1 0x40 MLOAD PUSH2 0x1D9 SWAP3 SWAP2 SWAP1 PUSH2 0x437 JUMP JUMPDEST SWAP1 DUP2 MSTORE PUSH1 0x40 MLOAD SWAP1 DUP2 SWAP1 SUB PUSH1 0x20 ADD SWAP1 KECCAK256 SLOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB AND SUB PUSH2 0x24F JUMPI PUSH1 0x40 MLOAD PUSH3 0x461BCD PUSH1 0xE5 SHL DUP2 MSTORE PUSH1 0x20 PUSH1 0x4 DUP3 ADD MSTORE PUSH1 0x27 PUSH1 0x24 DUP3 ADD MSTORE PUSH32 0x54686973206964656E74696669657220686173206E6F74206265656E20726567 PUSH1 0x44 DUP3 ADD MSTORE PUSH7 0x1A5CDD195C9959 PUSH1 0xCA SHL PUSH1 0x64 DUP3 ADD MSTORE PUSH1 0x84 ADD PUSH2 0x16B JUMP JUMPDEST PUSH1 0x1 DUP4 DUP4 PUSH1 0x40 MLOAD PUSH2 0x261 SWAP3 SWAP2 SWAP1 PUSH2 0x437 JUMP JUMPDEST SWAP1 DUP2 MSTORE PUSH1 0x40 MLOAD SWAP1 DUP2 SWAP1 SUB PUSH1 0x20 ADD SWAP1 KECCAK256 SLOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB AND SWAP1 POP SWAP3 SWAP2 POP POP JUMP JUMPDEST PUSH4 0x4E487B71 PUSH1 0xE0 SHL PUSH1 0x0 MSTORE PUSH1 0x41 PUSH1 0x4 MSTORE PUSH1 0x24 PUSH1 0x0 REVERT JUMPDEST PUSH1 0x0 PUSH1 0x20 DUP3 DUP5 SUB SLT ISZERO PUSH2 0x2AA JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST DUP2 CALLDATALOAD PUSH8 0xFFFFFFFFFFFFFFFF DUP1 DUP3 GT ISZERO PUSH2 0x2C2 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST DUP2 DUP5 ADD SWAP2 POP DUP5 PUSH1 0x1F DUP4 ADD SLT PUSH2 0x2D6 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST DUP2 CALLDATALOAD DUP2 DUP2 GT ISZERO PUSH2 0x2E8 JUMPI PUSH2 0x2E8 PUSH2 0x282 JUMP JUMPDEST PUSH1 0x40 MLOAD PUSH1 0x1F DUP3 ADD PUSH1 0x1F NOT SWAP1 DUP2 AND PUSH1 0x3F ADD AND DUP2 ADD SWAP1 DUP4 DUP3 GT DUP2 DUP4 LT OR ISZERO PUSH2 0x310 JUMPI PUSH2 0x310 PUSH2 0x282 JUMP JUMPDEST DUP2 PUSH1 0x40 MSTORE DUP3 DUP2 MSTORE DUP8 PUSH1 0x20 DUP5 DUP8 ADD ADD GT ISZERO PUSH2 0x329 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST DUP3 PUSH1 0x20 DUP7 ADD PUSH1 0x20 DUP4 ADD CALLDATACOPY PUSH1 0x0 SWAP3 DUP2 ADD PUSH1 0x20 ADD SWAP3 SWAP1 SWAP3 MSTORE POP SWAP6 SWAP5 POP POP POP POP POP JUMP JUMPDEST PUSH1 0x0 DUP1 DUP4 PUSH1 0x1F DUP5 ADD SLT PUSH2 0x35B JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST POP DUP2 CALLDATALOAD PUSH8 0xFFFFFFFFFFFFFFFF DUP2 GT ISZERO PUSH2 0x373 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST PUSH1 0x20 DUP4 ADD SWAP2 POP DUP4 PUSH1 0x20 DUP3 DUP6 ADD ADD GT ISZERO PUSH2 0x38B JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST SWAP3 POP SWAP3 SWAP1 POP JUMP JUMPDEST PUSH1 0x0 DUP1 PUSH1 0x0 PUSH1 0x40 DUP5 DUP7 SUB SLT ISZERO PUSH2 0x3A7 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST DUP4 CALLDATALOAD PUSH8 0xFFFFFFFFFFFFFFFF DUP2 GT ISZERO PUSH2 0x3BE JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST PUSH2 0x3CA DUP7 DUP3 DUP8 ADD PUSH2 0x349 JUMP JUMPDEST SWAP1 SWAP5 POP SWAP3 POP POP PUSH1 0x20 DUP5 ADD CALLDATALOAD PUSH1 0x1 PUSH1 0x1 PUSH1 0xA0 SHL SUB DUP2 AND DUP2 EQ PUSH2 0x3EA JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST DUP1 SWAP2 POP POP SWAP3 POP SWAP3 POP SWAP3 JUMP JUMPDEST PUSH1 0x0 DUP1 PUSH1 0x20 DUP4 DUP6 SUB SLT ISZERO PUSH2 0x408 JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST DUP3 CALLDATALOAD PUSH8 0xFFFFFFFFFFFFFFFF DUP2 GT ISZERO PUSH2 0x41F JUMPI PUSH1 0x0 DUP1 REVERT JUMPDEST PUSH2 0x42B DUP6 DUP3 DUP7 ADD PUSH2 0x349 JUMP JUMPDEST SWAP1 SWAP7 SWAP1 SWAP6 POP SWAP4 POP POP POP POP JUMP JUMPDEST DUP2 DUP4 DUP3 CALLDATACOPY PUSH1 0x0 SWAP2 ADD SWAP1 DUP2 MSTORE SWAP2 SWAP1 POP JUMP INVALID LOG2 PUSH5 0x6970667358 0x22 SLT KECCAK256 ADD CALLCODE CREATE SHL GASLIMIT 0x4B 0xD3 0xDB 0xEC 0xFB 0xE7 0xE2 SWAP8 0x1E PUSH26 0x774EF81BB0F3A59BAF3463BC77F5F8EA1264736F6C6343000813 STOP CALLER ",
   "pcMap": {
     "0": {
       "offset": [
@@ -3297,7 +3297,7 @@
         478,
         523
       ],
-      "op": "EQ",
+      "op": "SUB",
       "path": "4"
     },
     "500": {
@@ -4883,8 +4883,8 @@
       "op": "JUMP"
     }
   },
-  "sha1": "bc5878be16afb5184cad88b115c239478132a232",
-  "source": "// SPDX-License-Identifier: GPL-3.0\n\npragma solidity >=0.7.0 <0.9.0;\n\nimport \"./Ownable.sol\";\n\n\ncontract APIProvider is Ownable {\n\n    mapping(string => address) public RegisteredAPIs;\n\n    constructor () Ownable() {}\n\n    function setAPIAddress(string calldata apiIdentifier, address apiAddress) public onlyOwner {\n        RegisteredAPIs[apiIdentifier] = apiAddress;\n    }\n\n    function getAddress(string calldata apiIdentifier) public view returns (address) {\n        require(RegisteredAPIs[apiIdentifier] == address(0x0), \"This identifier has not been registered\");\n        return RegisteredAPIs[apiIdentifier];\n    }\n\n}",
+  "sha1": "894fa5f982baa8b32c90b9309fa831f0562dba08",
+  "source": "// SPDX-License-Identifier: GPL-3.0\n\npragma solidity >=0.7.0 <0.9.0;\n\nimport \"./Ownable.sol\";\n\n\ncontract APIProvider is Ownable {\n\n    mapping(string => address) public RegisteredAPIs;\n\n    constructor () Ownable() {}\n\n    function setAPIAddress(string calldata apiIdentifier, address apiAddress) public onlyOwner {\n        RegisteredAPIs[apiIdentifier] = apiAddress;\n    }\n\n    function getAddress(string calldata apiIdentifier) public view returns (address) {\n        require(RegisteredAPIs[apiIdentifier] != address(0x0), \"This identifier has not been registered\");\n        return RegisteredAPIs[apiIdentifier];\n    }\n\n}",
   "sourceMap": "96:527:4:-:0;;;190:27;;;;;;;;;-1:-1:-1;237:6:7;:19;;-1:-1:-1;;;;;;237:19:7;246:10;237:19;;;96:527:4;;;;;;",
   "sourcePath": "contracts/APIProvider.sol",
   "type": "contract"

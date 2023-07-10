@@ -18,6 +18,9 @@ class Accounts:
         else:
             raise BaseException(f"No accounts provided for network: {network.show_active()}")
 
+    def addLocalAccount(key=None):
+        return accounts.add(key)
+
     def getFromIndex(index):
         return accounts[index]
 

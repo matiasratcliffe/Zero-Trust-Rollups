@@ -16,7 +16,7 @@ contract APIProvider is Ownable {
     }
 
     function getAddress(string calldata apiIdentifier) public view returns (address) {
-        require(RegisteredAPIs[apiIdentifier] == address(0x0), "This identifier has not been registered");
+        require(RegisteredAPIs[apiIdentifier] != address(0x0), "This identifier has not been registered");
         return RegisteredAPIs[apiIdentifier];
     }
 

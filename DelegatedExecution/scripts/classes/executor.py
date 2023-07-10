@@ -64,8 +64,8 @@ class Executor:
         return f"Executor ({str(self.account)[:6]}..{str(self.account)[-3:]})"
 
     def _acceptRequest(self, requestID):
-        request = self.broker.requests(requestID)
-        transaction = self.broker.acceptRequest(requestID, {'from': self.account, 'value': request.dict()['challengeInsurance']})
+        request = self.broker.requests(requestID).dict()
+        transaction = self.broker.acceptRequest(requestID, {'from': self.account, 'value': request['challengeInsurance']})
         transaction.wait(1)
         if requestID in self.unacceptedRequests:
             self.unacceptedRequests.pop(self.unacceptedRequests.index(requestID))

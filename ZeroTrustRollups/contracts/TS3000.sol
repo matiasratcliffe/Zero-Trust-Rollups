@@ -29,6 +29,7 @@ contract TS3000 is BaseClient {
     string public encryptedDataRefference;
     KeyFragment[] public keyFragments;
     bytes32 public finalKey;
+    
     uint public rewardPerFragment;
     uint public postProcessingGas;
     bool public postProcessingEnabled;

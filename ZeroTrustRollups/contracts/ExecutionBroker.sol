@@ -20,7 +20,7 @@ struct Request {
 
 contract ExecutionBroker is Transferable {
 
-    uint public ACCEPTANCE_STAKE;
+    uint public ACCEPTANCE_STAKE;  //TODO agregar acceptance time? aunque mas largo que el de delegated, solo para que sepan que no lo pueden bloquear para siempre
 
     Request[] public requests;
 

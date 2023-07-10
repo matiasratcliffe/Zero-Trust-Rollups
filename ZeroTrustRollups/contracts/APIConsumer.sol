@@ -12,7 +12,7 @@ struct Input {
     string apiIdentifier;
 }
 
-struct APIResponse {
+struct APIResponse { //TODO pasar estas esctructuras al provider? o la funcion de getinputdatastructure a algun lugar accesible por APIOracle python
     bytes response;
     bytes signature;
 }
@@ -25,6 +25,10 @@ contract APIConsumer is BaseClient {
         provider = APIProvider(apiProviderAddress);
     }
 
+    function submitRequest(uint payment, bytes memory input) public onlyOwner payable returns (uint) {
+        return super.submitRequest(payment, input, 0);
+    }
+
     function checkResult(bytes calldata inputData, bytes calldata resultData) external override view returns (bool) {
         Input memory input = abi.decode(inputData, (Input));
         APIResponse memory apiResponse = abi.decode(resultData, (APIResponse));
@@ -33,6 +37,10 @@ contract APIConsumer is BaseClient {
     
     function getInputDataStructure() external override pure returns (string memory) {
         return "{string apiIdentifier;}";
+    }
+
+    function getAPIResponseDataStructure() external pure returns (string memory) {
+        return "{bytes response; bytes signature;}";
     }
 
     function _verifySignature(APIResponse memory apiResponse, address signer) private pure returns (bool) {

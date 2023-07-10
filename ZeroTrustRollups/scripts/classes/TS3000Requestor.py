@@ -52,7 +52,7 @@ class AESCipher(object):
 @Logger.LogClassMethods()
 class TS3000Requestor:
 
-    def __init__(self, broker, account, paymentPerFragment, textFileToEncrypt, numberOfKeyFragments: int = 50, difficulty: int = 10):
+    def __init__(self, broker, account, textFileToEncrypt, paymentPerFragment: int = 1e12, numberOfKeyFragments: int = 50, difficulty: int = 10):
         self.broker = broker
         self.owner = account
         firstLocalHash, globalHashes, passcode = self._generateKeyFragments(numberOfKeyFragments, difficulty)
@@ -73,4 +73,4 @@ class TS3000Requestor:
 
 def main():
     broker = BrokerFactory.getInstance()
-    requestor = TS3000Requestor(broker, Accounts.getAccount(), 1e14, "text_file")
+    requestor = TS3000Requestor(broker, Accounts.getAccount(), "text_file")
