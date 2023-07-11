@@ -34,12 +34,12 @@ contract APIConsumer is BaseClient {
         APIResponse memory apiResponse = abi.decode(resultData, (APIResponse));
         return _verifySignature(apiResponse, provider.getAddress(input.apiIdentifier));
     }
-    
+
     function getInputDataStructure() external override pure returns (string memory) {
         return "{string apiIdentifier;}";
     }
 
-    function getAPIResponseDataStructure() external pure returns (string memory) {
+    function getResultDataStructure() external override pure returns (string memory) {
         return "{bytes response; bytes signature;}";
     }
 

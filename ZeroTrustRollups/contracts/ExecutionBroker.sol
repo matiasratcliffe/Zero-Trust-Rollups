@@ -13,6 +13,7 @@ struct Request {
     uint postProcessingGas;
     BaseClient client;
     address executor;
+    uint acceptedTimestamp;
     bytes result;
     bool closed;
 }
@@ -20,7 +21,8 @@ struct Request {
 
 contract ExecutionBroker is Transferable {
 
-    uint public ACCEPTANCE_STAKE;  //TODO agregar acceptance time? aunque mas largo que el de delegated, solo para que sepan que no lo pueden bloquear para siempre
+    uint public ACCEPTANCE_GRACE_PERIOD;  // = 3600 seconds
+    uint public ACCEPTANCE_STAKE;  //TODO ver si vale la pena lo del porcentaje, capaz hago la stake mas chica pero hago que se pierda el 100% de la stake si la caga
 
     Request[] public requests;
 
@@ -34,8 +36,9 @@ contract ExecutionBroker is Transferable {
     event resultPostProcessed(uint requestID, bool success);
     event requestReOpened(uint requestID, uint payment, bool transferSuccess);
 
-    constructor(uint acceptanceStake) {
+    constructor(uint acceptanceStake, uint acceptanceGracePeriod) {
         ACCEPTANCE_STAKE = acceptanceStake;
+        ACCEPTANCE_GRACE_PERIOD = acceptanceGracePeriod;
     }
 
     // Public views
@@ -51,7 +54,7 @@ contract ExecutionBroker is Transferable {
     // Restricted interaction functions
 
     function submitRequest(bytes calldata input, uint postProcessingGas) public payable returns (uint) {
-        require(msg.value > postProcessingGas * tx.gasprice, "The post processing gas cannot takeup all of the supplied ether");  //TODO en el bot de python, ver que efectivamente el net payment, valga la pena
+        require(msg.value > postProcessingGas * tx.gasprice, "The post processing gas cannot takeup all of the supplied ether");
         Request memory request = Request({
             id: requests.length,
             input: input,
@@ -59,6 +62,7 @@ contract ExecutionBroker is Transferable {
             postProcessingGas: postProcessingGas,
             client: BaseClient(msg.sender),
             executor: address(0x0),
+            acceptedTimestamp: 0,
             result: abi.encode(0),
             closed: false
         });
@@ -88,9 +92,15 @@ contract ExecutionBroker is Transferable {
         // what if Request does not exist? what happens to the funds? IF YOU TRY TO ACCESS AN INVALID INDEX IN AN ARRAY, THE FUNCTION GETS REVERTED AND FUNDS RETURNED TOGETHER WITH SPARE GAS (BUT NOT ALREADY CONSUMED GAS)
         // what happens to the funds if one of the requires fail? THEY GET RETURNED
         require(!requests[requestID].closed, "The request is closed");
-        require(requests[requestID].executor == address(0x0), "There already is an acceptance for this request");
+        require(requests[requestID].executor != msg.sender, "This request is already accepted by you");
+        require(requests[requestID].executor == address(0x0) || (requests[requestID].acceptedTimestamp + ACCEPTANCE_GRACE_PERIOD) < block.timestamp, "There is an unexpired acceptance for this request");
         require(msg.value == ACCEPTANCE_STAKE, "Incorrect amount of stake provided");
+        if (requests[requestID].executor != address(0x0)) {
+            _internalTransferFunds((ACCEPTANCE_STAKE*95)/100, requests[requestID].executor);
+            _internalTransferFunds((ACCEPTANCE_STAKE*5)/100, address(requests[requestID].client));
+        }
         requests[requestID].executor = msg.sender;
+        requests[requestID].acceptedTimestamp = block.timestamp;
         emit requestAccepted(requestID, msg.sender);
     }
 

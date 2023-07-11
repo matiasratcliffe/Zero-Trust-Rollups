@@ -5,6 +5,8 @@ from scripts.classes.utils.logger import Logger
 
 @Logger.LogClassMethods()
 class BrokerFactory:
+    ACCEPTANCE_GRACE_PERIOD = 5
+
     def getInstance():
         if "brokerContractAddress" in config["networks"][network.show_active()]:
             return BrokerFactory.at(address=config["networks"][network.show_active()]["brokerContractAddress"])
@@ -13,11 +15,11 @@ class BrokerFactory:
         else:
             return BrokerFactory.create(Accounts.getAccount())
 
-    def create(account=None, acceptanceGracePeriod=5):
+    def create(account=None):
         if account == None:
             account = Accounts.getAccount()
         ExecutionBroker.deploy(
-            acceptanceGracePeriod,
+            BrokerFactory.ACCEPTANCE_GRACE_PERIOD,
             {"from": account},
             publish_source=config["networks"][network.show_active()]["verify"]
         )

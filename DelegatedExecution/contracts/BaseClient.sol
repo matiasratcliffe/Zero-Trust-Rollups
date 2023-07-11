@@ -24,6 +24,11 @@ abstract contract BaseClient is Ownable {
         _;
     }
     
+    modifier onlyOwnerOrBroker() {
+        require(msg.sender == address(brokerContract) || isOwner(), "Function accessible only by the owner or broker");
+        _;
+    }
+
     constructor(address brokerAddress) Ownable() {
         // aca linkear con Broker hardcoded
         brokerContract = ExecutionBroker(brokerAddress);
@@ -33,7 +38,7 @@ abstract contract BaseClient is Ownable {
     function processResult(bytes calldata result) external virtual onlyBroker {}
     function getInputStructure(uint functionID) external virtual pure returns (string memory);
 
-    function submitRequest(uint payment, ClientInput calldata input, uint postProcessingGas, uint requestedInsurance, uint claimDelay) external onlyOwner payable returns (uint) {
+    function submitRequest(uint payment, ClientInput calldata input, uint postProcessingGas, uint requestedInsurance, uint claimDelay) external onlyOwnerOrBroker payable returns (uint) {
         require(payment <= msg.value + address(this).balance, "Insufficient funds");
         uint requestID = brokerContract.submitRequest{value: payment}(input, postProcessingGas, requestedInsurance, claimDelay);
         emit requestSubmitted(requestID);

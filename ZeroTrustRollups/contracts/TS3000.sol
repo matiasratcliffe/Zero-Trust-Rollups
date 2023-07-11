@@ -29,13 +29,13 @@ contract TS3000 is BaseClient {
     string public encryptedDataRefference;
     KeyFragment[] public keyFragments;
     bytes32 public finalKey;
-    
+
     uint public rewardPerFragment;
     uint public postProcessingGas;
     bool public postProcessingEnabled;
     
     constructor(address brokerAddress, string memory _encryptedDataRefference, bytes32 firstLocalHash, bytes32[] memory globalHashes) BaseClient(brokerAddress) payable {
-        postProcessingGas = 10;  //TODO calculate postprocgas
+        postProcessingGas = 400000;  //TODO calculate postprocgas //// con 300000 funciona, con 200000 no
         postProcessingEnabled = true;
         rewardPerFragment = msg.value / globalHashes.length; //TODO aca tener en cuenta el postprocgas
         encryptedDataRefference = _encryptedDataRefference;
@@ -87,4 +87,9 @@ contract TS3000 is BaseClient {
     function getInputDataStructure() external override pure returns (string memory) {
         return "{uint fragmentIndex; bytes32 globalHash; bytes32 localHash;}";
     }
+    
+    function getResultDataStructure() external override pure returns (string memory) {
+        return "{uint fragmentIndex; uint passcode;}";
+    }
+
 }

@@ -4,7 +4,7 @@ pragma solidity >=0.7.0 <0.9.0;
 
 contract Ownable {
   modifier onlyOwner() {
-    require(isOwner(), "Function accessible only by the owner !!");
+    require(isOwner(), "Function accessible only by the owner");
     _;
   }
   address private _owner;

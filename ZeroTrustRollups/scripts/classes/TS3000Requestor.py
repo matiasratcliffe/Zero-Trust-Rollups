@@ -16,7 +16,7 @@ class AESCipher(object):
 
     def __init__(self, passcode: int):
         self.bs = AES.block_size
-        self.key = hashlib.sha256(keccak(encode(['uint'], [passcode])).hex().encode()).digest()
+        self.key = hashlib.sha256(passcode.hex().encode()).digest()
 
     def encryptFile(self, fileName):
         with open(fileName, "r") as f:
@@ -63,14 +63,13 @@ class TS3000Requestor:
 
     def _generateKeyFragments(self, size: int, difficulty: int):
         globalHashes = []
-        localHashes = [keccak(encode(['uint'], [randint(int('9' * (difficulty - 2)), int('9' * difficulty))]))]
+        localHashes = [keccak(encode(['uint'], [randint(0, int('9' * difficulty))]))]
         for i in range(size):
             passcode = randint(int('9' * (difficulty - 2)), int('9' * difficulty))
             globalHashes.append(keccak(encode(['uint', 'bytes32'], [passcode, localHashes[i]])))
             if i < size - 1:
                 localHashes.append(keccak(encode(['uint'], [passcode])))
-        return localHashes[0], globalHashes, passcode
-
-def main():
-    broker = BrokerFactory.getInstance()
-    requestor = TS3000Requestor(broker, Accounts.getAccount(), "text_file")
+        return localHashes[0], globalHashes, keccak(encode(['uint'], [passcode]))
+    
+    def getInitialRequestID(self):
+        return self.client.tx.events["requestCreated"]["requestID"]

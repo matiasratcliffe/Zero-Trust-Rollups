@@ -5,7 +5,8 @@ from scripts.classes.utils.logger import Logger
 
 @Logger.LogClassMethods()
 class BrokerFactory:
-    ACCEPTANCE_STAKE = 1e14
+    ACCEPTANCE_STAKE = 1e15  # 2 dollar aprox
+    ACCEPTANCE_GRACE_PERIOD = 5
 
     def getInstance():
         if "brokerContractAddress" in config["networks"][network.show_active()]:
@@ -20,6 +21,7 @@ class BrokerFactory:
             account = Accounts.getAccount()
         ExecutionBroker.deploy(
             BrokerFactory.ACCEPTANCE_STAKE,
+            BrokerFactory.ACCEPTANCE_GRACE_PERIOD,
             {"from": account},
             publish_source=config["networks"][network.show_active()]["verify"]
         )

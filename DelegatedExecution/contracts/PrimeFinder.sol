@@ -61,7 +61,7 @@ contract PrimeFinder is BaseClient {
         else { revert("Invalid function ID"); }
     }
 
-    function processResult(bytes calldata result) external onlyBroker override {
+    function processResult(bytes calldata result) external override onlyBroker {
         require(address(this).balance >= 10000 gwei, "Insufficient funds");
         uint number = abi.decode(result, (uint));
         ClientInput memory input = ClientInput({
@@ -73,7 +73,7 @@ contract PrimeFinder is BaseClient {
         if (abi.decode(_isPrime(abi.encode(TwoInput({number: number}))), (bool))) {
             PRIMES.push(number);
         }
-        return;
+        return; //TODO ??????
         for (uint8 i = 0; i < PRIMES.length; i++) {
             if (number % PRIMES[i] == 0) {
                 return;
