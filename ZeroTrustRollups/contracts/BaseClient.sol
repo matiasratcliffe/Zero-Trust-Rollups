@@ -51,4 +51,10 @@ abstract contract BaseClient is Ownable {
         return success;
     }
 
+    function submitResult(uint requestID, bytes calldata result) public {
+        //TODO Mantener una coleccion de requestIDs propios, y check que el requestID este en esa coleccion, y que no este ya resuelto
+        //TODO despues, check que msg sender sea el mismo que esta en acceptance de ese request a traves del broker.
+        //TODO hacer delegate call al broker 
+    }
+
 }

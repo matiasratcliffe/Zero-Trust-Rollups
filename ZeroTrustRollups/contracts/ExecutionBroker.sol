@@ -114,7 +114,7 @@ contract ExecutionBroker is Transferable {
         _internalTransferFunds((ACCEPTANCE_STAKE*5)/100, address(requests[requestID].client));
     }
 
-    function submitResult(uint requestID, bytes calldata result) public returns (bool) {
+    function submitResult(uint requestID, bytes calldata result) public returns (bool) {  //TODO onlyClient? check que el address de msg sender (a traves de delegate call) sea el mismo que el del client del requestID 
         // para evitar que le roben el resultado, puede subirlo encriptado y posteriormente subir la clave de decrypt, NAAAA, no es eficiente
         // pero aca caigo en el mismo dilema, tengo que esperar que pase la clave decrypt y tengo que poner un timer para que no ponga cualquier cosa y se vaya, aunque supongo que no lo quiere hacer porque quiere recuperar la insurance. Entonces capaz saco el tiempo de acceptance time window, y confiar que el tipo va a cumplir porque quiere cobrar, aunque capaz se cuelga y no lo puede resolver, entonces capaz es mejor que se haga con encriptacion? no pero eso no me sirve porque desencriptar es costoso. Mejor le pongo una opcion al tipo para cancelar la aceptacion, y se come el gas pero recupera la prima
         require(requests[requestID].executor != address(0x0), "You need to accept the request first");
