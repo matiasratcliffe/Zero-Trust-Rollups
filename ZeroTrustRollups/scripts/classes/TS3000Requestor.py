@@ -6,8 +6,6 @@ from eth_utils import keccak
 from eth_abi import encode
 from random import randint
 from brownie import TS3000
-from scripts.classes.utils.contractProvider import BrokerFactory
-from scripts.classes.utils.accountsManager import Accounts
 from scripts.classes.utils.logger import Logger
 
 

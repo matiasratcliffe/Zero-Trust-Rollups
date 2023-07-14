@@ -27,11 +27,13 @@ class TestAPIs:
         apiProvider.registerAPI(Accounts.addLocalAccount(), apiIdentifier)
 
         reqID = apiConsumer.createRequest([apiIdentifier], funds=1e14)
-        apiOracle._acceptRequest(reqID)
         apiWrong = MockAPI(Accounts.addLocalAccount(), "WRONG", "{bytes response; bytes signature;}")
         apiRight = MockAPI(Accounts.getFromIndex(10), "MOCK", "{bytes response; bytes signature;}")
-        assert False
-        apiOracle.broker.submitResult(reqID, apiWrong.getSignedResponse(), {"from": apiOracle.account})
-        apiOracle.broker.submitResult(reqID, apiRight.getSignedResponse(), {"from": apiOracle.account})
+        apiOracle._acceptRequest(reqID)
+        assert apiOracle._submitResult(reqID, apiWrong.getSignedResponse()) == False
+        apiOracle._acceptRequest(reqID)
+        assert apiOracle._submitResult(reqID, apiRight.getSignedResponse()) == True
+
+    def notest2(self):
         #apiOracle._resolveRequest(reqID)
-        
+        pass    

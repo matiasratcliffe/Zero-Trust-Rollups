@@ -9,16 +9,13 @@ import "./Ownable.sol";
 abstract contract BaseClient is Ownable {
 
     ExecutionBroker public brokerContract;
+    mapping(uint => bool) activeRequestIDs;
 
     event requestSubmitted(uint requestID);
+    event resultPostProcessed(uint requestID, bool success);
 
-    modifier onlyBroker() {
-        require(msg.sender == address(brokerContract), "Can only be called by the registered broker contract");
-        _;
-    }
-    // TODO FLOOOOOOOOOOOOOOOOOORRRRRR DE VULNERABILIDADDDD, CUALQUIER POST PROCESS PUEDE LLAMAR A CUALQUIER ONLYBROKER DE CUALQUIER OOOTRO CONTRATO, Y AHORA TAMBIEN A LOS SUBMITS, QUIZAS SE SOLUCIONA HACIENDO TODAS LAS INTERACCIONES A TRAVES DE EL CONTRATO CLIENTE? Otro limite es el postprocess? pero no, porque el post process lo pone el atacante en este caso. Hay alguna manera de contar la cantidad de internal calls?
-    modifier onlyOwnerOrBroker() {
-        require(msg.sender == address(brokerContract) || isOwner(), "Function accessible only by the owner or broker");
+    modifier onlyClient() {
+        require(msg.sender == address(this), "Function accessible only by the contract itself");
         _;
     }
 
@@ -29,13 +26,23 @@ abstract contract BaseClient is Ownable {
     function checkResult(bytes calldata inputData, bytes calldata resultData) external virtual view returns (bool);
     function getInputDataStructure() external virtual pure returns (string memory);
     function getResultDataStructure() external virtual returns (string memory);
-    function processResult(bytes calldata resultData) external virtual onlyBroker {}
+    function processResult(bytes calldata resultData) public virtual onlyClient {}
 
-    function submitRequest(uint payment, bytes memory input, uint postProcessingGas) public onlyOwnerOrBroker payable returns (uint) {
-        require(payment <= msg.value + address(this).balance, "Insufficient funds");
+    event asd(uint balance);
+    function myfunc() public payable {
+        emit asd(address(this).balance);
+    }
+
+    function submitRequest(uint payment, bytes memory input, uint postProcessingGas) public onlyOwner payable returns (uint) {
+        return _submitRequest(payment, input, postProcessingGas);
+    }
+
+    function _submitRequest(uint payment, bytes memory input, uint postProcessingGas) internal returns (uint) {
+        require(payment <= address(this).balance, "Insufficient funds");
         uint requestID = brokerContract.submitRequest{value: payment}(input, postProcessingGas);
         emit requestSubmitted(requestID);
-        return requestID;
+        activeRequestIDs[requestID] = true;
+        return requestID;    
     }
 
     function cancelRequest(uint requestID) external onlyOwner {
@@ -51,10 +58,21 @@ abstract contract BaseClient is Ownable {
         return success;
     }
 
-    function submitResult(uint requestID, bytes calldata result) public {
-        //TODO Mantener una coleccion de requestIDs propios, y check que el requestID este en esa coleccion, y que no este ya resuelto
-        //TODO despues, check que msg sender sea el mismo que esta en acceptance de ese request a traves del broker.
-        //TODO hacer delegate call al broker 
+    function submitResult(uint requestID, bytes calldata result) external returns (bool) {
+        require(activeRequestIDs[requestID] == true, "This ID does not belong to an active request within this client");
+        Request memory request = brokerContract.getRequest(requestID);
+        require(request.executor != address(0x0), "You need to accept the request first");
+        require(request.closed == false, "The request is already closed");
+        require(request.executor == msg.sender, "Someone else has accepted the Request");
+        
+        bool success = brokerContract.submitResult(requestID, result);
+        if (success) {
+            activeRequestIDs[requestID] = false;
+            bytes memory data = abi.encodeWithSelector(request.client.processResult.selector, result);
+            (bool callSuccess, ) = address(this).call{gas: request.postProcessingGas}(data);  // la hago low level porque quiero que la funcion siga aunque falle esto. podria usar un try catch pero paja
+            emit resultPostProcessed(requestID, callSuccess);
+        }
+        return success;
     }
 
 }

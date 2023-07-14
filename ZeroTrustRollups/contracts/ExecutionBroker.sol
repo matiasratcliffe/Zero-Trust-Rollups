@@ -8,7 +8,7 @@ import "./BaseClient.sol";
 
 struct Request {
     uint id;  // Index, for unicity when raw comparing
-    bytes input; //TODO ver tema inputs y logic reference?
+    bytes input;
     uint payment; // In Wei; deberia tener en cuenta el computo y el gas de las operaciones de submit y claim
     uint postProcessingGas;
     BaseClient client;
@@ -33,7 +33,6 @@ contract ExecutionBroker is Transferable {
     event acceptanceCancelled(uint requestID, address acceptor, bool refundSuccess);
 
     event requestCompleted(uint requestID, bool transferSuccess);
-    event resultPostProcessed(uint requestID, bool success);
     event requestReOpened(uint requestID, uint payment, bool transferSuccess);
 
     constructor(uint acceptanceStake, uint acceptanceGracePeriod) {
@@ -49,6 +48,10 @@ contract ExecutionBroker is Transferable {
 
     function getRequests() public view returns (Request[] memory) {
         return requests;
+    }
+
+    function getRequest(uint requestID) public view returns (Request memory) {
+        return requests[requestID];
     }
 
     // Restricted interaction functions
@@ -114,23 +117,16 @@ contract ExecutionBroker is Transferable {
         _internalTransferFunds((ACCEPTANCE_STAKE*5)/100, address(requests[requestID].client));
     }
 
-    function submitResult(uint requestID, bytes calldata result) public returns (bool) {  //TODO onlyClient? check que el address de msg sender (a traves de delegate call) sea el mismo que el del client del requestID 
+    function submitResult(uint requestID, bytes calldata result) external returns (bool) {
         // para evitar que le roben el resultado, puede subirlo encriptado y posteriormente subir la clave de decrypt, NAAAA, no es eficiente
         // pero aca caigo en el mismo dilema, tengo que esperar que pase la clave decrypt y tengo que poner un timer para que no ponga cualquier cosa y se vaya, aunque supongo que no lo quiere hacer porque quiere recuperar la insurance. Entonces capaz saco el tiempo de acceptance time window, y confiar que el tipo va a cumplir porque quiere cobrar, aunque capaz se cuelga y no lo puede resolver, entonces capaz es mejor que se haga con encriptacion? no pero eso no me sirve porque desencriptar es costoso. Mejor le pongo una opcion al tipo para cancelar la aceptacion, y se come el gas pero recupera la prima
-        require(requests[requestID].executor != address(0x0), "You need to accept the request first");
-        require(requests[requestID].closed == false, "The request is already closed");
-        require(requests[requestID].executor == msg.sender, "Someone else has accepted the Request");
+        require(msg.sender == address(requests[requestID].client), "You can only submit results through the client");
         if (requests[requestID].client.checkResult(requests[requestID].input, result)) {
             requests[requestID].result = result;
             requests[requestID].closed = true;
             uint payAmount = requests[requestID].payment + ACCEPTANCE_STAKE;
             bool transferSuccess = _internalTransferFunds(payAmount, msg.sender);
             emit requestCompleted(requestID, transferSuccess);
-
-            bytes memory data = abi.encodeWithSelector(requests[requestID].client.processResult.selector, requests[requestID].result);
-            (bool callSuccess, ) = address(requests[requestID].client).call{gas: requests[requestID].postProcessingGas}(data);  // el delegate para que me aparezca el sender como el broker. cuidado si esto no me hace una vulnerabilidad, puedo vaciar fondos desde client? no deberia pasar nada, ni el broker ni el client puede extraer fondos
-            emit resultPostProcessed(requestID, callSuccess); //TODO ver si no le mando suficiente gas para el postprocessing, si me ejecuta igual o se cancela entero, HOPEFULLY SE CANCELA ENTEROOO
-
             return true;
         } else {
             requests[requestID].executor = address(0x0);

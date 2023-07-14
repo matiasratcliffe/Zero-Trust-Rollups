@@ -22,4 +22,6 @@ class TS3000Miner:
         return encode(["("+",".join(re.findall(memberRegex, TS3000Contract.getResultDataStructure()))+")"], [(fragmentIndex, passcode)])
 
     def submitFragmentResult(self, requestID, result):
-        return self.broker.submitResult(requestID, result, {"from": self.account})
+        #TODO ahora con el cambio de submitear resultados a traves del client quizas tenga que hacer un low level cal codificando el selector de la funcion. Aunque quizas eso se mas para DelegatedExecution, porque en ZTR cada ejecutor es custom; TODO poner eso en la tesis como desventaja, que cada ejecutor es custom. Also hintear a la idea de que los custom executors pueden escuchar los eventos del cliente mas que los del broker
+        TS3000Contract = TS3000.at(self.broker.requests(requestID).dict()["client"])
+        return TS3000Contract.submitResult(requestID, result, {"from": self.account})

@@ -19,10 +19,11 @@ class TestTS3000:
         pass
 
     def test_ts3000(self):
+        fileName = "text_file"
         broker = BrokerFactory.getInstance()
-        requestor = TS3000Requestor(broker, Accounts.getAccount(), "text_file", numberOfKeyFragments=5, difficulty=5)
+        requestor = TS3000Requestor(broker, Accounts.getFromIndex(0), fileName, numberOfKeyFragments=5, difficulty=5)
         reqID = requestor.getInitialRequestID()
-        miner = TS3000Miner(broker, Accounts.getAccount())
+        miner = TS3000Miner(broker, Accounts.getFromIndex(1))
 
         while True:
             broker.acceptRequest(reqID, {"from": miner.account, "value": BrokerFactory.ACCEPTANCE_STAKE})
@@ -32,4 +33,10 @@ class TestTS3000:
                 break
             reqID = tx.events["requestCreated"]["requestID"]
         finalKey = bytes(requestor.client.finalKey())
-        AESCipher(finalKey).decryptFile("text_file.encrypted")
+
+        with open(f"{fileName}.decrypted", "w") as f1:
+            decryptedText = AESCipher(finalKey).decryptFile("text_file.encrypted")
+            f1.write(decryptedText)
+            with open(fileName, "r") as f2:
+                originalText = f2.read()
+                assert originalText == decryptedText

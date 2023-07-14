@@ -47,4 +47,9 @@ class APIOracle:
         identifier = decode(["("+",".join(re.findall(memberRegex, apiConsumer.getInputDataStructure()))+")"], request["input"])[0][0]
         address = self.apiProvider.RegisteredAPIs(identifier)
         api = MockAPI(Accounts.getFromKey(address), identifier, apiConsumer.getResultDataStructure())
-        self.broker.submitResult(requestID, api.getSignedResponse(), {"from": self.account})
+        self._submitResult(requestID, api.getSignedResponse())
+    
+    def _submitResult(self, requestID, signedResponse):
+        request = self.broker.requests(requestID).dict()
+        client = APIConsumerFactory.at(address=request["client"])
+        return client.submitResult(requestID, signedResponse, {"from": self.account}).return_value

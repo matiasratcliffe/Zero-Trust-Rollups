@@ -35,9 +35,9 @@ contract TS3000 is BaseClient {
     bool public postProcessingEnabled;
     
     constructor(address brokerAddress, string memory _encryptedDataRefference, bytes32 firstLocalHash, bytes32[] memory globalHashes) BaseClient(brokerAddress) payable {
-        postProcessingGas = 400000;  //TODO calculate postprocgas //// con 300000 funciona, con 200000 no
+        postProcessingGas = 400000;  // calculate postprocgas //// con 300000 funciona, con 200000 no
         postProcessingEnabled = true;
-        rewardPerFragment = msg.value / globalHashes.length; //TODO aca tener en cuenta el postprocgas
+        rewardPerFragment = msg.value / globalHashes.length; //aca tener en cuenta el postprocgas
         encryptedDataRefference = _encryptedDataRefference;
         for (uint i = 0; i < globalHashes.length; i++) {
             KeyFragment memory fragment; 
@@ -52,7 +52,7 @@ contract TS3000 is BaseClient {
             globalHash: globalHashes[0],
             localHash: firstLocalHash
         });
-        submitRequest(rewardPerFragment, abi.encode(input), postProcessingGas);
+        _submitRequest(rewardPerFragment, abi.encode(input), postProcessingGas);
     }
 
     function checkResult(bytes calldata inputData, bytes calldata resultData) external override pure returns (bool) {
@@ -61,7 +61,8 @@ contract TS3000 is BaseClient {
         return (input.fragmentIndex == result.fragmentIndex) && (keccak256(abi.encode(result.passcode, input.localHash)) == input.globalHash);
     }
 
-    function processResult(bytes calldata resultData) external override onlyBroker {
+    function processResult(bytes calldata resultData) public override onlyClient { // decidir si quiero mantener el parametro de post processing gas, o si lo dejo limitless a criterio del ejecutor. LO MANTENGO POR QUE ESTA SETEADO EL LIMITE DESDE BASE CLIENT FUERA DEL CONTROL DE CLIENTES MALICIOSOS
+        //La hago public y only client en vez de internal porque necesito el cambio de msg.sender y necesito limitar el gas
         Result memory result = abi.decode(resultData, (Result));
         keyFragments[result.fragmentIndex].passcode = result.passcode;
         if (result.fragmentIndex == keyFragments.length - 1) {
@@ -75,7 +76,7 @@ contract TS3000 is BaseClient {
                     globalHash: keyFragments[result.fragmentIndex + 1].globalHash,
                     localHash: keyFragments[result.fragmentIndex + 1].localHash
                 });
-                submitRequest(rewardPerFragment, abi.encode(input), postProcessingGas);
+                _submitRequest(rewardPerFragment, abi.encode(input), postProcessingGas);
             }
         }
     }

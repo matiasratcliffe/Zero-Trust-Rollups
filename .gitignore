@@ -8,3 +8,4 @@
 **/.pytest_cache
 **/text_file
 **/text_file.encrypted
+**/text_file.decrypted

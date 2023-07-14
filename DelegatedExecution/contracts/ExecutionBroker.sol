@@ -204,7 +204,7 @@ contract ExecutionBroker is Transferable {
         bool transferSuccess = _internalTransferFunds(payAmount, requests[requestID].submission.issuer);
         
         bytes memory data = abi.encodeWithSelector(requests[requestID].client.processResult.selector, requests[requestID].submission.result);
-        (bool callSuccess, ) = address(requests[requestID].client).call{gas: requests[requestID].postProcessingGas}(data);  // el delegate para que me aparezca el sender como el broker. cuidado si esto no me hace una vulnerabilidad, puedo vaciar fondos desde client? no deberia pasar nada, ni el broker ni el client puede extraer fondos
+        (bool callSuccess, ) = address(requests[requestID].client).call{gas: requests[requestID].postProcessingGas}(data);
         emit resultPostProcessed(requestID, callSuccess);
 
         return transferSuccess;
