@@ -145,7 +145,7 @@ contract ExecutionBroker is Transferable {
         emit resultSubmitted(requestID, result, msg.sender);
     }
 
-    function challengeSubmission(uint requestID) public returns (bool) {
+    function challengeSubmission(uint requestID) public returns (bool) {  //TODO todas las funciones que llamen a solidify, se tienen que hacer a traves del cliente, porque corren postproc
         require(requests[requestID].submission.issuer != address(0x0), "There are no submissions for the challenged request");
         require(!requests[requestID].submission.solidified, "The challenged submission has already solidified");
 
@@ -172,7 +172,7 @@ contract ExecutionBroker is Transferable {
         }
     }
 
-    function claimPayment(uint requestID) public returns (bool) {
+    function claimPayment(uint requestID) public returns (bool) {  //TODO todas las funciones que llamen a solidify, se tienen que hacer a traves del cliente, porque corren postproc
         require(requests[requestID].submission.issuer != address(0x0), "There are no submissions for the provided request");
         require(requests[requestID].submission.issuer == msg.sender, "This payment does not belong to you");
         require(!requests[requestID].submission.solidified, "The provided request has already solidified");
@@ -195,6 +195,10 @@ contract ExecutionBroker is Transferable {
         return requests;
     }
 
+    function getRequest(uint requestID) public view returns (Request memory) {
+        return requests[requestID];
+    }
+
     // Private functions
     function _solidify(uint requestID) private returns (bool) {
         // first solidify, then pay, for reentrancy issues
@@ -202,11 +206,6 @@ contract ExecutionBroker is Transferable {
         emit requestSolidified(requestID);
         uint payAmount = requests[requestID].payment + requests[requestID].challengeInsurance;
         bool transferSuccess = _internalTransferFunds(payAmount, requests[requestID].submission.issuer);
-        
-        bytes memory data = abi.encodeWithSelector(requests[requestID].client.processResult.selector, requests[requestID].submission.result);
-        (bool callSuccess, ) = address(requests[requestID].client).call{gas: requests[requestID].postProcessingGas}(data);
-        emit resultPostProcessed(requestID, callSuccess);
-
         return transferSuccess;
     }
 

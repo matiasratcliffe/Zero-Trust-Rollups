@@ -28,11 +28,6 @@ abstract contract BaseClient is Ownable {
     function getResultDataStructure() external virtual returns (string memory);
     function processResult(bytes calldata resultData) public virtual onlyClient {}
 
-    event asd(uint balance);
-    function myfunc() public payable {
-        emit asd(address(this).balance);
-    }
-
     function submitRequest(uint payment, bytes memory input, uint postProcessingGas) public onlyOwner payable returns (uint) {
         return _submitRequest(payment, input, postProcessingGas);
     }

@@ -13,19 +13,12 @@ abstract contract BaseClient is Ownable {
         bytes data;
     }
 
-    //TODO hacer una funcion que reciba dinero y emita un evento
-
     ExecutionBroker public brokerContract;
 
     event requestSubmitted(uint requestID);
-
-    modifier onlyBroker() {
-        require(msg.sender == address(brokerContract), "Can only be called by the registered broker contract");
-        _;
-    }
     
-    modifier onlyOwnerOrBroker() {
-        require(msg.sender == address(brokerContract) || isOwner(), "Function accessible only by the owner or broker");
+    modifier onlyClient() {
+        require(msg.sender == address(this), "Function accessible only by the contract itself");
         _;
     }
 
@@ -35,11 +28,15 @@ abstract contract BaseClient is Ownable {
     }
 
     function clientLogic(ClientInput calldata input) external virtual pure returns (bytes memory);
-    function processResult(bytes calldata result) external virtual onlyBroker {}
+    function processResult(bytes calldata result) public virtual onlyClient {}
     function getInputStructure(uint functionID) external virtual pure returns (string memory);
 
-    function submitRequest(uint payment, ClientInput calldata input, uint postProcessingGas, uint requestedInsurance, uint claimDelay) external onlyOwnerOrBroker payable returns (uint) {
-        require(payment <= msg.value + address(this).balance, "Insufficient funds");
+    function submitRequest(uint payment, ClientInput calldata input, uint postProcessingGas, uint requestedInsurance, uint claimDelay) external payable onlyOwner returns (uint) {
+        return _submitRequest(payment, input, postProcessingGas, requestedInsurance, claimDelay);
+    }
+
+    function _submitRequest(uint payment, ClientInput memory input, uint postProcessingGas, uint requestedInsurance, uint claimDelay) internal returns (uint) {
+        require(payment <= address(this).balance, "Insufficient funds");
         uint requestID = brokerContract.submitRequest{value: payment}(input, postProcessingGas, requestedInsurance, claimDelay);
         emit requestSubmitted(requestID);
         return requestID;
@@ -56,6 +53,23 @@ abstract contract BaseClient is Ownable {
         address payable payee = payable(msg.sender);
         (bool success, ) = payee.call{value: value}("");
         return success;
+    }
+
+    function challengeSubmission(uint requestID) external returns (bool) {
+        Request memory request = brokerContract.getRequest(requestID);
+        bool success = brokerContract.challengeSubmission(requestID);
+        
+        /* TODO esto lo ejecuto regardless
+        bytes memory data = abi.encodeWithSelector(requests[requestID].client.processResult.selector, requests[requestID].submission.result);
+        (bool callSuccess, ) = address(requests[requestID].client).call{gas: requests[requestID].postProcessingGas}(data);
+        emit resultPostProcessed(requestID, callSuccess);*/
+        
+        return success;
+    }
+
+    function claimPayment(uint requestID) external returns (bool) {
+        Request memory request = brokerContract.getRequest(requestID);
+        //bool success = brokerContract.claimPayment() //TODO aca podria usar un delegate call, porque el cliente si confia en el broker pero no viceversa. O podria mandar el msg sender original como otro parametro
     }
 
 }
