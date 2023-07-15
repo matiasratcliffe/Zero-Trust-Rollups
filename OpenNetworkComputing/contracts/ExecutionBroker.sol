@@ -16,25 +16,23 @@ struct Executor {
 }
 
 enum CategoryIdentifiers {
-    STANDARD
+    LOWEST,
+    STANDARD,
+    HIGHEST
 }
 
 struct ExecutorCategory {
-    Executor[5] activeExecutors; //TODO inicializarlas en el constructor
+    Executor[] activeExecutors; //TODO inicializarlas en el constructor
+    uint24 amount
 }
 
 struct ExecutorsCollection {
-    ExecutorCategory[] executorCategories;
+    ExecutorCategory[3] executorCategories;
     Executor[] activeExecutors;  // Not in a mapping because I need to be able to index them by uint to pick random TODO hacer una matriz de catergorias? un arreglo de arreglos
     mapping (address => uint) activeIndexOf;
     mapping (address => Executor) inactiveExecutors;
     mapping (address => Executor) busyExecutors;
-    uint amountOfActiveExecutors;
-}
-
-struct Criteria {
-    uint16 maxInaccuracyPercentage;
-    uint16 maxTimesPunished;
+    uint24 amountOfActiveExecutors;
 }
 
 struct Request {
@@ -42,7 +40,6 @@ struct Request {
     address clientAddress;
     uint executionPowerPrice;
     uint executionPowerPaidFor;
-    Criteria executorCriteria;
     string inputState;  // Tambien aca esta el point of insertion
     string codeReference;  // Tambien aca esta la data sobre la version y compilador y otras specs que pueden afectar el resultado
     // TODO ver tema entorno de ejecucion restringido
@@ -110,16 +107,11 @@ contract ExecutionBroker is Transferable {
             inaccurateSolvings: 0,
             timesPunished: 0
         });
-        Criteria memory criteria = Criteria({
-            maxInaccuracyPercentage: 0,
-            maxTimesPunished: 0
-        });
         Request memory request = Request({
             id: 0,
             clientAddress: address(0x0),
             executionPowerPrice: 0,
             executionPowerPaidFor: 0,
-            executorCriteria: criteria,
             inputState: '',
             codeReference: '',
             result: Result({
@@ -131,6 +123,12 @@ contract ExecutionBroker is Transferable {
         });
         executorsCollection.activeExecutors.push(executor);  // This is to reserve the index 0, because when you delete an entry in the address => uint map, it gets set to 0
         requests.push(request);
+    }
+
+    // Pure functions
+
+    function getExecutorCategory(Executor memory executor) public pure returns (CategoryIdentifiers) {
+
     }
 
     // Public views
@@ -199,9 +197,9 @@ contract ExecutionBroker is Transferable {
         return executorsCollection.activeExecutors[position];
     }
 
-    function getAmountOfActiveExecutorsWithCriteria(Criteria memory criteria) public view returns (uint16) {
-        uint16 count = 0;
-        for (uint16 i = 0; i < executorsCollection.activeExecutors.length; i++) {
+    function getAmountOfActiveExecutorsWithCriteria(Criteria memory criteria) public view returns (uint24) {
+        uint24 count = 0;
+        for (uint24 i = 0; i < executorsCollection.activeExecutors.length; i++) {
             if (executorsCollection.activeExecutors[i].executorAddress != address(0x0) &&
                 executorsCollection.activeExecutors[i].timesPunished <= criteria.maxTimesPunished &&
                 (executorsCollection.activeExecutors[i].inaccurateSolvings * 1000) / (executorsCollection.activeExecutors[i].inaccurateSolvings + executorsCollection.activeExecutors[i].accurateSolvings + 1) <= criteria.maxInaccuracyPercentage) {
@@ -269,7 +267,7 @@ contract ExecutionBroker is Transferable {
         delete executorsCollection.inactiveExecutors[msg.sender];
     }
 
-    function submitRequest(string memory inputState, string memory codeReference, uint amountOfExecutors, uint executionPowerPrice, uint executionPowerPaidFor, uint256 randomSeed, Criteria memory criteria) public payable returns (uint) {
+    function submitRequest(string memory inputState, string memory codeReference, uint amountOfExecutors, uint executionPowerPrice, uint executionPowerPaidFor, uint256 randomSeed, CategoryIdentifiers executorCategory) public payable returns (uint) {
         require(amountOfExecutors % 2 == 1, "You must choose an odd amount of executors");
         require(amountOfExecutors <= MAXIMUM_EXECUTORS_PER_REQUEST, "You exceeded the maximum number of allowed executors per request");
         require(executionPowerPaidFor <= MAXIMUM_EXECUTION_POWER, "You exceeded the maximum allowed execution power per request");
@@ -277,7 +275,7 @@ contract ExecutionBroker is Transferable {
         require(executionPowerPrice >= getReferenceExecutionPowerPrice(), "The offered execution power price must be greater or equal than the networks reference price"); //TODO capaz cambiarlo a que no pueda ser muy distinto? onda que la division de uno por otro sea igual a 1? ver como redondea solidity en division de enteros
         require(msg.value == executionPowerPrice * executionPowerPaidFor * amountOfExecutors, "The value sent in the request must be the execution power you intend to pay for multiplied by the price and the amount of executors");
         
-        return _submitRequest(msg.sender, executionPowerPrice, executionPowerPaidFor, inputState, codeReference, amountOfExecutors, randomSeed, criteria);
+        return _submitRequest(msg.sender, executionPowerPrice, executionPowerPaidFor, inputState, codeReference, amountOfExecutors, randomSeed, executorCategory);
     }
 
     function rotateExecutors(uint requestID, uint256 randomSeed) public returns (bool transferSuccess) {
@@ -295,8 +293,8 @@ contract ExecutionBroker is Transferable {
             return false;
         }
         //TODO check all uint types, google if they are cheaper, include in thesis
-        uint16 amountOfAvailableExecutorsFittingCriteria = getAmountOfActiveExecutorsWithCriteria(requests[requestID].executorCriteria);
-        uint16 effectiveAmountOfPunishedExecutors = amountOfAvailableExecutorsFittingCriteria > amountOfPunishedExecutors ? amountOfPunishedExecutors : amountOfAvailableExecutorsFittingCriteria;
+        uint24 amountOfAvailableExecutorsFittingCriteria = getAmountOfActiveExecutorsWithCriteria(requests[requestID].executorCriteria);
+        uint24 effectiveAmountOfPunishedExecutors = amountOfAvailableExecutorsFittingCriteria > amountOfPunishedExecutors ? amountOfPunishedExecutors : amountOfAvailableExecutorsFittingCriteria;
         address[] memory punishedExecutorsAddresses = new address[](effectiveAmountOfPunishedExecutors);
         for (uint8 i = 0; i < effectiveAmountOfPunishedExecutors; i++) {  // Si la cantidad efectiva es menor a la cantidad total, solo roto los primeros
             uint taskIndex = punishedExecutorsTaskIDs[i];
@@ -455,13 +453,16 @@ contract ExecutionBroker is Transferable {
     //TODO puedo hacer que el precio del executionpower sea inversamente proporsional a la cantidad de ejecutores activos, uso tx.gasprice? YA CONFIRME QUE SI EXISTE
     // Private Functions
 
-    function _submitRequest(address clientAddress, uint executionPowerPrice, uint executionPowerPaidFor, string memory inputState, string memory codeReference, uint amountOfExecutors, uint256 randomSeed, Criteria memory criteria) private returns (uint) {
+    function _reinstateExecutor(Executor memory executor) private { //TODO me parece que siempre termino usando activate executor, en ese caso, modificar el comportamiento de esa funcion y borrar esta
+        //TODO aca meterlo en la categoria que corresponda 
+    }
+
+    function _submitRequest(address clientAddress, uint executionPowerPrice, uint executionPowerPaidFor, string memory inputState, string memory codeReference, uint amountOfExecutors, uint256 randomSeed, CategoryIdentifiers executorCategory) private returns (uint) {
         Request memory request = Request({
             id: requests.length,
             clientAddress: clientAddress,
             executionPowerPrice: executionPowerPrice,
             executionPowerPaidFor: executionPowerPaidFor,
-            executorCriteria: criteria,
             inputState: inputState,
             codeReference: codeReference,
             result: Result({
@@ -610,7 +611,8 @@ contract ExecutionBroker is Transferable {
 
     function _activateExecutor(Executor memory executor) private {
         require(executorsCollection.activeIndexOf[executor.executorAddress] == 0, "This address is already registered as an active executor");
-        uint16 executorIndex;
+        CategoryIdentifiers category = getExecutorCategory(executor); //TODO usar esto
+        uint24 executorIndex;
         for (executorIndex = 1; executorIndex < executorsCollection.activeExecutors.length; executorIndex++) {
             if (executorsCollection.activeExecutors[executorIndex].executorAddress == address(0x0)) {
                 break;
