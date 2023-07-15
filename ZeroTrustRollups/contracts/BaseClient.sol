@@ -64,7 +64,7 @@ abstract contract BaseClient is Ownable {
         if (success) {
             activeRequestIDs[requestID] = false;
             bytes memory data = abi.encodeWithSelector(request.client.processResult.selector, result);
-            (bool callSuccess, ) = address(this).call{gas: request.postProcessingGas}(data);  // la hago low level porque quiero que la funcion siga aunque falle esto. podria usar un try catch pero paja
+            (bool callSuccess, ) = address(request.client).call{gas: request.postProcessingGas}(data);  // la hago low level porque quiero que la funcion siga aunque falle esto. podria usar un try catch pero paja
             emit resultPostProcessed(requestID, callSuccess);
         }
         return success;

@@ -14,9 +14,11 @@ abstract contract BaseClient is Ownable {
     }
 
     ExecutionBroker public brokerContract;
+    mapping(uint => bool) activeRequestIDs;
 
     event requestSubmitted(uint requestID);
-    
+    event resultPostProcessed(uint requestID, bool success);
+
     modifier onlyClient() {
         require(msg.sender == address(this), "Function accessible only by the contract itself");
         _;
@@ -39,6 +41,7 @@ abstract contract BaseClient is Ownable {
         require(payment <= address(this).balance, "Insufficient funds");
         uint requestID = brokerContract.submitRequest{value: payment}(input, postProcessingGas, requestedInsurance, claimDelay);
         emit requestSubmitted(requestID);
+        activeRequestIDs[requestID] = true;
         return requestID;
     }
 
@@ -56,20 +59,36 @@ abstract contract BaseClient is Ownable {
     }
 
     function challengeSubmission(uint requestID) external returns (bool) {
+        require(activeRequestIDs[requestID] == true, "This ID does not belong to an active request within this client");
         Request memory request = brokerContract.getRequest(requestID);
-        bool success = brokerContract.challengeSubmission(requestID);
+        require(request.submission.issuer != address(0x0), "There are no submissions for the challenged request");
+        require(!request.submission.solidified, "The challenged submission has already solidified");
         
-        /* TODO esto lo ejecuto regardless
-        bytes memory data = abi.encodeWithSelector(requests[requestID].client.processResult.selector, requests[requestID].submission.result);
-        (bool callSuccess, ) = address(requests[requestID].client).call{gas: requests[requestID].postProcessingGas}(data);
-        emit resultPostProcessed(requestID, callSuccess);*/
+        bool success = brokerContract.challengeSubmission(requestID, msg.sender);
+        
+        bytes memory data = abi.encodeWithSelector(request.client.processResult.selector, request.submission.result);
+        (bool callSuccess, ) = address(request.client).call{gas: request.postProcessingGas}(data);
+        emit resultPostProcessed(requestID, callSuccess);
         
         return success;
     }
 
     function claimPayment(uint requestID) external returns (bool) {
+        require(activeRequestIDs[requestID] == true, "This ID does not belong to an active request within this client");
         Request memory request = brokerContract.getRequest(requestID);
-        //bool success = brokerContract.claimPayment() //TODO aca podria usar un delegate call, porque el cliente si confia en el broker pero no viceversa. O podria mandar el msg sender original como otro parametro
+        require(request.submission.issuer != address(0x0), "There are no submissions for the provided request");
+        require(request.submission.issuer == msg.sender, "This payment does not belong to you");
+        require(!request.submission.solidified, "The provided request has already solidified");
+
+        bool success = brokerContract.claimPayment(requestID);
+        activeRequestIDs[requestID] = false;
+        
+        bytes memory data = abi.encodeWithSelector(request.client.processResult.selector, request.submission.result);
+        (bool callSuccess, ) = address(request.client).call{gas: request.postProcessingGas}(data);
+        emit resultPostProcessed(requestID, callSuccess);
+
+        return success;
     }
 
 }
+//TODO poner en la tesis que esta correccion de vulnerabilidad es por si un cliente hace un delegate call al postproc de otro cliente con la identidad del broker

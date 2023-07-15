@@ -45,7 +45,6 @@ contract ExecutionBroker is Transferable {
     event acceptanceCancelled(uint requestID, address acceptor, bool refundSuccess);
     
     event resultSubmitted(uint requestID, bytes result, address submitter);
-    event resultPostProcessed(uint requestID, bool success);
     event requestSolidified(uint requestID);
     
     event challengeProcessed(uint requestID, bytes result);
@@ -145,25 +144,23 @@ contract ExecutionBroker is Transferable {
         emit resultSubmitted(requestID, result, msg.sender);
     }
 
-    function challengeSubmission(uint requestID) public returns (bool) {  //TODO todas las funciones que llamen a solidify, se tienen que hacer a traves del cliente, porque corren postproc
-        require(requests[requestID].submission.issuer != address(0x0), "There are no submissions for the challenged request");
-        require(!requests[requestID].submission.solidified, "The challenged submission has already solidified");
-
-		bytes memory submittedResult = requests[requestID].submission.result;
+    function challengeSubmission(uint requestID, address challenger) public returns (bool) {
+		require(msg.sender == address(requests[requestID].client), "You can only challenge a submission through the client");
+        bytes memory submittedResult = requests[requestID].submission.result;
         BaseClient.ClientInput memory requestInput = requests[requestID].input;
         bytes memory trueFinalResult = requests[requestID].client.clientLogic(requestInput);
         emit challengeProcessed(requestID, trueFinalResult);
 
         if (keccak256(submittedResult) != keccak256(trueFinalResult)) {
             Submission memory submission = Submission({
-                issuer: msg.sender,
+                issuer: challenger,
                 timestamp: block.timestamp,
                 result: trueFinalResult,
                 solidified: false
             });
             requests[requestID].submission = submission;  // notar que en las requests que se resolvieron por challenge el acceptor es diferente al issuer (a menos que alguien se autochallengee)
             bool transferSuccess = _solidify(requestID);
-            emit challengePayment(requestID, msg.sender, transferSuccess);
+            emit challengePayment(requestID, challenger, transferSuccess);
             return true;  // result was corrected
         } else {  // el original lo hizo bien, solidifico y le pago
             bool transferSuccess = _solidify(requestID);
@@ -172,11 +169,8 @@ contract ExecutionBroker is Transferable {
         }
     }
 
-    function claimPayment(uint requestID) public returns (bool) {  //TODO todas las funciones que llamen a solidify, se tienen que hacer a traves del cliente, porque corren postproc
-        require(requests[requestID].submission.issuer != address(0x0), "There are no submissions for the provided request");
-        require(requests[requestID].submission.issuer == msg.sender, "This payment does not belong to you");
-        require(!requests[requestID].submission.solidified, "The provided request has already solidified");
-        require(requests[requestID].submission.timestamp + requests[requestID].claimDelay <= block.timestamp, "The claim delay hasn't passed yet");
+    function claimPayment(uint requestID) public returns (bool) {
+        require(msg.sender == address(requests[requestID].client), "You can only claim a payment through the client");
         bool transferSuccess = _solidify(requestID);
         return transferSuccess;
     }
