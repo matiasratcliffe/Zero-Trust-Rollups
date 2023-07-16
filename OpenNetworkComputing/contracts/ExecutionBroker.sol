@@ -29,11 +29,9 @@ struct ExecutorCategory {
 
 struct ExecutorsCollection {
     ExecutorCategory[3] executorCategories;
-    //Executor[] activeExecutors;  // Not in a mapping because I need to be able to index them by uint to pick random TODO hacer una matriz de catergorias? un arreglo de arreglos
-    //mapping (address => uint) activeIndexOf;
     mapping (address => Executor) inactiveExecutors;
     mapping (address => Executor) busyExecutors;
-    //uint24 amountOfActiveExecutors;
+    uint24 amountOfActiveExecutors;
 }
 
 struct Request {
@@ -128,9 +126,9 @@ contract ExecutionBroker is Transferable {
             submissionsLocked: false,
             closed: true
         });
-        executorsCollection.executorCategories[CategoryIdentifiers.HIGHEST].activeExecutors.push(executor);  // This is to reserve the index 0, because when you delete an entry in the address => uint map, it gets set to 0
-        executorsCollection.executorCategories[CategoryIdentifiers.STANDARD].activeExecutors.push(executor);
-        executorsCollection.executorCategories[CategoryIdentifiers.LOWEST].activeExecutors.push(executor);
+        executorsCollection.executorCategories[uint8(CategoryIdentifiers.HIGHEST)].activeExecutors.push(executor);  // This is to reserve the index 0, because when you delete an entry in the address => uint map, it gets set to 0
+        executorsCollection.executorCategories[uint8(CategoryIdentifiers.STANDARD)].activeExecutors.push(executor);
+        executorsCollection.executorCategories[uint8(CategoryIdentifiers.LOWEST)].activeExecutors.push(executor);
         requests.push(request);  // This is because executors have an assignedRequestID that when set to 0 is meant to be interpreted as null
     }
 
@@ -160,11 +158,11 @@ contract ExecutionBroker is Transferable {
 
     function getActiveExecutorsList() public view returns (address[3][] memory) {
         address[3][] memory addresses = new address[3][](executorsCollection.amountOfActiveExecutors);
-        uint32 j = 0;
+        uint24 j = 0;
         for (uint8 category = 0; category < 3; category++) {
-            for (uint32 i = 0; i < executorsCollection.executorCategories[category].activeExecutors.length; i++) {
-                if (executorsCollection.executorCategories[category].activeExecutors[i].executorAddress != address(0x0)) {
-                    addresses[category][j] = executorsCollection.executorCategories[category].activeExecutors[i].executorAddress;
+            for (uint24 i = 0; i < executorsCollection.executorCategories[uint8(category)].activeExecutors.length; i++) {
+                if (executorsCollection.executorCategories[uint8(category)].activeExecutors[i].executorAddress != address(0x0)) {
+                    addresses[uint8(category)][j] = executorsCollection.executorCategories[uint8(category)].activeExecutors[i].executorAddress;
                     j++;
                 }
             }
@@ -173,9 +171,19 @@ contract ExecutionBroker is Transferable {
     }
 
     function getAmountOfActiveExecutors() public view returns (uint) {
-        return executorsCollection.executorCategories[CategoryIdentifiers.HIGHEST].amountOfActiveExecutors +
-            executorsCollection.executorCategories[CategoryIdentifiers.STANDARD].amountOfActiveExecutors +
-            executorsCollection.executorCategories[CategoryIdentifiers.LOWEST].amountOfActiveExecutors;
+        return executorsCollection.executorCategories[uint8(CategoryIdentifiers.HIGHEST)].amountOfActiveExecutors +
+            executorsCollection.executorCategories[uint8(CategoryIdentifiers.STANDARD)].amountOfActiveExecutors +
+            executorsCollection.executorCategories[uint8(CategoryIdentifiers.LOWEST)].amountOfActiveExecutors;
+    }
+
+    function getAmountOfActiveExecutorsWithCriteria(CategoryIdentifiers minimumCategory) public view returns (uint24) {
+        uint24 amountOfFittingExecutors = executorsCollection.executorCategories[uint8(CategoryIdentifiers.HIGHEST)].amountOfActiveExecutors;
+        if (minimumCategory == CategoryIdentifiers.STANDARD) {
+            amountOfFittingExecutors += executorsCollection.executorCategories[uint8(CategoryIdentifiers.STANDARD)].amountOfActiveExecutors;
+        } else if (minimumCategory == CategoryIdentifiers.LOWEST) {
+            amountOfFittingExecutors += executorsCollection.executorCategories[uint8(CategoryIdentifiers.STANDARD)].amountOfActiveExecutors + executorsCollection.executorCategories[uint8(CategoryIdentifiers.LOWEST)].amountOfActiveExecutors;
+        }
+        return amountOfFittingExecutors;
     }
 
     function getInactiveExecutorByAddress(address executorAddress) public view returns (Executor memory) {
@@ -186,22 +194,22 @@ contract ExecutionBroker is Transferable {
         return executorsCollection.busyExecutors[executorAddress];
     }
 
-    function getActiveIndexAndCategoryOfExecutorByAddress(address executorAddress) public view returns (uint, CategoryIdentifiers) {
-        if (executorsCollection.executorCategories[CategoryIdentifiers.HIGHEST].activeIndexOf[executorAddress] != 0) {
-            return (executorsCollection.executorCategories[CategoryIdentifiers.HIGHEST].activeIndexOf[executorAddress], CategoryIdentifiers.HIGHEST);
-        } else if (executorsCollection.executorCategories[CategoryIdentifiers.STANDARD].activeIndexOf[executorAddress] != 0) {
-            return (executorsCollection.executorCategories[CategoryIdentifiers.STANDARD].activeIndexOf[executorAddress], CategoryIdentifiers.STANDARD);
-        } else if (executorsCollection.executorCategories[CategoryIdentifiers.LOWEST].activeIndexOf[executorAddress] != 0) {
-            return (executorsCollection.executorCategories[CategoryIdentifiers.LOWEST].activeIndexOf[executorAddress], CategoryIdentifiers.LOWEST);
+    function getIndexAndCategoryOfActiveExecutorByAddress(address executorAddress) public view returns (uint, CategoryIdentifiers) {
+        if (executorsCollection.executorCategories[uint8(CategoryIdentifiers.HIGHEST)].activeIndexOf[executorAddress] != 0) {
+            return (executorsCollection.executorCategories[uint8(CategoryIdentifiers.HIGHEST)].activeIndexOf[executorAddress], CategoryIdentifiers.HIGHEST);
+        } else if (executorsCollection.executorCategories[uint8(CategoryIdentifiers.STANDARD)].activeIndexOf[executorAddress] != 0) {
+            return (executorsCollection.executorCategories[uint8(CategoryIdentifiers.STANDARD)].activeIndexOf[executorAddress], CategoryIdentifiers.STANDARD);
+        } else if (executorsCollection.executorCategories[uint8(CategoryIdentifiers.LOWEST)].activeIndexOf[executorAddress] != 0) {
+            return (executorsCollection.executorCategories[uint8(CategoryIdentifiers.LOWEST)].activeIndexOf[executorAddress], CategoryIdentifiers.LOWEST);
         } else {
             revert("This address does not belong to an active executor");
         }
     }
 
     function getExecutorStateByAddress(address executorAddress) public view returns (ExecutorState executorState) {
-        if (executorsCollection.executorCategories[CategoryIdentifiers.HIGHEST].activeIndexOf[executorAddress] != 0 || 
-            executorsCollection.executorCategories[CategoryIdentifiers.STANDARD].activeIndexOf[executorAddress] != 0 ||
-            executorsCollection.executorCategories[CategoryIdentifiers.LOWEST].activeIndexOf[executorAddress] != 0) {
+        if (executorsCollection.executorCategories[uint8(CategoryIdentifiers.HIGHEST)].activeIndexOf[executorAddress] != 0 || 
+            executorsCollection.executorCategories[uint8(CategoryIdentifiers.STANDARD)].activeIndexOf[executorAddress] != 0 ||
+            executorsCollection.executorCategories[uint8(CategoryIdentifiers.LOWEST)].activeIndexOf[executorAddress] != 0) {
             return ExecutorState.ACTIVE;
         } else if (executorsCollection.inactiveExecutors[executorAddress].executorAddress == executorAddress) {
             return ExecutorState.INACTIVE;
@@ -213,12 +221,12 @@ contract ExecutionBroker is Transferable {
     } 
 
     function getExecutorByAddress(address executorAddress) public view returns (Executor memory executor) {  
-        if (executorsCollection.executorCategories[CategoryIdentifiers.HIGHEST].activeIndexOf[executorAddress] != 0) {
-            return executorsCollection.executorCategories[CategoryIdentifiers.HIGHEST].activeExecutors[executorsCollection.executorCategories[CategoryIdentifiers.HIGHEST].activeIndexOf[executorAddress]];
-        } else if (executorsCollection.executorCategories[CategoryIdentifiers.STANDARD].activeIndexOf[executorAddress] != 0) {
-            return executorsCollection.executorCategories[CategoryIdentifiers.STANDARD].activeExecutors[executorsCollection.executorCategories[CategoryIdentifiers.STANDARD].activeIndexOf[executorAddress]];
-        } else if (executorsCollection.executorCategories[CategoryIdentifiers.LOWEST].activeIndexOf[executorAddress] != 0) {
-            return executorsCollection.executorCategories[CategoryIdentifiers.LOWEST].activeExecutors[executorsCollection.executorCategories[CategoryIdentifiers.LOWEST].activeIndexOf[executorAddress]];
+        if (executorsCollection.executorCategories[uint8(CategoryIdentifiers.HIGHEST)].activeIndexOf[executorAddress] != 0) {
+            return executorsCollection.executorCategories[uint8(CategoryIdentifiers.HIGHEST)].activeExecutors[executorsCollection.executorCategories[uint8(CategoryIdentifiers.HIGHEST)].activeIndexOf[executorAddress]];
+        } else if (executorsCollection.executorCategories[uint8(CategoryIdentifiers.STANDARD)].activeIndexOf[executorAddress] != 0) {
+            return executorsCollection.executorCategories[uint8(CategoryIdentifiers.STANDARD)].activeExecutors[executorsCollection.executorCategories[uint8(CategoryIdentifiers.STANDARD)].activeIndexOf[executorAddress]];
+        } else if (executorsCollection.executorCategories[uint8(CategoryIdentifiers.LOWEST)].activeIndexOf[executorAddress] != 0) {
+            return executorsCollection.executorCategories[uint8(CategoryIdentifiers.LOWEST)].activeExecutors[executorsCollection.executorCategories[uint8(CategoryIdentifiers.LOWEST)].activeIndexOf[executorAddress]];
         } else if (executorsCollection.inactiveExecutors[executorAddress].executorAddress == executorAddress) {
             return executorsCollection.inactiveExecutors[executorAddress];
         } else if (executorsCollection.busyExecutors[executorAddress].executorAddress == executorAddress) {
@@ -228,43 +236,30 @@ contract ExecutionBroker is Transferable {
         }
     }
 
-    function getActiveExecutorByIndex(uint index, CategoryIdentifiers category) public view returns (Executor memory executor) {
-        return executorsCollection.executorCategories[category].activeExecutors[index];
+    function getActiveExecutorByRelativeIndex(uint index, CategoryIdentifiers category) public view returns (Executor memory executor) {
+        return executorsCollection.executorCategories[uint8(category)].activeExecutors[index];
     }
 
-    function getActiveExecutorByPosition(uint position) public view returns (Executor memory executor) {
-        if (position < executorsCollection.executorCategories[CategoryIdentifiers.HIGHEST].amountOfActiveExecutors) {
-            return executorsCollection.executorCategories[CategoryIdentifiers.HIGHEST].activeExecutors[position];
-        } else if (position > executorsCollection.executorCategories[CategoryIdentifiers.HIGHEST].amountOfActiveExecutors && position < (executorsCollection.executorCategories[CategoryIdentifiers.HIGHEST].amountOfActiveExecutors + executorsCollection.executorCategories[CategoryIdentifiers.STANDARD].amountOfActiveExecutors)) {
-            return executorsCollection.executorCategories[CategoryIdentifiers.STANDARD].activeExecutors[position - executorsCollection.executorCategories[CategoryIdentifiers.HIGHEST].amountOfActiveExecutors];
-        } else {
-            return executorsCollection.executorCategories[CategoryIdentifiers.LOWEST].activeExecutors[position - (executorsCollection.executorCategories[CategoryIdentifiers.HIGHEST].amountOfActiveExecutors + executorsCollection.executorCategories[CategoryIdentifiers.STANDARD].amountOfActiveExecutors)];
-        }
-    }
-
-    /*function getAmountOfActiveExecutorsWithCriteria(Criteria memory criteria) public view returns (uint24) {
-        uint24 count = 0;
-        for (uint24 i = 0; i < executorsCollection.activeExecutors.length; i++) {
-            if (executorsCollection.activeExecutors[i].executorAddress != address(0x0) &&
-                executorsCollection.activeExecutors[i].timesPunished <= criteria.maxTimesPunished &&
-                (executorsCollection.activeExecutors[i].inaccurateSolvings * 1000) / (executorsCollection.activeExecutors[i].inaccurateSolvings + executorsCollection.activeExecutors[i].accurateSolvings + 1) <= criteria.maxInaccuracyPercentage) {
-                    count++;
-            }
-        }
-        return count;
-    } TODO esto mepa que lo borro */
-
-    // TODO esto lo tengo que modificar
-    function getRandomExecutorAddress(uint256 randomSeed, Criteria memory criteria) public view returns (address) {  // Position starts from zero and is not equal to index
-        uint32 j = 0;
-        for (uint32 i = 0; i < executorsCollection.activeExecutors.length; i++) {
-            if (executorsCollection.activeExecutors[i].executorAddress == address(0x0)) {
+    function getActiveExecutorByRelativePosition(uint position, CategoryIdentifiers category) public view returns (Executor memory executor) {
+        uint24 j = 0;
+        for (uint24 i = 0; i < executorsCollection.executorCategories[uint8(category)].amountOfActiveExecutors; i++) {
+            if (executorsCollection.executorCategories[uint8(category)].activeExecutors[i].executorAddress == address(0x0)) {
                 continue;
             }
-            if (j == 1) {
-                return executorsCollection.activeExecutors[i];
+            if (j == position) {
+                return executorsCollection.executorCategories[uint8(category)].activeExecutors[i];
             }
-            j++;
+        }
+        revert("Position exceeded number of available executors for category");
+    }
+
+    function getActiveExecutorByAbsolutePosition(uint position) public view returns (Executor memory executor) {
+        if (position < executorsCollection.executorCategories[uint8(CategoryIdentifiers.HIGHEST)].amountOfActiveExecutors) {
+            return getActiveExecutorByRelativePosition(position, CategoryIdentifiers.HIGHEST);
+        } else if (position > executorsCollection.executorCategories[uint8(CategoryIdentifiers.HIGHEST)].amountOfActiveExecutors && position < (executorsCollection.executorCategories[uint8(CategoryIdentifiers.HIGHEST)].amountOfActiveExecutors + executorsCollection.executorCategories[uint8(CategoryIdentifiers.STANDARD)].amountOfActiveExecutors)) {
+            return getActiveExecutorByRelativePosition(position - executorsCollection.executorCategories[uint8(CategoryIdentifiers.HIGHEST)].amountOfActiveExecutors, CategoryIdentifiers.STANDARD);
+        } else {
+            return getActiveExecutorByRelativePosition(position - (executorsCollection.executorCategories[uint8(CategoryIdentifiers.HIGHEST)].amountOfActiveExecutors + executorsCollection.executorCategories[uint8(CategoryIdentifiers.STANDARD)].amountOfActiveExecutors), CategoryIdentifiers.LOWEST);
         }
     }
 
@@ -290,17 +285,18 @@ contract ExecutionBroker is Transferable {
     }
 
     function pauseExecutor(bool withrawLockedFunds) public returns (bool) {
-        require(executorsCollection.activeIndexOf[msg.sender] != 0, "This address does not belong to an active executor");
+        require(getExecutorStateByAddress(msg.sender) == ExecutorState.ACTIVE, "This address does not belong to an active executor");
         bool transferSuccess = true;
-        uint executorIndex = executorsCollection.activeIndexOf[msg.sender];
-        Executor memory executor = executorsCollection.activeExecutors[executorIndex];
+        (uint executorIndex, CategoryIdentifiers category) = getIndexAndCategoryOfActiveExecutorByAddress(msg.sender);
+        Executor memory executor = executorsCollection.executorCategories[uint8(category)].activeExecutors[executorIndex];
         if (withrawLockedFunds) {
             transferSuccess = _internalTransferFunds(executor.lockedWei, msg.sender);
             executor.lockedWei = 0;
         }
         executorsCollection.inactiveExecutors[msg.sender] = executor;
-        delete executorsCollection.activeExecutors[executorIndex];
-        delete executorsCollection.activeIndexOf[msg.sender];
+        delete executorsCollection.executorCategories[uint8(category)].activeExecutors[executorIndex];
+        delete executorsCollection.executorCategories[uint8(category)].activeIndexOf[msg.sender];
+        executorsCollection.executorCategories[uint8(category)].amountOfActiveExecutors--;
         executorsCollection.amountOfActiveExecutors--;
         return transferSuccess;
     }
@@ -317,14 +313,14 @@ contract ExecutionBroker is Transferable {
         require(amountOfExecutors % 2 == 1, "You must choose an odd amount of executors");
         require(amountOfExecutors <= MAXIMUM_EXECUTORS_PER_REQUEST, "You exceeded the maximum number of allowed executors per request");
         require(executionPowerPaidFor <= MAXIMUM_EXECUTION_POWER, "You exceeded the maximum allowed execution power per request");
-        require(amountOfExecutors <= getAmountOfActiveExecutorsWithCriteria(criteria), "You exceeded the number of available executors that fit your criteria");
+        require(amountOfExecutors <= getAmountOfActiveExecutorsWithCriteria(executorCategory), "You exceeded the number of available executors that fit your criteria");
         require(executionPowerPrice >= getReferenceExecutionPowerPrice(), "The offered execution power price must be greater or equal than the networks reference price"); //TODO capaz cambiarlo a que no pueda ser muy distinto? onda que la division de uno por otro sea igual a 1? ver como redondea solidity en division de enteros
         require(msg.value == executionPowerPrice * executionPowerPaidFor * amountOfExecutors, "The value sent in the request must be the execution power you intend to pay for multiplied by the price and the amount of executors");
         
         return _submitRequest(msg.sender, executionPowerPrice, executionPowerPaidFor, inputState, codeReference, amountOfExecutors, randomSeed, executorCategory);
     }
 
-    function rotateExecutors(uint requestID, uint256 randomSeed) public returns (bool transferSuccess) {
+    function rotateExecutors(uint requestID, uint256 randomSeed, CategoryIdentifiers category) public returns (bool transferSuccess) {
         uint initialGas = gasleft();
         require(requests[requestID].clientAddress == msg.sender, "You cant rotate a request that was not made by you");
         require(requests[requestID].submissionsLocked == false, "All executors for this request have already delivered");
@@ -339,19 +335,20 @@ contract ExecutionBroker is Transferable {
             return false;
         }
         //TODO check all uint types, google if they are cheaper, include in thesis
-        uint24 amountOfAvailableExecutorsFittingCriteria = getAmountOfActiveExecutorsWithCriteria(requests[requestID].executorCriteria);
+        uint24 amountOfAvailableExecutorsFittingCriteria = getAmountOfActiveExecutorsWithCriteria(category);
         uint24 effectiveAmountOfPunishedExecutors = amountOfAvailableExecutorsFittingCriteria > amountOfPunishedExecutors ? amountOfPunishedExecutors : amountOfAvailableExecutorsFittingCriteria;
         address[] memory punishedExecutorsAddresses = new address[](effectiveAmountOfPunishedExecutors);
+        uint24 ceiling = amountOfAvailableExecutorsFittingCriteria;
         for (uint8 i = 0; i < effectiveAmountOfPunishedExecutors; i++) {  // Si la cantidad efectiva es menor a la cantidad total, solo roto los primeros
             uint taskIndex = punishedExecutorsTaskIDs[i];
             punishedExecutorsAddresses[i] = taskAssignmentsMap[requestID][taskIndex].executorAddress;
-            uint randomPosition = randomSeed % executorsCollection.amountOfActiveExecutors; //TODO borrar esto
-            address newExecutorAddress = getRandomExecutorAddress(randomSeed, requests[requestID].executorCriteria); //TODO ver aca, que fitee el criteria
+            address newExecutorAddress = getActiveExecutorByAbsolutePosition(randomSeed % ceiling).executorAddress;
             taskAssignmentsMap[requestID][taskIndex].executorAddress = newExecutorAddress;
             taskAssignmentsMap[requestID][taskIndex].timestamp = block.timestamp;
             _lockExecutor(newExecutorAddress, requestID, i);
             effectiveAmountOfPunishedExecutors++;
-            randomSeed /= executorsCollection.amountOfActiveExecutors > 0 ? executorsCollection.amountOfActiveExecutors : 1; //TODO borrar esto
+            randomSeed /= ceiling;
+            ceiling--;
         }
         if (effectiveAmountOfPunishedExecutors == 0) {
             return false;
@@ -487,14 +484,12 @@ contract ExecutionBroker is Transferable {
     //TODO puedo hacer que el precio del executionpower sea inversamente proporsional a la cantidad de ejecutores activos, uso tx.gasprice? YA CONFIRME QUE SI EXISTE
     // Private Functions
 
-    tengo que mirar pause executor
-
     function _recycleRequest(uint requestID, uint initialGas, uint markedCount, address[] memory executorsMarked) private {
         uint refundAmount = 0;
         requests[requestID].closed = true;
         emit requestClosed(requestID, 0);
-        if (getAmountOfActiveExecutorsWithCriteria(requests[requestID].executorCriteria) >= taskAssignmentsMap[requestID].length) {
-            _submitRequest(requests[requestID].clientAddress, requests[requestID].executionPowerPrice, requests[requestID].executionPowerPaidFor, requests[requestID].inputState, requests[requestID].codeReference, taskAssignmentsMap[requestID].length, uint256(blockhash(block.number-1)), requests[requestID].executorCriteria);
+        if (getAmountOfActiveExecutorsWithCriteria(CategoryIdentifiers.LOWEST) >= taskAssignmentsMap[requestID].length) {
+            _submitRequest(requests[requestID].clientAddress, requests[requestID].executionPowerPrice, requests[requestID].executionPowerPaidFor, requests[requestID].inputState, requests[requestID].codeReference, taskAssignmentsMap[requestID].length, uint256(blockhash(block.number-1)), CategoryIdentifiers.LOWEST);
         } else {
             refundAmount = requests[requestID].executionPowerPrice * requests[requestID].executionPowerPaidFor * markedCount;
         }
@@ -518,9 +513,9 @@ contract ExecutionBroker is Transferable {
         });
         requests.push(request);
         TaskAssignment[] storage taskAssignments = taskAssignmentsMap[request.id];
-        for (uint32 i = 0; i < amountOfExecutors; i++) {
-            uint randomPosition = randomSeed % executorsCollection.amountOfActiveExecutors;  // TODO borrar esto
-            address executorAddress = getRandomExecutorAddress(randomSeed, criteria);
+        uint24 ceiling = getAmountOfActiveExecutorsWithCriteria(executorCategory);
+        for (uint24 i = 0; i < amountOfExecutors; i++) {
+            address executorAddress = getActiveExecutorByAbsolutePosition(randomSeed % ceiling).executorAddress;
             taskAssignments.push(TaskAssignment({
                 executorAddress: executorAddress,
                 timestamp: block.timestamp,
@@ -534,7 +529,8 @@ contract ExecutionBroker is Transferable {
                 liberated: false
             }));
             _lockExecutor(executorAddress, request.id, i);
-            randomSeed /= executorsCollection.amountOfActiveExecutors > 0 ? executorsCollection.amountOfActiveExecutors : 1; // TODO borrar esto
+            randomSeed /= ceiling;
+            ceiling--;
         }
         emit requestCreated(request.id, clientAddress);
         return request.id;
@@ -633,14 +629,15 @@ contract ExecutionBroker is Transferable {
 
     function _lockExecutor(address executorAddress, uint requestID, uint taskAssignmentIndex) private {
         require(getExecutorStateByAddress(executorAddress) == ExecutorState.ACTIVE, "This address does not belong to an active executor");
-        (uint executorIndex, CategoryIdentifiers category) = getActiveIndexAndCategoryOfExecutorByAddress(executorAddress);
-        Executor memory executor = executorsCollection.executorCategories[category].activeExecutors[executorIndex];
+        (uint executorIndex, CategoryIdentifiers category) = getIndexAndCategoryOfActiveExecutorByAddress(executorAddress);
+        Executor memory executor = executorsCollection.executorCategories[uint8(category)].activeExecutors[executorIndex];
         executor.assignedRequestID = requestID;
         executor.taskAssignmentIndex = taskAssignmentIndex;
         executorsCollection.busyExecutors[executorAddress] = executor;
-        delete executorsCollection.executorCategories[category].activeExecutors[executorIndex];
-        delete executorsCollection.executorCategories[category].activeIndexOf[executorAddress];
-        executorsCollection.executorCategories[category].amountOfActiveExecutors--;
+        delete executorsCollection.executorCategories[uint8(category)].activeExecutors[executorIndex];
+        delete executorsCollection.executorCategories[uint8(category)].activeIndexOf[executorAddress];
+        executorsCollection.executorCategories[uint8(category)].amountOfActiveExecutors--;
+        executorsCollection.amountOfActiveExecutors--;
         emit executorLocked(executorAddress);
     }
 
@@ -655,20 +652,21 @@ contract ExecutionBroker is Transferable {
 
     function _activateExecutor(Executor memory executor) private {
         CategoryIdentifiers category = getExecutorCategory(executor);
-        require(executorsCollection.executorCategories[category].activeIndexOf[executor.executorAddress] == 0, "This address is already registered as an active executor");
+        require(executorsCollection.executorCategories[uint8(category)].activeIndexOf[executor.executorAddress] == 0, "This address is already registered as an active executor");
         uint24 executorIndex;
-        for (executorIndex = 1; executorIndex < executorsCollection.executorCategories[category].activeExecutors.length; executorIndex++) {
-            if (executorsCollection.executorCategories[category].activeExecutors[executorIndex].executorAddress == address(0x0)) {
+        for (executorIndex = 1; executorIndex < executorsCollection.executorCategories[uint8(category)].activeExecutors.length; executorIndex++) {
+            if (executorsCollection.executorCategories[uint8(category)].activeExecutors[executorIndex].executorAddress == address(0x0)) {
                 break;
             }
         }
-        if (executorIndex == executorsCollection.activeExecutors.length) {
-            executorsCollection.executorCategories[category].activeExecutors.push(executor);
+        if (executorIndex == executorsCollection.executorCategories[uint8(category)].activeExecutors.length) {
+            executorsCollection.executorCategories[uint8(category)].activeExecutors.push(executor);
         } else {
-            executorsCollection.executorCategories[category].activeExecutors[executorIndex] = executor;
+            executorsCollection.executorCategories[uint8(category)].activeExecutors[executorIndex] = executor;
         }
-        executorsCollection.executorCategories[category].activeIndexOf[executor.executorAddress] = executorIndex;
-        executorsCollection.executorCategories[category].amountOfActiveExecutors++;
+        executorsCollection.executorCategories[uint8(category)].activeIndexOf[executor.executorAddress] = executorIndex;
+        executorsCollection.executorCategories[uint8(category)].amountOfActiveExecutors++;
+        executorsCollection.amountOfActiveExecutors++;
     }
 
 }
