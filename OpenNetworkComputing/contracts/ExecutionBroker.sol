@@ -22,7 +22,7 @@ enum CategoryIdentifiers {
 }
 
 struct ExecutorCategory {
-    Executor[] activeExecutors; //TODO inicializarlas en el constructor
+    Executor[] activeExecutors;
     mapping (address => uint) activeIndexOf;
     uint24 amountOfActiveExecutors;
 }
@@ -98,7 +98,7 @@ contract ExecutionBroker is Transferable {
     event executorPunished(address executorAddress);
 
     constructor(uint executionTimeFrame, uint baseStakeAmount, uint maximumPower, uint maximumExecutors) {
-        referenceExecutionPowerPriceCache = 1;
+        referenceExecutionPowerPriceCache = 1; //TODO
         EXECUTION_TIME_FRAME_SECONDS = executionTimeFrame;
         BASE_STAKE_AMOUNT = baseStakeAmount;
         MAXIMUM_EXECUTION_POWER = maximumPower;
@@ -264,7 +264,8 @@ contract ExecutionBroker is Transferable {
     }
 
     function getReferenceExecutionPowerPrice() public view returns (uint) {
-        return referenceExecutionPowerPriceCache; //TODO quizas agregar mas cosas aca, como el gas price, y el ratio de total available executors
+        uint16 gasProportionality = 1;
+        return ((tx.gasprice / gasProportionality) | 1); //TODO quizas agregar mas cosas aca, como el gas price, y el ratio de total available executors
     }
 
     // Open interaction functions
@@ -309,15 +310,15 @@ contract ExecutionBroker is Transferable {
         delete executorsCollection.inactiveExecutors[msg.sender];
     }
 
-    function submitRequest(string memory inputState, string memory codeReference, uint amountOfExecutors, uint executionPowerPrice, uint executionPowerPaidFor, uint256 randomSeed, CategoryIdentifiers executorCategory) public payable returns (uint) {
+    function submitRequest(string memory inputState, string memory codeReference, uint amountOfExecutors, uint executionPowerPaidFor, uint256 randomSeed, CategoryIdentifiers executorCategory) public payable returns (uint) {
+        referenceExecutionPowerPriceCache = getReferenceExecutionPowerPrice();
         require(amountOfExecutors % 2 == 1, "You must choose an odd amount of executors");
         require(amountOfExecutors <= MAXIMUM_EXECUTORS_PER_REQUEST, "You exceeded the maximum number of allowed executors per request");
         require(executionPowerPaidFor <= MAXIMUM_EXECUTION_POWER, "You exceeded the maximum allowed execution power per request");
         require(amountOfExecutors <= getAmountOfActiveExecutorsWithCriteria(executorCategory), "You exceeded the number of available executors that fit your criteria");
-        require(executionPowerPrice >= getReferenceExecutionPowerPrice(), "The offered execution power price must be greater or equal than the networks reference price"); //TODO capaz cambiarlo a que no pueda ser muy distinto? onda que la division de uno por otro sea igual a 1? ver como redondea solidity en division de enteros
-        require(msg.value == executionPowerPrice * executionPowerPaidFor * amountOfExecutors, "The value sent in the request must be the execution power you intend to pay for multiplied by the price and the amount of executors");
+        require(msg.value == referenceExecutionPowerPriceCache * executionPowerPaidFor * amountOfExecutors, "The value sent in the request must be the execution power you intend to pay for multiplied by the price and the amount of executors");
         
-        return _submitRequest(msg.sender, executionPowerPrice, executionPowerPaidFor, inputState, codeReference, amountOfExecutors, randomSeed, executorCategory);
+        return _submitRequest(msg.sender, referenceExecutionPowerPriceCache, executionPowerPaidFor, inputState, codeReference, amountOfExecutors, randomSeed, executorCategory);
     }
 
     function rotateExecutors(uint requestID, uint256 randomSeed, CategoryIdentifiers category) public returns (bool transferSuccess) {
@@ -353,7 +354,6 @@ contract ExecutionBroker is Transferable {
         if (effectiveAmountOfPunishedExecutors == 0) {
             return false;
         }
-
         return _punishmentRound(requestID, PunishmentCase.REGULAR, initialGas, effectiveAmountOfPunishedExecutors, punishedExecutorsAddresses, 0);  // aca no hay refund porque se rotan? a menos que no haya suficientes, pero si no hay suficientes available se espera, no se rota asique no hay refund regardless
     }
 
@@ -440,7 +440,7 @@ contract ExecutionBroker is Transferable {
                 break;
             }
         }
-        if (lastOne) { // TODO Hacer que el cliente ponga una prima para devolverle el gas al ultimo ejecutor en liberar, que es el que paga toda esta logica extra. El resto debe estar contemplado en el pago. TAMBIEN DEVOLVER DICHA PRIMA AL FINAL DE ESTA FUNCION, SI Y SOLO SI EL ULTIMO FUE ACCURATE, naah mejor devolver la prima siempre
+        if (lastOne) { // TODO Hacer que el cliente ponga una prima para devolverle el gas al ultimo ejecutor en liberar, que es el que paga toda esta logica extra. El resto debe estar contemplado en el pago. TAMBIEN DEVOLVER DICHA PRIMA AL FINAL DE ESTA FUNCION, SI Y SOLO SI EL ULTIMO FUE ACCURATE, naah mejor devolver la prima siempre. Hacer que la prima sea bastante grande, y se le devuelve la diferencia al cliente
             uint markedCount = 0;
             uint nonTruncatedExecutors = 0;
             address[] memory executorsMarked = new address[](taskAssignmentsMap[requestID].length);  // Para los castigos de aca y de close, uso address[] en vez de taskAssignmentIDs porque ya no me interesa el task assignment, ya que la request se va a cerrar
