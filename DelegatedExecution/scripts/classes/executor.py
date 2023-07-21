@@ -1,8 +1,7 @@
-from scripts.classes.utils.contractProvider import ClientFactory, BrokerFactory
+from scripts.classes.utils.contractProvider import ClientFactory
 from scripts.classes.utils.logger import Logger
 import time
 
-# TODO TODO TODO TODO TODO se puede castear las tuplas que me devuelve brownie a diccionariooooo
 
 @Logger.LogClassMethods()
 class Executor:
@@ -86,14 +85,16 @@ class Executor:
         return transaction
     
     def _challengeSubmission(self, requestID):
-        transaction = self.broker.challengeSubmission(requestID, {'from': self.account})
+        client = ClientFactory.at(address=self.broker.requests(requestID).dict()['client'])
+        transaction = client.challengeSubmission(requestID, {'from': self.account})
         transaction.wait(1)
         if requestID in self.unsolidifiedSubmissions:
             self.unsolidifiedSubmissions.pop(self.unsolidifiedSubmissions.index(requestID))
         return transaction
 
     def _claimPayment(self, requestID):
-        self.broker.claimPayment(requestID, {'from': self.account})
+        client = ClientFactory.at(address=self.broker.requests(requestID).dict()['client'])
+        return client.claimPayment(requestID, {'from': self.account})
 
     def solverLoopRound(self):
         if len(self.unacceptedRequests) > 0:
@@ -106,7 +107,7 @@ class Executor:
         else:
             Logger.log("Unaccepted requests buffer empty")
 
-    def challengerLoopRound(self): #TODO proof of challenge? algun incentivo al challenger?
+    def challengerLoopRound(self): #TODO que se pueda convalidar ejecucion, y que los primeros N (a determinar por el cliente) en convalidar se lleven una pequeña paga. Pero para convalidar tenes que dejar una prima que se va a devolver junto con la paga cuando se solidifique la request
         if len(self.unsolidifiedSubmissions) > 0:
             requestID = self.unsolidifiedSubmissions.pop(0)
             request = self.broker.requests(requestID)

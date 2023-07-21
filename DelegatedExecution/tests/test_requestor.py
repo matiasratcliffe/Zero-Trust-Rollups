@@ -204,9 +204,10 @@ class TestRequestor:
         broker = BrokerFactory.at(address=requestor.client.brokerContract())
         executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
         assert reqID not in executor.unacceptedRequests
-        requestor.publicizeRequest(reqID)
-        time.sleep(4)
-        assert reqID in executor.unacceptedRequests
+        tx = requestor.publicizeRequest(reqID)
+        assert "requestCreated" in tx.events
+        assert tx.events["requestCreated"]["requestID"] == reqID
+
 
     # Low level tests
 
@@ -245,10 +246,10 @@ class TestRequestor:
                 {'from': account2, 'value': 1}
             )
 
-    def test_process_result_only_broker(self):
+    def test_process_result_only_client(self):
         client = ClientFactory.getInstance()
         account = Accounts.getFromKey(client.owner())
-        with pytest.raises(Exception, match="Can only be called by the registered broker contract"):
+        with pytest.raises(Exception, match="Function accessible only by the contract itself"):
             client.processResult(
                 0,  # This would yield an error but the call should never make it past the modifiers
                 {'from': account}

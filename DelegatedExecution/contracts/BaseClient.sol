@@ -79,6 +79,7 @@ abstract contract BaseClient is Ownable {
         require(request.submission.issuer != address(0x0), "There are no submissions for the provided request");
         require(request.submission.issuer == msg.sender, "This payment does not belong to you");
         require(!request.submission.solidified, "The provided request has already solidified");
+        require(request.submission.timestamp + request.claimDelay <= block.timestamp, "The claim delay hasn't passed yet");
 
         bool success = brokerContract.claimPayment(requestID);
         activeRequestIDs[requestID] = false;

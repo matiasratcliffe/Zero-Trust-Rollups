@@ -175,6 +175,8 @@ contract ExecutionBroker is Transferable {
         return transferSuccess;
     }
 
+    //TODO test onlyClient here and within client
+
     // Public views
 
     function isRequestOpen(uint requestID) public view returns (bool) {  // solo a modo de ayuda

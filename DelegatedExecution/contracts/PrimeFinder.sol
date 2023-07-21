@@ -68,7 +68,7 @@ contract PrimeFinder is BaseClient {
             functionToRun: 1,
             data: abi.encode(OneInput({startPoint: number + 1}))
         });
-        _submitRequest(10000 gwei, input, 1000 gwei, 200000 gwei, 0 seconds);
+        _submitRequest(10000 gwei, input, 1000 gwei, 200000 gwei, 0 seconds);  //TODO si no tengo fondos, que no falle
         if (abi.decode(_isPrime(abi.encode(TwoInput({number: number}))), (bool))) {
             PRIMES.push(number);
         }

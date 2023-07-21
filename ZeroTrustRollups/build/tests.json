@@ -1,16 +1,23 @@
 {
   "contracts": {
-    "APIConsumer": "ca79cff4c94de2f5035b25be7477475f957485ac",
+    "APIConsumer": "b7599b135ebaa1347610ce55f4a552f5a66ef820",
     "APIProvider": "9b08f00b064623d04f2c099f68afc2d5ba0361e5",
     "ExecutionBroker": "96eda7d0b89500fd812819cac61c91a7d8630196",
     "OpenZeppelin/openzeppelin-contracts@4.9.2/Math": "1ce946f6a4eaa185320328620ccf999b9e86db7c",
     "OpenZeppelin/openzeppelin-contracts@4.9.2/SignedMath": "1ce946f6a4eaa185320328620ccf999b9e86db7c",
     "OpenZeppelin/openzeppelin-contracts@4.9.2/Strings": "1ce946f6a4eaa185320328620ccf999b9e86db7c",
     "Ownable": "672f70f06f11b1d7dfeb0f73ad0bb11d0c9972ad",
-    "TS3000": "22edb29c7eb79b25f5844a978f466c296d5a8331",
+    "TS3000": "c7a665a469f073f553e8012ffeaa175dba043568",
     "Transferable": "46d8302b7b373057f7bb873d07b598531307e853"
   },
   "tests": {
+    "tests/test_apis.py": {
+      "coverage": false,
+      "isolated": false,
+      "results": "F",
+      "sha1": "60160f58dbf3c44d215c79854276c69ca89c30d2",
+      "txhash": []
+    },
     "tests/test_ts3000.py": {
       "coverage": false,
       "isolated": false,

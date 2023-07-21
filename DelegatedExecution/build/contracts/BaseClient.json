@@ -272,28 +272,28 @@
     "absolutePath": "contracts/BaseClient.sol",
     "exportedSymbols": {
       "Acceptance": [
-        441
+        454
       ],
       "BaseClient": [
-        407
+        420
       ],
       "ExecutionBroker": [
-        1266
+        1279
       ],
       "Ownable": [
-        1648
+        1661
       ],
       "Request": [
-        436
+        449
       ],
       "Submission": [
-        450
+        463
       ],
       "Transferable": [
-        1732
+        1745
       ]
     },
-    "id": 408,
+    "id": 421,
     "license": "GPL-3.0",
     "nodeType": "SourceUnit",
     "nodes": [
@@ -317,8 +317,8 @@
         "id": 2,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 408,
-        "sourceUnit": 1267,
+        "scope": 421,
+        "sourceUnit": 1280,
         "src": "70:31:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -329,8 +329,8 @@
         "id": 3,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 408,
-        "sourceUnit": 1649,
+        "scope": 421,
+        "sourceUnit": 1662,
         "src": "102:23:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -346,7 +346,7 @@
                 "160:7:0"
               ],
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 1648,
+              "referencedDeclaration": 1661,
               "src": "160:7:0"
             },
             "id": 5,
@@ -358,10 +358,10 @@
         "contractDependencies": [],
         "contractKind": "contract",
         "fullyImplemented": false,
-        "id": 407,
+        "id": 420,
         "linearizedBaseContracts": [
-          407,
-          1648
+          420,
+          1661
         ],
         "name": "BaseClient",
         "nameLocation": "146:10:0",
@@ -429,7 +429,7 @@
             "name": "ClientInput",
             "nameLocation": "182:11:0",
             "nodeType": "StructDefinition",
-            "scope": 407,
+            "scope": 420,
             "src": "175:74:0",
             "visibility": "public"
           },
@@ -441,12 +441,12 @@
             "name": "brokerContract",
             "nameLocation": "278:14:0",
             "nodeType": "VariableDeclaration",
-            "scope": 407,
+            "scope": 420,
             "src": "255:37:0",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_ExecutionBroker_$1266",
+              "typeIdentifier": "t_contract$_ExecutionBroker_$1279",
               "typeString": "contract ExecutionBroker"
             },
             "typeName": {
@@ -459,13 +459,13 @@
                   "255:15:0"
                 ],
                 "nodeType": "IdentifierPath",
-                "referencedDeclaration": 1266,
+                "referencedDeclaration": 1279,
                 "src": "255:15:0"
               },
-              "referencedDeclaration": 1266,
+              "referencedDeclaration": 1279,
               "src": "255:15:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_ExecutionBroker_$1266",
+                "typeIdentifier": "t_contract$_ExecutionBroker_$1279",
                 "typeString": "contract ExecutionBroker"
               }
             },
@@ -478,7 +478,7 @@
             "name": "activeRequestIDs",
             "nameLocation": "320:16:0",
             "nodeType": "VariableDeclaration",
-            "scope": 407,
+            "scope": 420,
             "src": "298:38:0",
             "stateVariable": true,
             "storageLocation": "default",
@@ -695,7 +695,7 @@
                               "referencedDeclaration": -28,
                               "src": "511:4:0",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_BaseClient_$407",
+                                "typeIdentifier": "t_contract$_BaseClient_$420",
                                 "typeString": "contract BaseClient"
                               }
                             }
@@ -703,7 +703,7 @@
                           "expression": {
                             "argumentTypes": [
                               {
-                                "typeIdentifier": "t_contract$_BaseClient_$407",
+                                "typeIdentifier": "t_contract$_BaseClient_$420",
                                 "typeString": "contract BaseClient"
                               }
                             ],
@@ -852,7 +852,7 @@
                       "referencedDeclaration": 13,
                       "src": "691:14:0",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ExecutionBroker_$1266",
+                        "typeIdentifier": "t_contract$_ExecutionBroker_$1279",
                         "typeString": "contract ExecutionBroker"
                       }
                     },
@@ -884,10 +884,10 @@
                         "name": "ExecutionBroker",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1266,
+                        "referencedDeclaration": 1279,
                         "src": "708:15:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_ExecutionBroker_$1266_$",
+                          "typeIdentifier": "t_type$_t_contract$_ExecutionBroker_$1279_$",
                           "typeString": "type(contract ExecutionBroker)"
                         }
                       },
@@ -903,13 +903,13 @@
                       "src": "708:30:0",
                       "tryCall": false,
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ExecutionBroker_$1266",
+                        "typeIdentifier": "t_contract$_ExecutionBroker_$1279",
                         "typeString": "contract ExecutionBroker"
                       }
                     },
                     "src": "691:47:0",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ExecutionBroker_$1266",
+                      "typeIdentifier": "t_contract$_ExecutionBroker_$1279",
                       "typeString": "contract ExecutionBroker"
                     }
                   },
@@ -934,7 +934,7 @@
                     "627:7:0"
                   ],
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 1648,
+                  "referencedDeclaration": 1661,
                   "src": "627:7:0"
                 },
                 "nodeType": "ModifierInvocation",
@@ -985,7 +985,7 @@
               "parameters": [],
               "src": "637:0:0"
             },
-            "scope": 407,
+            "scope": 420,
             "src": "592:153:0",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -1078,7 +1078,7 @@
               ],
               "src": "830:14:0"
             },
-            "scope": 407,
+            "scope": 420,
             "src": "751:94:0",
             "stateMutability": "pure",
             "virtual": true,
@@ -1156,7 +1156,7 @@
               "parameters": [],
               "src": "922:0:0"
             },
-            "scope": 407,
+            "scope": 420,
             "src": "850:74:0",
             "stateMutability": "nonpayable",
             "virtual": true,
@@ -1239,7 +1239,7 @@
               ],
               "src": "1003:15:0"
             },
-            "scope": 407,
+            "scope": 420,
             "src": "929:90:0",
             "stateMutability": "pure",
             "virtual": true,
@@ -1387,7 +1387,7 @@
                     "1173:9:0"
                   ],
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 1617,
+                  "referencedDeclaration": 1630,
                   "src": "1173:9:0"
                 },
                 "nodeType": "ModifierInvocation",
@@ -1583,7 +1583,7 @@
               ],
               "src": "1191:6:0"
             },
-            "scope": 407,
+            "scope": 420,
             "src": "1025:278:0",
             "stateMutability": "payable",
             "virtual": false,
@@ -1633,7 +1633,7 @@
                                 "referencedDeclaration": -28,
                                 "src": "1500:4:0",
                                 "typeDescriptions": {
-                                  "typeIdentifier": "t_contract$_BaseClient_$407",
+                                  "typeIdentifier": "t_contract$_BaseClient_$420",
                                   "typeString": "contract BaseClient"
                                 }
                               }
@@ -1641,7 +1641,7 @@
                             "expression": {
                               "argumentTypes": [
                                 {
-                                  "typeIdentifier": "t_contract$_BaseClient_$407",
+                                  "typeIdentifier": "t_contract$_BaseClient_$420",
                                   "typeString": "contract BaseClient"
                                 }
                               ],
@@ -1893,7 +1893,7 @@
                           "referencedDeclaration": 13,
                           "src": "1563:14:0",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_contract$_ExecutionBroker_$1266",
+                            "typeIdentifier": "t_contract$_ExecutionBroker_$1279",
                             "typeString": "contract ExecutionBroker"
                           }
                         },
@@ -1905,7 +1905,7 @@
                         "memberLocation": "1578:13:0",
                         "memberName": "submitRequest",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 619,
+                        "referencedDeclaration": 632,
                         "src": "1563:28:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_function_external_payable$_t_struct$_ClientInput_$10_memory_ptr_$_t_uint256_$_t_uint256_$_t_uint256_$returns$_t_uint256_$",
@@ -2299,7 +2299,7 @@
               ],
               "src": "1456:6:0"
             },
-            "scope": 407,
+            "scope": 420,
             "src": "1309:475:0",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -2342,7 +2342,7 @@
                         "referencedDeclaration": 13,
                         "src": "1858:14:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ExecutionBroker_$1266",
+                          "typeIdentifier": "t_contract$_ExecutionBroker_$1279",
                           "typeString": "contract ExecutionBroker"
                         }
                       },
@@ -2354,7 +2354,7 @@
                       "memberLocation": "1873:13:0",
                       "memberName": "cancelRequest",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 698,
+                      "referencedDeclaration": 711,
                       "src": "1858:28:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_uint256_$returns$__$",
@@ -2398,7 +2398,7 @@
                     "1838:9:0"
                   ],
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 1617,
+                  "referencedDeclaration": 1630,
                   "src": "1838:9:0"
                 },
                 "nodeType": "ModifierInvocation",
@@ -2448,7 +2448,7 @@
               "parameters": [],
               "src": "1848:0:0"
             },
-            "scope": 407,
+            "scope": 420,
             "src": "1790:114:0",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -2481,7 +2481,7 @@
               "parameters": [],
               "src": "1946:0:0"
             },
-            "scope": 407,
+            "scope": 420,
             "src": "1910:38:0",
             "stateMutability": "payable",
             "virtual": false,
@@ -2517,7 +2517,7 @@
                                 "referencedDeclaration": -28,
                                 "src": "2051:4:0",
                                 "typeDescriptions": {
-                                  "typeIdentifier": "t_contract$_BaseClient_$407",
+                                  "typeIdentifier": "t_contract$_BaseClient_$420",
                                   "typeString": "contract BaseClient"
                                 }
                               }
@@ -2525,7 +2525,7 @@
                             "expression": {
                               "argumentTypes": [
                                 {
-                                  "typeIdentifier": "t_contract$_BaseClient_$407",
+                                  "typeIdentifier": "t_contract$_BaseClient_$420",
                                   "typeString": "contract BaseClient"
                                 }
                               ],
@@ -2949,7 +2949,7 @@
                     "2000:9:0"
                   ],
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 1617,
+                  "referencedDeclaration": 1630,
                   "src": "2000:9:0"
                 },
                 "nodeType": "ModifierInvocation",
@@ -3027,7 +3027,7 @@
               ],
               "src": "2018:6:0"
             },
-            "scope": 407,
+            "scope": 420,
             "src": "1958:279:0",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -3192,7 +3192,7 @@
                       "stateVariable": false,
                       "storageLocation": "memory",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_struct$_Request_$436_memory_ptr",
+                        "typeIdentifier": "t_struct$_Request_$449_memory_ptr",
                         "typeString": "struct Request"
                       },
                       "typeName": {
@@ -3205,13 +3205,13 @@
                             "2443:7:0"
                           ],
                           "nodeType": "IdentifierPath",
-                          "referencedDeclaration": 436,
+                          "referencedDeclaration": 449,
                           "src": "2443:7:0"
                         },
-                        "referencedDeclaration": 436,
+                        "referencedDeclaration": 449,
                         "src": "2443:7:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_struct$_Request_$436_storage_ptr",
+                          "typeIdentifier": "t_struct$_Request_$449_storage_ptr",
                           "typeString": "struct Request"
                         }
                       },
@@ -3249,7 +3249,7 @@
                         "referencedDeclaration": 13,
                         "src": "2468:14:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ExecutionBroker_$1266",
+                          "typeIdentifier": "t_contract$_ExecutionBroker_$1279",
                           "typeString": "contract ExecutionBroker"
                         }
                       },
@@ -3261,10 +3261,10 @@
                       "memberLocation": "2483:10:0",
                       "memberName": "getRequest",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 1220,
+                      "referencedDeclaration": 1233,
                       "src": "2468:25:0",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_external_view$_t_uint256_$returns$_t_struct$_Request_$436_memory_ptr_$",
+                        "typeIdentifier": "t_function_external_view$_t_uint256_$returns$_t_struct$_Request_$449_memory_ptr_$",
                         "typeString": "function (uint256) view external returns (struct Request memory)"
                       }
                     },
@@ -3280,7 +3280,7 @@
                     "src": "2468:36:0",
                     "tryCall": false,
                     "typeDescriptions": {
-                      "typeIdentifier": "t_struct$_Request_$436_memory_ptr",
+                      "typeIdentifier": "t_struct$_Request_$449_memory_ptr",
                       "typeString": "struct Request memory"
                     }
                   },
@@ -3310,7 +3310,7 @@
                               "referencedDeclaration": 234,
                               "src": "2522:7:0",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_struct$_Request_$436_memory_ptr",
+                                "typeIdentifier": "t_struct$_Request_$449_memory_ptr",
                                 "typeString": "struct Request memory"
                               }
                             },
@@ -3322,10 +3322,10 @@
                             "memberLocation": "2530:10:0",
                             "memberName": "submission",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 433,
+                            "referencedDeclaration": 446,
                             "src": "2522:18:0",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_struct$_Submission_$450_memory_ptr",
+                              "typeIdentifier": "t_struct$_Submission_$463_memory_ptr",
                               "typeString": "struct Submission memory"
                             }
                           },
@@ -3337,7 +3337,7 @@
                           "memberLocation": "2541:6:0",
                           "memberName": "issuer",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 443,
+                          "referencedDeclaration": 456,
                           "src": "2522:25:0",
                           "typeDescriptions": {
                             "typeIdentifier": "t_address",
@@ -3498,7 +3498,7 @@
                               "referencedDeclaration": 234,
                               "src": "2638:7:0",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_struct$_Request_$436_memory_ptr",
+                                "typeIdentifier": "t_struct$_Request_$449_memory_ptr",
                                 "typeString": "struct Request memory"
                               }
                             },
@@ -3510,10 +3510,10 @@
                             "memberLocation": "2646:10:0",
                             "memberName": "submission",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 433,
+                            "referencedDeclaration": 446,
                             "src": "2638:18:0",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_struct$_Submission_$450_memory_ptr",
+                              "typeIdentifier": "t_struct$_Submission_$463_memory_ptr",
                               "typeString": "struct Submission memory"
                             }
                           },
@@ -3525,7 +3525,7 @@
                           "memberLocation": "2657:10:0",
                           "memberName": "solidified",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 449,
+                          "referencedDeclaration": 462,
                           "src": "2638:29:0",
                           "typeDescriptions": {
                             "typeIdentifier": "t_bool",
@@ -3694,7 +3694,7 @@
                         "referencedDeclaration": 13,
                         "src": "2754:14:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ExecutionBroker_$1266",
+                          "typeIdentifier": "t_contract$_ExecutionBroker_$1279",
                           "typeString": "contract ExecutionBroker"
                         }
                       },
@@ -3706,7 +3706,7 @@
                       "memberLocation": "2769:19:0",
                       "memberName": "challengeSubmission",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 1132,
+                      "referencedDeclaration": 1145,
                       "src": "2754:34:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_uint256_$_t_address_$returns$_t_bool_$",
@@ -3779,7 +3779,7 @@
                               "referencedDeclaration": 234,
                               "src": "2873:7:0",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_struct$_Request_$436_memory_ptr",
+                                "typeIdentifier": "t_struct$_Request_$449_memory_ptr",
                                 "typeString": "struct Request memory"
                               }
                             },
@@ -3791,10 +3791,10 @@
                             "memberLocation": "2881:6:0",
                             "memberName": "client",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 427,
+                            "referencedDeclaration": 440,
                             "src": "2873:14:0",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_BaseClient_$407",
+                              "typeIdentifier": "t_contract$_BaseClient_$420",
                               "typeString": "contract BaseClient"
                             }
                           },
@@ -3837,7 +3837,7 @@
                             "referencedDeclaration": 234,
                             "src": "2912:7:0",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_struct$_Request_$436_memory_ptr",
+                              "typeIdentifier": "t_struct$_Request_$449_memory_ptr",
                               "typeString": "struct Request memory"
                             }
                           },
@@ -3849,10 +3849,10 @@
                           "memberLocation": "2920:10:0",
                           "memberName": "submission",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 433,
+                          "referencedDeclaration": 446,
                           "src": "2912:18:0",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_struct$_Submission_$450_memory_ptr",
+                            "typeIdentifier": "t_struct$_Submission_$463_memory_ptr",
                             "typeString": "struct Submission memory"
                           }
                         },
@@ -3864,7 +3864,7 @@
                         "memberLocation": "2931:6:0",
                         "memberName": "result",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 447,
+                        "referencedDeclaration": 460,
                         "src": "2912:25:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes_memory_ptr",
@@ -4004,7 +4004,7 @@
                                 "referencedDeclaration": 234,
                                 "src": "2979:7:0",
                                 "typeDescriptions": {
-                                  "typeIdentifier": "t_struct$_Request_$436_memory_ptr",
+                                  "typeIdentifier": "t_struct$_Request_$449_memory_ptr",
                                   "typeString": "struct Request memory"
                                 }
                               },
@@ -4016,10 +4016,10 @@
                               "memberLocation": "2987:6:0",
                               "memberName": "client",
                               "nodeType": "MemberAccess",
-                              "referencedDeclaration": 427,
+                              "referencedDeclaration": 440,
                               "src": "2979:14:0",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_BaseClient_$407",
+                                "typeIdentifier": "t_contract$_BaseClient_$420",
                                 "typeString": "contract BaseClient"
                               }
                             }
@@ -4027,7 +4027,7 @@
                           "expression": {
                             "argumentTypes": [
                               {
-                                "typeIdentifier": "t_contract$_BaseClient_$407",
+                                "typeIdentifier": "t_contract$_BaseClient_$420",
                                 "typeString": "contract BaseClient"
                               }
                             ],
@@ -4099,7 +4099,7 @@
                             "referencedDeclaration": 234,
                             "src": "3005:7:0",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_struct$_Request_$436_memory_ptr",
+                              "typeIdentifier": "t_struct$_Request_$449_memory_ptr",
                               "typeString": "struct Request memory"
                             }
                           },
@@ -4111,7 +4111,7 @@
                           "memberLocation": "3013:17:0",
                           "memberName": "postProcessingGas",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 420,
+                          "referencedDeclaration": 433,
                           "src": "3005:25:0",
                           "typeDescriptions": {
                             "typeIdentifier": "t_uint256",
@@ -4310,7 +4310,7 @@
               ],
               "src": "2305:6:0"
             },
-            "scope": 407,
+            "scope": 420,
             "src": "2243:892:0",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -4318,9 +4318,9 @@
           },
           {
             "body": {
-              "id": 405,
+              "id": 418,
               "nodeType": "Block",
-              "src": "3203:923:0",
+              "src": "3203:1047:0",
               "statements": [
                 {
                   "expression": {
@@ -4470,12 +4470,12 @@
                       "name": "request",
                       "nameLocation": "3349:7:0",
                       "nodeType": "VariableDeclaration",
-                      "scope": 405,
+                      "scope": 418,
                       "src": "3334:22:0",
                       "stateVariable": false,
                       "storageLocation": "memory",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_struct$_Request_$436_memory_ptr",
+                        "typeIdentifier": "t_struct$_Request_$449_memory_ptr",
                         "typeString": "struct Request"
                       },
                       "typeName": {
@@ -4488,13 +4488,13 @@
                             "3334:7:0"
                           ],
                           "nodeType": "IdentifierPath",
-                          "referencedDeclaration": 436,
+                          "referencedDeclaration": 449,
                           "src": "3334:7:0"
                         },
-                        "referencedDeclaration": 436,
+                        "referencedDeclaration": 449,
                         "src": "3334:7:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_struct$_Request_$436_storage_ptr",
+                          "typeIdentifier": "t_struct$_Request_$449_storage_ptr",
                           "typeString": "struct Request"
                         }
                       },
@@ -4532,7 +4532,7 @@
                         "referencedDeclaration": 13,
                         "src": "3359:14:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ExecutionBroker_$1266",
+                          "typeIdentifier": "t_contract$_ExecutionBroker_$1279",
                           "typeString": "contract ExecutionBroker"
                         }
                       },
@@ -4544,10 +4544,10 @@
                       "memberLocation": "3374:10:0",
                       "memberName": "getRequest",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 1220,
+                      "referencedDeclaration": 1233,
                       "src": "3359:25:0",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_external_view$_t_uint256_$returns$_t_struct$_Request_$436_memory_ptr_$",
+                        "typeIdentifier": "t_function_external_view$_t_uint256_$returns$_t_struct$_Request_$449_memory_ptr_$",
                         "typeString": "function (uint256) view external returns (struct Request memory)"
                       }
                     },
@@ -4563,7 +4563,7 @@
                     "src": "3359:36:0",
                     "tryCall": false,
                     "typeDescriptions": {
-                      "typeIdentifier": "t_struct$_Request_$436_memory_ptr",
+                      "typeIdentifier": "t_struct$_Request_$449_memory_ptr",
                       "typeString": "struct Request memory"
                     }
                   },
@@ -4593,7 +4593,7 @@
                               "referencedDeclaration": 322,
                               "src": "3413:7:0",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_struct$_Request_$436_memory_ptr",
+                                "typeIdentifier": "t_struct$_Request_$449_memory_ptr",
                                 "typeString": "struct Request memory"
                               }
                             },
@@ -4605,10 +4605,10 @@
                             "memberLocation": "3421:10:0",
                             "memberName": "submission",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 433,
+                            "referencedDeclaration": 446,
                             "src": "3413:18:0",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_struct$_Submission_$450_memory_ptr",
+                              "typeIdentifier": "t_struct$_Submission_$463_memory_ptr",
                               "typeString": "struct Submission memory"
                             }
                           },
@@ -4620,7 +4620,7 @@
                           "memberLocation": "3432:6:0",
                           "memberName": "issuer",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 443,
+                          "referencedDeclaration": 456,
                           "src": "3413:25:0",
                           "typeDescriptions": {
                             "typeIdentifier": "t_address",
@@ -4781,7 +4781,7 @@
                               "referencedDeclaration": 322,
                               "src": "3526:7:0",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_struct$_Request_$436_memory_ptr",
+                                "typeIdentifier": "t_struct$_Request_$449_memory_ptr",
                                 "typeString": "struct Request memory"
                               }
                             },
@@ -4793,10 +4793,10 @@
                             "memberLocation": "3534:10:0",
                             "memberName": "submission",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 433,
+                            "referencedDeclaration": 446,
                             "src": "3526:18:0",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_struct$_Submission_$450_memory_ptr",
+                              "typeIdentifier": "t_struct$_Submission_$463_memory_ptr",
                               "typeString": "struct Submission memory"
                             }
                           },
@@ -4808,7 +4808,7 @@
                           "memberLocation": "3545:6:0",
                           "memberName": "issuer",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 443,
+                          "referencedDeclaration": 456,
                           "src": "3526:25:0",
                           "typeDescriptions": {
                             "typeIdentifier": "t_address",
@@ -4935,7 +4935,7 @@
                               "referencedDeclaration": 322,
                               "src": "3624:7:0",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_struct$_Request_$436_memory_ptr",
+                                "typeIdentifier": "t_struct$_Request_$449_memory_ptr",
                                 "typeString": "struct Request memory"
                               }
                             },
@@ -4947,10 +4947,10 @@
                             "memberLocation": "3632:10:0",
                             "memberName": "submission",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 433,
+                            "referencedDeclaration": 446,
                             "src": "3624:18:0",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_struct$_Submission_$450_memory_ptr",
+                              "typeIdentifier": "t_struct$_Submission_$463_memory_ptr",
                               "typeString": "struct Submission memory"
                             }
                           },
@@ -4962,7 +4962,7 @@
                           "memberLocation": "3643:10:0",
                           "memberName": "solidified",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 449,
+                          "referencedDeclaration": 462,
                           "src": "3624:29:0",
                           "typeDescriptions": {
                             "typeIdentifier": "t_bool",
@@ -5037,89 +5037,186 @@
                   "src": "3615:86:0"
                 },
                 {
-                  "assignments": [
-                    359
-                  ],
-                  "declarations": [
-                    {
-                      "constant": false,
-                      "id": 359,
-                      "mutability": "mutable",
-                      "name": "success",
-                      "nameLocation": "3717:7:0",
-                      "nodeType": "VariableDeclaration",
-                      "scope": 405,
-                      "src": "3712:12:0",
-                      "stateVariable": false,
-                      "storageLocation": "default",
-                      "typeDescriptions": {
-                        "typeIdentifier": "t_bool",
-                        "typeString": "bool"
-                      },
-                      "typeName": {
-                        "id": 358,
-                        "name": "bool",
-                        "nodeType": "ElementaryTypeName",
-                        "src": "3712:4:0",
+                  "expression": {
+                    "arguments": [
+                      {
+                        "commonType": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        "id": 367,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "commonType": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          },
+                          "id": 364,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "leftExpression": {
+                            "expression": {
+                              "expression": {
+                                "id": 359,
+                                "name": "request",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 322,
+                                "src": "3719:7:0",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_struct$_Request_$449_memory_ptr",
+                                  "typeString": "struct Request memory"
+                                }
+                              },
+                              "id": 360,
+                              "isConstant": false,
+                              "isLValue": true,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "memberLocation": "3727:10:0",
+                              "memberName": "submission",
+                              "nodeType": "MemberAccess",
+                              "referencedDeclaration": 446,
+                              "src": "3719:18:0",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_struct$_Submission_$463_memory_ptr",
+                                "typeString": "struct Submission memory"
+                              }
+                            },
+                            "id": 361,
+                            "isConstant": false,
+                            "isLValue": true,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberLocation": "3738:9:0",
+                            "memberName": "timestamp",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 458,
+                            "src": "3719:28:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          },
+                          "nodeType": "BinaryOperation",
+                          "operator": "+",
+                          "rightExpression": {
+                            "expression": {
+                              "id": 362,
+                              "name": "request",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 322,
+                              "src": "3750:7:0",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_struct$_Request_$449_memory_ptr",
+                                "typeString": "struct Request memory"
+                              }
+                            },
+                            "id": 363,
+                            "isConstant": false,
+                            "isLValue": true,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberLocation": "3758:10:0",
+                            "memberName": "claimDelay",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 437,
+                            "src": "3750:18:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          },
+                          "src": "3719:49:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "<=",
+                        "rightExpression": {
+                          "expression": {
+                            "id": 365,
+                            "name": "block",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": -4,
+                            "src": "3772:5:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_magic_block",
+                              "typeString": "block"
+                            }
+                          },
+                          "id": 366,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberLocation": "3778:9:0",
+                          "memberName": "timestamp",
+                          "nodeType": "MemberAccess",
+                          "src": "3772:15:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "src": "3719:68:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
                         }
                       },
-                      "visibility": "internal"
-                    }
-                  ],
-                  "id": 364,
-                  "initialValue": {
-                    "arguments": [
                       {
-                        "id": 362,
-                        "name": "requestID",
-                        "nodeType": "Identifier",
-                        "overloadedDeclarations": [],
-                        "referencedDeclaration": 306,
-                        "src": "3755:9:0",
+                        "hexValue": "54686520636c61696d2064656c6179206861736e27742070617373656420796574",
+                        "id": 368,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "3789:35:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_uint256",
-                          "typeString": "uint256"
-                        }
+                          "typeIdentifier": "t_stringliteral_8bae005ca0192fe0d88e8743e6f54837cf49c856b7aff294f7c7372ee9ef49a3",
+                          "typeString": "literal_string \"The claim delay hasn't passed yet\""
+                        },
+                        "value": "The claim delay hasn't passed yet"
                       }
                     ],
                     "expression": {
                       "argumentTypes": [
                         {
-                          "typeIdentifier": "t_uint256",
-                          "typeString": "uint256"
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_8bae005ca0192fe0d88e8743e6f54837cf49c856b7aff294f7c7372ee9ef49a3",
+                          "typeString": "literal_string \"The claim delay hasn't passed yet\""
                         }
                       ],
-                      "expression": {
-                        "id": 360,
-                        "name": "brokerContract",
-                        "nodeType": "Identifier",
-                        "overloadedDeclarations": [],
-                        "referencedDeclaration": 13,
-                        "src": "3727:14:0",
-                        "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ExecutionBroker_$1266",
-                          "typeString": "contract ExecutionBroker"
-                        }
-                      },
-                      "id": 361,
-                      "isConstant": false,
-                      "isLValue": false,
-                      "isPure": false,
-                      "lValueRequested": false,
-                      "memberLocation": "3742:12:0",
-                      "memberName": "claimPayment",
-                      "nodeType": "MemberAccess",
-                      "referencedDeclaration": 1162,
-                      "src": "3727:27:0",
+                      "id": 358,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        -18,
+                        -18
+                      ],
+                      "referencedDeclaration": -18,
+                      "src": "3711:7:0",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_external_nonpayable$_t_uint256_$returns$_t_bool_$",
-                        "typeString": "function (uint256) external returns (bool)"
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 363,
+                    "id": 369,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -5128,87 +5225,16 @@
                     "nameLocations": [],
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "3727:38:0",
+                    "src": "3711:114:0",
                     "tryCall": false,
                     "typeDescriptions": {
-                      "typeIdentifier": "t_bool",
-                      "typeString": "bool"
-                    }
-                  },
-                  "nodeType": "VariableDeclarationStatement",
-                  "src": "3712:53:0"
-                },
-                {
-                  "expression": {
-                    "id": 369,
-                    "isConstant": false,
-                    "isLValue": false,
-                    "isPure": false,
-                    "lValueRequested": false,
-                    "leftHandSide": {
-                      "baseExpression": {
-                        "id": 365,
-                        "name": "activeRequestIDs",
-                        "nodeType": "Identifier",
-                        "overloadedDeclarations": [],
-                        "referencedDeclaration": 17,
-                        "src": "3775:16:0",
-                        "typeDescriptions": {
-                          "typeIdentifier": "t_mapping$_t_uint256_$_t_bool_$",
-                          "typeString": "mapping(uint256 => bool)"
-                        }
-                      },
-                      "id": 367,
-                      "indexExpression": {
-                        "id": 366,
-                        "name": "requestID",
-                        "nodeType": "Identifier",
-                        "overloadedDeclarations": [],
-                        "referencedDeclaration": 306,
-                        "src": "3792:9:0",
-                        "typeDescriptions": {
-                          "typeIdentifier": "t_uint256",
-                          "typeString": "uint256"
-                        }
-                      },
-                      "isConstant": false,
-                      "isLValue": true,
-                      "isPure": false,
-                      "lValueRequested": true,
-                      "nodeType": "IndexAccess",
-                      "src": "3775:27:0",
-                      "typeDescriptions": {
-                        "typeIdentifier": "t_bool",
-                        "typeString": "bool"
-                      }
-                    },
-                    "nodeType": "Assignment",
-                    "operator": "=",
-                    "rightHandSide": {
-                      "hexValue": "66616c7365",
-                      "id": 368,
-                      "isConstant": false,
-                      "isLValue": false,
-                      "isPure": true,
-                      "kind": "bool",
-                      "lValueRequested": false,
-                      "nodeType": "Literal",
-                      "src": "3805:5:0",
-                      "typeDescriptions": {
-                        "typeIdentifier": "t_bool",
-                        "typeString": "bool"
-                      },
-                      "value": "false"
-                    },
-                    "src": "3775:35:0",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_bool",
-                      "typeString": "bool"
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
                     }
                   },
                   "id": 370,
                   "nodeType": "ExpressionStatement",
-                  "src": "3775:35:0"
+                  "src": "3711:114:0"
                 },
                 {
                   "assignments": [
@@ -5219,11 +5245,185 @@
                       "constant": false,
                       "id": 372,
                       "mutability": "mutable",
-                      "name": "data",
-                      "nameLocation": "3842:4:0",
+                      "name": "success",
+                      "nameLocation": "3841:7:0",
                       "nodeType": "VariableDeclaration",
-                      "scope": 405,
-                      "src": "3829:17:0",
+                      "scope": 418,
+                      "src": "3836:12:0",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bool",
+                        "typeString": "bool"
+                      },
+                      "typeName": {
+                        "id": 371,
+                        "name": "bool",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "3836:4:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 377,
+                  "initialValue": {
+                    "arguments": [
+                      {
+                        "id": 375,
+                        "name": "requestID",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 306,
+                        "src": "3879:9:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      ],
+                      "expression": {
+                        "id": 373,
+                        "name": "brokerContract",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 13,
+                        "src": "3851:14:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_ExecutionBroker_$1279",
+                          "typeString": "contract ExecutionBroker"
+                        }
+                      },
+                      "id": 374,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "3866:12:0",
+                      "memberName": "claimPayment",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 1175,
+                      "src": "3851:27:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_nonpayable$_t_uint256_$returns$_t_bool_$",
+                        "typeString": "function (uint256) external returns (bool)"
+                      }
+                    },
+                    "id": 376,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "3851:38:0",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "3836:53:0"
+                },
+                {
+                  "expression": {
+                    "id": 382,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "baseExpression": {
+                        "id": 378,
+                        "name": "activeRequestIDs",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 17,
+                        "src": "3899:16:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_mapping$_t_uint256_$_t_bool_$",
+                          "typeString": "mapping(uint256 => bool)"
+                        }
+                      },
+                      "id": 380,
+                      "indexExpression": {
+                        "id": 379,
+                        "name": "requestID",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 306,
+                        "src": "3916:9:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "nodeType": "IndexAccess",
+                      "src": "3899:27:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bool",
+                        "typeString": "bool"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "hexValue": "66616c7365",
+                      "id": 381,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "bool",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "3929:5:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bool",
+                        "typeString": "bool"
+                      },
+                      "value": "false"
+                    },
+                    "src": "3899:35:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 383,
+                  "nodeType": "ExpressionStatement",
+                  "src": "3899:35:0"
+                },
+                {
+                  "assignments": [
+                    385
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 385,
+                      "mutability": "mutable",
+                      "name": "data",
+                      "nameLocation": "3966:4:0",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 418,
+                      "src": "3953:17:0",
                       "stateVariable": false,
                       "storageLocation": "memory",
                       "typeDescriptions": {
@@ -5231,10 +5431,10 @@
                         "typeString": "bytes"
                       },
                       "typeName": {
-                        "id": 371,
+                        "id": 384,
                         "name": "bytes",
                         "nodeType": "ElementaryTypeName",
-                        "src": "3829:5:0",
+                        "src": "3953:5:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes_storage_ptr",
                           "typeString": "bytes"
@@ -5243,63 +5443,63 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 383,
+                  "id": 396,
                   "initialValue": {
                     "arguments": [
                       {
                         "expression": {
                           "expression": {
                             "expression": {
-                              "id": 375,
+                              "id": 388,
                               "name": "request",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
                               "referencedDeclaration": 322,
-                              "src": "3872:7:0",
+                              "src": "3996:7:0",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_struct$_Request_$436_memory_ptr",
+                                "typeIdentifier": "t_struct$_Request_$449_memory_ptr",
                                 "typeString": "struct Request memory"
                               }
                             },
-                            "id": 376,
+                            "id": 389,
                             "isConstant": false,
                             "isLValue": true,
                             "isPure": false,
                             "lValueRequested": false,
-                            "memberLocation": "3880:6:0",
+                            "memberLocation": "4004:6:0",
                             "memberName": "client",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 427,
-                            "src": "3872:14:0",
+                            "referencedDeclaration": 440,
+                            "src": "3996:14:0",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_BaseClient_$407",
+                              "typeIdentifier": "t_contract$_BaseClient_$420",
                               "typeString": "contract BaseClient"
                             }
                           },
-                          "id": 377,
+                          "id": 390,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
                           "lValueRequested": false,
-                          "memberLocation": "3887:13:0",
+                          "memberLocation": "4011:13:0",
                           "memberName": "processResult",
                           "nodeType": "MemberAccess",
                           "referencedDeclaration": 72,
-                          "src": "3872:28:0",
+                          "src": "3996:28:0",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_external_nonpayable$_t_bytes_memory_ptr_$returns$__$",
                             "typeString": "function (bytes memory) external"
                           }
                         },
-                        "id": 378,
+                        "id": 391,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
                         "lValueRequested": false,
-                        "memberLocation": "3901:8:0",
+                        "memberLocation": "4025:8:0",
                         "memberName": "selector",
                         "nodeType": "MemberAccess",
-                        "src": "3872:37:0",
+                        "src": "3996:37:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes4",
                           "typeString": "bytes4"
@@ -5308,42 +5508,42 @@
                       {
                         "expression": {
                           "expression": {
-                            "id": 379,
+                            "id": 392,
                             "name": "request",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
                             "referencedDeclaration": 322,
-                            "src": "3911:7:0",
+                            "src": "4035:7:0",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_struct$_Request_$436_memory_ptr",
+                              "typeIdentifier": "t_struct$_Request_$449_memory_ptr",
                               "typeString": "struct Request memory"
                             }
                           },
-                          "id": 380,
+                          "id": 393,
                           "isConstant": false,
                           "isLValue": true,
                           "isPure": false,
                           "lValueRequested": false,
-                          "memberLocation": "3919:10:0",
+                          "memberLocation": "4043:10:0",
                           "memberName": "submission",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 433,
-                          "src": "3911:18:0",
+                          "referencedDeclaration": 446,
+                          "src": "4035:18:0",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_struct$_Submission_$450_memory_ptr",
+                            "typeIdentifier": "t_struct$_Submission_$463_memory_ptr",
                             "typeString": "struct Submission memory"
                           }
                         },
-                        "id": 381,
+                        "id": 394,
                         "isConstant": false,
                         "isLValue": true,
                         "isPure": false,
                         "lValueRequested": false,
-                        "memberLocation": "3930:6:0",
+                        "memberLocation": "4054:6:0",
                         "memberName": "result",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 447,
-                        "src": "3911:25:0",
+                        "referencedDeclaration": 460,
+                        "src": "4035:25:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes_memory_ptr",
                           "typeString": "bytes memory"
@@ -5362,32 +5562,32 @@
                         }
                       ],
                       "expression": {
-                        "id": 373,
+                        "id": 386,
                         "name": "abi",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
                         "referencedDeclaration": -1,
-                        "src": "3849:3:0",
+                        "src": "3973:3:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_magic_abi",
                           "typeString": "abi"
                         }
                       },
-                      "id": 374,
+                      "id": 387,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "lValueRequested": false,
-                      "memberLocation": "3853:18:0",
+                      "memberLocation": "3977:18:0",
                       "memberName": "encodeWithSelector",
                       "nodeType": "MemberAccess",
-                      "src": "3849:22:0",
+                      "src": "3973:22:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_abiencodewithselector_pure$_t_bytes4_$returns$_t_bytes_memory_ptr_$",
                         "typeString": "function (bytes4) pure returns (bytes memory)"
                       }
                     },
-                    "id": 382,
+                    "id": 395,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -5396,7 +5596,7 @@
                     "nameLocations": [],
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "3849:88:0",
+                    "src": "3973:88:0",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes_memory_ptr",
@@ -5404,23 +5604,23 @@
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "3829:108:0"
+                  "src": "3953:108:0"
                 },
                 {
                   "assignments": [
-                    385,
+                    398,
                     null
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 385,
+                      "id": 398,
                       "mutability": "mutable",
                       "name": "callSuccess",
-                      "nameLocation": "3953:11:0",
+                      "nameLocation": "4077:11:0",
                       "nodeType": "VariableDeclaration",
-                      "scope": 405,
-                      "src": "3948:16:0",
+                      "scope": 418,
+                      "src": "4072:16:0",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
@@ -5428,10 +5628,10 @@
                         "typeString": "bool"
                       },
                       "typeName": {
-                        "id": 384,
+                        "id": 397,
                         "name": "bool",
                         "nodeType": "ElementaryTypeName",
-                        "src": "3948:4:0",
+                        "src": "4072:4:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
@@ -5441,16 +5641,16 @@
                     },
                     null
                   ],
-                  "id": 397,
+                  "id": 410,
                   "initialValue": {
                     "arguments": [
                       {
-                        "id": 395,
+                        "id": 408,
                         "name": "data",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 372,
-                        "src": "4031:4:0",
+                        "referencedDeclaration": 385,
+                        "src": "4155:4:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes_memory_ptr",
                           "typeString": "bytes memory"
@@ -5475,29 +5675,29 @@
                           "arguments": [
                             {
                               "expression": {
-                                "id": 388,
+                                "id": 401,
                                 "name": "request",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
                                 "referencedDeclaration": 322,
-                                "src": "3978:7:0",
+                                "src": "4102:7:0",
                                 "typeDescriptions": {
-                                  "typeIdentifier": "t_struct$_Request_$436_memory_ptr",
+                                  "typeIdentifier": "t_struct$_Request_$449_memory_ptr",
                                   "typeString": "struct Request memory"
                                 }
                               },
-                              "id": 389,
+                              "id": 402,
                               "isConstant": false,
                               "isLValue": true,
                               "isPure": false,
                               "lValueRequested": false,
-                              "memberLocation": "3986:6:0",
+                              "memberLocation": "4110:6:0",
                               "memberName": "client",
                               "nodeType": "MemberAccess",
-                              "referencedDeclaration": 427,
-                              "src": "3978:14:0",
+                              "referencedDeclaration": 440,
+                              "src": "4102:14:0",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_BaseClient_$407",
+                                "typeIdentifier": "t_contract$_BaseClient_$420",
                                 "typeString": "contract BaseClient"
                               }
                             }
@@ -5505,30 +5705,30 @@
                           "expression": {
                             "argumentTypes": [
                               {
-                                "typeIdentifier": "t_contract$_BaseClient_$407",
+                                "typeIdentifier": "t_contract$_BaseClient_$420",
                                 "typeString": "contract BaseClient"
                               }
                             ],
-                            "id": 387,
+                            "id": 400,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
                             "lValueRequested": false,
                             "nodeType": "ElementaryTypeNameExpression",
-                            "src": "3970:7:0",
+                            "src": "4094:7:0",
                             "typeDescriptions": {
                               "typeIdentifier": "t_type$_t_address_$",
                               "typeString": "type(address)"
                             },
                             "typeName": {
-                              "id": 386,
+                              "id": 399,
                               "name": "address",
                               "nodeType": "ElementaryTypeName",
-                              "src": "3970:7:0",
+                              "src": "4094:7:0",
                               "typeDescriptions": {}
                             }
                           },
-                          "id": 390,
+                          "id": 403,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -5537,28 +5737,28 @@
                           "nameLocations": [],
                           "names": [],
                           "nodeType": "FunctionCall",
-                          "src": "3970:23:0",
+                          "src": "4094:23:0",
                           "tryCall": false,
                           "typeDescriptions": {
                             "typeIdentifier": "t_address",
                             "typeString": "address"
                           }
                         },
-                        "id": 391,
+                        "id": 404,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
                         "lValueRequested": false,
-                        "memberLocation": "3994:4:0",
+                        "memberLocation": "4118:4:0",
                         "memberName": "call",
                         "nodeType": "MemberAccess",
-                        "src": "3970:28:0",
+                        "src": "4094:28:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_function_barecall_payable$_t_bytes_memory_ptr_$returns$_t_bool_$_t_bytes_memory_ptr_$",
                           "typeString": "function (bytes memory) payable returns (bool,bytes memory)"
                         }
                       },
-                      "id": 394,
+                      "id": 407,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -5570,40 +5770,40 @@
                       "options": [
                         {
                           "expression": {
-                            "id": 392,
+                            "id": 405,
                             "name": "request",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
                             "referencedDeclaration": 322,
-                            "src": "4004:7:0",
+                            "src": "4128:7:0",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_struct$_Request_$436_memory_ptr",
+                              "typeIdentifier": "t_struct$_Request_$449_memory_ptr",
                               "typeString": "struct Request memory"
                             }
                           },
-                          "id": 393,
+                          "id": 406,
                           "isConstant": false,
                           "isLValue": true,
                           "isPure": false,
                           "lValueRequested": false,
-                          "memberLocation": "4012:17:0",
+                          "memberLocation": "4136:17:0",
                           "memberName": "postProcessingGas",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 420,
-                          "src": "4004:25:0",
+                          "referencedDeclaration": 433,
+                          "src": "4128:25:0",
                           "typeDescriptions": {
                             "typeIdentifier": "t_uint256",
                             "typeString": "uint256"
                           }
                         }
                       ],
-                      "src": "3970:60:0",
+                      "src": "4094:60:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_barecall_payable$_t_bytes_memory_ptr_$returns$_t_bool_$_t_bytes_memory_ptr_$gas",
                         "typeString": "function (bytes memory) payable returns (bool,bytes memory)"
                       }
                     },
-                    "id": 396,
+                    "id": 409,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -5612,7 +5812,7 @@
                     "nameLocations": [],
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "3970:66:0",
+                    "src": "4094:66:0",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$_t_bool_$_t_bytes_memory_ptr_$",
@@ -5620,30 +5820,30 @@
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "3947:89:0"
+                  "src": "4071:89:0"
                 },
                 {
                   "eventCall": {
                     "arguments": [
                       {
-                        "id": 399,
+                        "id": 412,
                         "name": "requestID",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
                         "referencedDeclaration": 306,
-                        "src": "4071:9:0",
+                        "src": "4195:9:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
                         }
                       },
                       {
-                        "id": 400,
+                        "id": 413,
                         "name": "callSuccess",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 385,
-                        "src": "4082:11:0",
+                        "referencedDeclaration": 398,
+                        "src": "4206:11:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
@@ -5661,18 +5861,18 @@
                           "typeString": "bool"
                         }
                       ],
-                      "id": 398,
+                      "id": 411,
                       "name": "resultPostProcessed",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
                       "referencedDeclaration": 27,
-                      "src": "4051:19:0",
+                      "src": "4175:19:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_uint256_$_t_bool_$returns$__$",
                         "typeString": "function (uint256,bool)"
                       }
                     },
-                    "id": 401,
+                    "id": 414,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -5681,39 +5881,39 @@
                     "nameLocations": [],
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "4051:43:0",
+                    "src": "4175:43:0",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 402,
+                  "id": 415,
                   "nodeType": "EmitStatement",
-                  "src": "4046:48:0"
+                  "src": "4170:48:0"
                 },
                 {
                   "expression": {
-                    "id": 403,
+                    "id": 416,
                     "name": "success",
                     "nodeType": "Identifier",
                     "overloadedDeclarations": [],
-                    "referencedDeclaration": 359,
-                    "src": "4112:7:0",
+                    "referencedDeclaration": 372,
+                    "src": "4236:7:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
                     }
                   },
                   "functionReturnParameters": 310,
-                  "id": 404,
+                  "id": 417,
                   "nodeType": "Return",
-                  "src": "4105:14:0"
+                  "src": "4229:14:0"
                 }
               ]
             },
             "functionSelector": "c63fdcc7",
-            "id": 406,
+            "id": 419,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -5731,7 +5931,7 @@
                   "name": "requestID",
                   "nameLocation": "3168:9:0",
                   "nodeType": "VariableDeclaration",
-                  "scope": 406,
+                  "scope": 419,
                   "src": "3163:14:0",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -5765,7 +5965,7 @@
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 406,
+                  "scope": 419,
                   "src": "3197:4:0",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -5788,19 +5988,19 @@
               ],
               "src": "3196:6:0"
             },
-            "scope": 407,
-            "src": "3141:985:0",
+            "scope": 420,
+            "src": "3141:1109:0",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 408,
-        "src": "128:4001:0",
+        "scope": 421,
+        "src": "128:4125:0",
         "usedErrors": []
       }
     ],
-    "src": "37:4254:0"
+    "src": "37:4378:0"
   },
   "bytecode": "",
   "bytecodeSha1": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
@@ -5831,12 +6031,12 @@
   },
   "offset": [
     128,
-    4129
+    4253
   ],
   "opcodes": "",
   "pcMap": {},
-  "sha1": "9f8f5ea587ead626e0f353294db1af2c7dbd3f64",
-  "source": "// SPDX-License-Identifier: GPL-3.0\n\npragma solidity >=0.7.0 <0.9.0;\n\nimport \"./ExecutionBroker.sol\";\nimport \"./Ownable.sol\";\n\n\nabstract contract BaseClient is Ownable {\n\n    struct ClientInput {\n        uint functionToRun;\n        bytes data;\n    }\n\n    ExecutionBroker public brokerContract;\n    mapping(uint => bool) activeRequestIDs;\n\n    event requestSubmitted(uint requestID);\n    event resultPostProcessed(uint requestID, bool success);\n\n    modifier onlyClient() {\n        require(msg.sender == address(this), \"Function accessible only by the contract itself\");\n        _;\n    }\n\n    constructor(address brokerAddress) Ownable() {\n        // aca linkear con Broker hardcoded\n        brokerContract = ExecutionBroker(brokerAddress);\n    }\n\n    function clientLogic(ClientInput calldata input) external virtual pure returns (bytes memory);\n    function processResult(bytes calldata result) public virtual onlyClient {}\n    function getInputStructure(uint functionID) external virtual pure returns (string memory);\n\n    function submitRequest(uint payment, ClientInput calldata input, uint postProcessingGas, uint requestedInsurance, uint claimDelay) external payable onlyOwner returns (uint) {\n        return _submitRequest(payment, input, postProcessingGas, requestedInsurance, claimDelay);\n    }\n\n    function _submitRequest(uint payment, ClientInput memory input, uint postProcessingGas, uint requestedInsurance, uint claimDelay) internal returns (uint) {\n        require(payment <= address(this).balance, \"Insufficient funds\");\n        uint requestID = brokerContract.submitRequest{value: payment}(input, postProcessingGas, requestedInsurance, claimDelay);\n        emit requestSubmitted(requestID);\n        activeRequestIDs[requestID] = true;\n        return requestID;\n    }\n\n    function cancelRequest(uint requestID) external onlyOwner {\n        brokerContract.cancelRequest(requestID);\n    }\n\n    function sendFunds() public payable {}\n    \n    function withdrawFunds(uint value) public onlyOwner returns (bool) {\n        require(address(this).balance >= value, \"Insufficient funds\");\n        address payable payee = payable(msg.sender);\n        (bool success, ) = payee.call{value: value}(\"\");\n        return success;\n    }\n\n    function challengeSubmission(uint requestID) external returns (bool) {\n        require(activeRequestIDs[requestID] == true, \"This ID does not belong to an active request within this client\");\n        Request memory request = brokerContract.getRequest(requestID);\n        require(request.submission.issuer != address(0x0), \"There are no submissions for the challenged request\");\n        require(!request.submission.solidified, \"The challenged submission has already solidified\");\n        \n        bool success = brokerContract.challengeSubmission(requestID, msg.sender);\n        \n        bytes memory data = abi.encodeWithSelector(request.client.processResult.selector, request.submission.result);\n        (bool callSuccess, ) = address(request.client).call{gas: request.postProcessingGas}(data);\n        emit resultPostProcessed(requestID, callSuccess);\n        \n        return success;\n    }\n\n    function claimPayment(uint requestID) external returns (bool) {\n        require(activeRequestIDs[requestID] == true, \"This ID does not belong to an active request within this client\");\n        Request memory request = brokerContract.getRequest(requestID);\n        require(request.submission.issuer != address(0x0), \"There are no submissions for the provided request\");\n        require(request.submission.issuer == msg.sender, \"This payment does not belong to you\");\n        require(!request.submission.solidified, \"The provided request has already solidified\");\n\n        bool success = brokerContract.claimPayment(requestID);\n        activeRequestIDs[requestID] = false;\n        \n        bytes memory data = abi.encodeWithSelector(request.client.processResult.selector, request.submission.result);\n        (bool callSuccess, ) = address(request.client).call{gas: request.postProcessingGas}(data);\n        emit resultPostProcessed(requestID, callSuccess);\n\n        return success;\n    }\n\n}\n//TODO poner en la tesis que esta correccion de vulnerabilidad es por si un cliente hace un delegate call al postproc de otro cliente con la identidad del broker",
+  "sha1": "732c9861aaa8da881547809c2895b161f59db7a7",
+  "source": "// SPDX-License-Identifier: GPL-3.0\n\npragma solidity >=0.7.0 <0.9.0;\n\nimport \"./ExecutionBroker.sol\";\nimport \"./Ownable.sol\";\n\n\nabstract contract BaseClient is Ownable {\n\n    struct ClientInput {\n        uint functionToRun;\n        bytes data;\n    }\n\n    ExecutionBroker public brokerContract;\n    mapping(uint => bool) activeRequestIDs;\n\n    event requestSubmitted(uint requestID);\n    event resultPostProcessed(uint requestID, bool success);\n\n    modifier onlyClient() {\n        require(msg.sender == address(this), \"Function accessible only by the contract itself\");\n        _;\n    }\n\n    constructor(address brokerAddress) Ownable() {\n        // aca linkear con Broker hardcoded\n        brokerContract = ExecutionBroker(brokerAddress);\n    }\n\n    function clientLogic(ClientInput calldata input) external virtual pure returns (bytes memory);\n    function processResult(bytes calldata result) public virtual onlyClient {}\n    function getInputStructure(uint functionID) external virtual pure returns (string memory);\n\n    function submitRequest(uint payment, ClientInput calldata input, uint postProcessingGas, uint requestedInsurance, uint claimDelay) external payable onlyOwner returns (uint) {\n        return _submitRequest(payment, input, postProcessingGas, requestedInsurance, claimDelay);\n    }\n\n    function _submitRequest(uint payment, ClientInput memory input, uint postProcessingGas, uint requestedInsurance, uint claimDelay) internal returns (uint) {\n        require(payment <= address(this).balance, \"Insufficient funds\");\n        uint requestID = brokerContract.submitRequest{value: payment}(input, postProcessingGas, requestedInsurance, claimDelay);\n        emit requestSubmitted(requestID);\n        activeRequestIDs[requestID] = true;\n        return requestID;\n    }\n\n    function cancelRequest(uint requestID) external onlyOwner {\n        brokerContract.cancelRequest(requestID);\n    }\n\n    function sendFunds() public payable {}\n    \n    function withdrawFunds(uint value) public onlyOwner returns (bool) {\n        require(address(this).balance >= value, \"Insufficient funds\");\n        address payable payee = payable(msg.sender);\n        (bool success, ) = payee.call{value: value}(\"\");\n        return success;\n    }\n\n    function challengeSubmission(uint requestID) external returns (bool) {\n        require(activeRequestIDs[requestID] == true, \"This ID does not belong to an active request within this client\");\n        Request memory request = brokerContract.getRequest(requestID);\n        require(request.submission.issuer != address(0x0), \"There are no submissions for the challenged request\");\n        require(!request.submission.solidified, \"The challenged submission has already solidified\");\n        \n        bool success = brokerContract.challengeSubmission(requestID, msg.sender);\n        \n        bytes memory data = abi.encodeWithSelector(request.client.processResult.selector, request.submission.result);\n        (bool callSuccess, ) = address(request.client).call{gas: request.postProcessingGas}(data);\n        emit resultPostProcessed(requestID, callSuccess);\n        \n        return success;\n    }\n\n    function claimPayment(uint requestID) external returns (bool) {\n        require(activeRequestIDs[requestID] == true, \"This ID does not belong to an active request within this client\");\n        Request memory request = brokerContract.getRequest(requestID);\n        require(request.submission.issuer != address(0x0), \"There are no submissions for the provided request\");\n        require(request.submission.issuer == msg.sender, \"This payment does not belong to you\");\n        require(!request.submission.solidified, \"The provided request has already solidified\");\n        require(request.submission.timestamp + request.claimDelay <= block.timestamp, \"The claim delay hasn't passed yet\");\n\n        bool success = brokerContract.claimPayment(requestID);\n        activeRequestIDs[requestID] = false;\n        \n        bytes memory data = abi.encodeWithSelector(request.client.processResult.selector, request.submission.result);\n        (bool callSuccess, ) = address(request.client).call{gas: request.postProcessingGas}(data);\n        emit resultPostProcessed(requestID, callSuccess);\n\n        return success;\n    }\n\n}\n//TODO poner en la tesis que esta correccion de vulnerabilidad es por si un cliente hace un delegate call al postproc de otro cliente con la identidad del broker",
   "sourceMap": "",
   "sourcePath": "contracts/BaseClient.sol",
   "type": "contract"

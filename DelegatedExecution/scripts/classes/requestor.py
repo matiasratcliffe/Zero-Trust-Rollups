@@ -51,4 +51,4 @@ class Requestor:
 
     def publicizeRequest(self, requestID):
         broker = BrokerFactory.at(address=self.client.brokerContract())
-        broker.publicizeRequest(requestID, {"from": self.owner})
+        return broker.publicizeRequest(requestID, {"from": self.owner})
