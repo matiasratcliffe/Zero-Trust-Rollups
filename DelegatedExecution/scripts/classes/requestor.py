@@ -52,3 +52,6 @@ class Requestor:
     def publicizeRequest(self, requestID):
         broker = BrokerFactory.at(address=self.client.brokerContract())
         return broker.publicizeRequest(requestID, {"from": self.owner})
+
+    def togglePostProcessing(self):
+        return self.client.togglePostProcessing({"from": self.owner})

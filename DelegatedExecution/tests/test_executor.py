@@ -405,7 +405,7 @@ class TestExecutor:
     def test_find_first_primes(self):
         broker = BrokerFactory.create(account=Accounts.getFromIndex(0))
         requestor = Requestor(ClientFactory.create(broker, owner=Accounts.getFromIndex(1)))
-        requestor.sendFunds(99e18)
+        requestor.sendFunds(1e18)
         reqID = requestor.createRequest(functionToRun=1, dataArray=[3], payment=1e13, postProcessingGas=1e12, requestedInsurance=2e14)
         executor = Executor(Accounts.getFromIndex(0), broker, populateBuffers=True)
         initialFunds = executor.account.balance()
@@ -416,4 +416,112 @@ class TestExecutor:
             executor._claimPayment(reqID + i)
         assert executor.account.balance() > initialFunds
         assert list(requestor.client.getPrimes()) == [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73]
-        
+
+    def test_confirm_result_no_submissions(self):
+        requestor = Requestor(ClientFactory.getInstance())
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor = Executor(Accounts.getFromIndex(0), broker, populateBuffers=False)
+        with pytest.raises(Exception, match="There are no submissions for this request"):
+            executor._confirmResult(reqID)
+    
+    def test_confirm_solidified_result(self):
+        requestor = Requestor(ClientFactory.getInstance())
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18, claimDelay=0)
+        executor.unacceptedRequests = [reqID]
+        executor.solverLoopRound()
+        executor._claimPayment(reqID)
+        with pytest.raises(Exception, match="This request has already been solidified"):
+            executor._confirmResult(reqID)
+
+    def test_confirm_own_result(self):
+        requestor = Requestor(ClientFactory.getInstance())
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor = Executor(Accounts.getAccount(), broker, populateBuffers=False)
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        executor.unacceptedRequests = [reqID]
+        executor.solverLoopRound()
+        with pytest.raises(Exception, match="You cant confirm your own result"):
+            executor._confirmResult(reqID)
+    
+    def test_confirm_result_twice(self):
+        requestor = Requestor(ClientFactory.getInstance())
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor1 = Executor(Accounts.getFromIndex(0), broker, populateBuffers=False)
+        executor2 = Executor(Accounts.getFromIndex(1), broker, populateBuffers=False)
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        executor1.unacceptedRequests = [reqID]
+        executor1.solverLoopRound()
+        executor2._confirmResult(reqID)
+        with pytest.raises(Exception, match="You have already confirmed this result"):
+            executor2._confirmResult(reqID)
+
+    def test_confirm_result_max_confirmations(self):
+        requestor = Requestor(ClientFactory.getInstance())
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor1 = Executor(Accounts.getFromIndex(0), broker, populateBuffers=False)
+        executor2 = Executor(Accounts.getFromIndex(1), broker, populateBuffers=False)
+        executor3 = Executor(Accounts.getFromIndex(2), broker, populateBuffers=False)
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        executor1.unacceptedRequests = [reqID]
+        executor1.solverLoopRound()
+        executor2._confirmResult(reqID)
+        executor3._confirmResult(reqID)
+        with pytest.raises(Exception, match="This request has reached max confirmation"):
+            executor2._confirmResult(reqID)
+    
+    def test_confirm_result_wrong_amount_of_insurance(self):
+        requestor = Requestor(ClientFactory.getInstance())
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor1 = Executor(Accounts.getFromIndex(0), broker, populateBuffers=False)
+        executor2 = Executor(Accounts.getFromIndex(1), broker, populateBuffers=False)
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        executor1.unacceptedRequests = [reqID]
+        executor1.solverLoopRound()
+        with pytest.raises(Exception, match="You need to deposit a percentage of the insurance fee to confirm"):
+            executor2.broker.confirmResult(reqID, {"from": executor2.account})
+    
+    def test_confirm_correct_result(self):
+        requestor = Requestor(ClientFactory.getInstance())
+        requestor.togglePostProcessing()
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor1 = Executor(Accounts.getFromIndex(0), broker, populateBuffers=False)
+        executor2 = Executor(Accounts.getFromIndex(1), broker, populateBuffers=False)
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18, claimDelay=0)
+        request = broker.requests(reqID).dict()
+        executor1.unacceptedRequests = [reqID]
+        executor1.solverLoopRound()
+        executor2._confirmResult(reqID)
+        requestorOriginalBalance = requestor.client.balance()
+        executor1OriginalBalance = executor1.account.balance()
+        executor2OriginalBalance = executor2.account.balance()
+        tx = executor1._claimPayment(reqID)
+        assert requestor.client.balance() == requestorOriginalBalance + (request["payment"] * broker.CONFIRMERS_FEE_PERCENTAGE()) / 100
+        assert executor1.account.balance() == executor1OriginalBalance + (request["payment"] + request["challengeInsurance"]) - (tx.gas_used * tx.gas_price)
+        assert executor2.account.balance() == executor2OriginalBalance + ((request["payment"] + request["challengeInsurance"]) * broker.CONFIRMERS_FEE_PERCENTAGE()) / 100
+    
+    def test_confirm_erroneous_result(self):
+        requestor = Requestor(ClientFactory.getInstance())
+        requestor.togglePostProcessing()
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        executor1 = Executor(Accounts.getFromIndex(0), broker, populateBuffers=False)
+        executor2 = Executor(Accounts.getFromIndex(1), broker, populateBuffers=False)
+        executor3 = Executor(Accounts.getFromIndex(2), broker, populateBuffers=False)
+        reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        request = broker.requests(reqID).dict()
+        executor1._acceptRequest(reqID)
+        result = executor1._computeResult(reqID)
+        alteredResult = HexString((int.from_bytes(result, "big") + 1), "bytes32")
+        executor1._submitResult(reqID, alteredResult)
+        executor2._confirmResult(reqID)
+        requestorOriginalBalance = requestor.client.balance()
+        executor1OriginalBalance = executor1.account.balance()
+        executor2OriginalBalance = executor2.account.balance()
+        executor3OriginalBalance = executor3.account.balance()
+        tx = executor3._challengeSubmission(reqID)
+        assert requestor.client.balance() == requestorOriginalBalance + 2 * (request["payment"] * broker.CONFIRMERS_FEE_PERCENTAGE()) / 100
+        assert executor1.account.balance() == executor1OriginalBalance
+        assert executor2.account.balance() == executor2OriginalBalance
+        assert executor3.account.balance() == executor3OriginalBalance + (request["payment"] + request["challengeInsurance"]) + (request["challengeInsurance"] * broker.CONFIRMERS_FEE_PERCENTAGE()) / 100 - (tx.gas_used * tx.gas_price)

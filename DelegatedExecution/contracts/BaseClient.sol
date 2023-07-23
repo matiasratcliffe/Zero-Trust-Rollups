@@ -38,8 +38,9 @@ abstract contract BaseClient is Ownable {
     }
 
     function _submitRequest(uint payment, ClientInput memory input, uint postProcessingGas, uint requestedInsurance, uint claimDelay) internal returns (uint) {
-        require(payment <= address(this).balance, "Insufficient funds");
-        uint requestID = brokerContract.submitRequest{value: payment}(input, postProcessingGas, requestedInsurance, claimDelay);
+        uint actualPayment = payment + (payment * brokerContract.AMOUNT_OF_CONFIRMERS() * brokerContract.CONFIRMERS_FEE_PERCENTAGE()) / 100;
+        require(actualPayment <= address(this).balance, "Insufficient funds: you must pay for the executor and confirmers");
+        uint requestID = brokerContract.submitRequest{value: actualPayment}(input, payment, postProcessingGas, requestedInsurance, claimDelay);
         emit requestSubmitted(requestID);
         activeRequestIDs[requestID] = true;
         return requestID;
@@ -52,7 +53,7 @@ abstract contract BaseClient is Ownable {
     function sendFunds() public payable {}
     
     function withdrawFunds(uint value) public onlyOwner returns (bool) {
-        require(address(this).balance >= value, "Insufficient funds");
+        //require(address(this).balance >= value, "Insufficient funds");
         address payable payee = payable(msg.sender);
         (bool success, ) = payee.call{value: value}("");
         return success;
@@ -90,6 +91,7 @@ abstract contract BaseClient is Ownable {
 
         return success;
     }
-
+    
+    receive() external payable {}
 }
 //TODO poner en la tesis que esta correccion de vulnerabilidad es por si un cliente hace un delegate call al postproc de otro cliente con la identidad del broker

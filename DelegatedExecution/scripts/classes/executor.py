@@ -11,7 +11,7 @@ class Executor:
         self._maxInsurance = 1e+18
         self._maxDelay = 60 * 60 * 24
         self.account = account
-        self.broker = broker #BrokerFactory.at(address=broker) TODO check this!!!
+        self.broker = broker
         self.unacceptedRequests = []
         self.unsolidifiedSubmissions = []
         if (populateBuffers):
@@ -37,7 +37,6 @@ class Executor:
             Logger.log(f"{self} detected -> Event[{event.event}]: {dict(event.args)}", logIndentation=0)
             if event.args.requestID in self.unsolidifiedSubmissions:
                 self.unsolidifiedSubmissions.remove(event.args.requestID)
-        # TODO ver tema matar threads
         self.broker.events.subscribe("requestCreated", addUnacceptedRequest)
         self.broker.events.subscribe("acceptanceCancelled", addUnacceptedRequest)
         self.broker.events.subscribe("requestCancelled", removeUnacceptedRequest)
@@ -83,7 +82,13 @@ class Executor:
         transaction = self.broker.submitResult(requestID, result, {'from': self.account})
         transaction.wait(1)
         return transaction
-    
+
+    def _confirmResult(self, requestID):
+        insurance = int((self.broker.requests(requestID).dict()["challengeInsurance"] * self.broker.CONFIRMERS_FEE_PERCENTAGE()) / 100)
+        transaction = self.broker.confirmResult(requestID, {"value": insurance, "from": self.account})
+        transaction.wait(1)
+        return transaction
+
     def _challengeSubmission(self, requestID):
         client = ClientFactory.at(address=self.broker.requests(requestID).dict()['client'])
         transaction = client.challengeSubmission(requestID, {'from': self.account})
@@ -99,8 +104,8 @@ class Executor:
     def solverLoopRound(self):
         if len(self.unacceptedRequests) > 0:
             requestID = self.unacceptedRequests.pop(0)
-            self._acceptRequest(requestID)  # TODO what if anything here fails? TEST THAT TOO
-            time.sleep(2) # TODO loop here?
+            self._acceptRequest(requestID)
+            time.sleep(2)
             if str(self.broker.requests(requestID).dict()['acceptance'][0]) == self.account.address:
                 result = self._computeResult(requestID)
                 self._submitResult(requestID, result)

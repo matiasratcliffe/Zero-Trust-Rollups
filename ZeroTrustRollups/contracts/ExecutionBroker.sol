@@ -63,7 +63,7 @@ contract ExecutionBroker is Transferable {
             input: input,
             payment: msg.value,  // aca esta incluido el post processing gas, para evitar tener que devolver aparte
             postProcessingGas: postProcessingGas,
-            client: BaseClient(msg.sender),
+            client: BaseClient(payable(msg.sender)),
             executor: address(0x0),
             acceptedTimestamp: 0,
             result: abi.encode(0),

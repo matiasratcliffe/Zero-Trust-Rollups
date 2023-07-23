@@ -70,4 +70,5 @@ abstract contract BaseClient is Ownable {
         return success;
     }
 
+    receive() external payable {}
 }

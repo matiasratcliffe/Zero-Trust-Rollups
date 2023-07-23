@@ -10,6 +10,7 @@ struct Request {
     uint id;  // Index, for unicity when raw comparing
     BaseClient.ClientInput input;
     uint payment; // In Wei; deberia tener en cuenta el computo y el gas de las operaciones de submit y claim
+    address[] confirmers;
     uint postProcessingGas;  // In Wei; for the post processing, if any
     uint challengeInsurance;  // amount of gas for challenges, deberia ser mayor al gas estimado, just in case
     uint claimDelay;  // the minimum amount of time that needs to pass between a submission and a payment claim, to allow for possible challengers, in secconds
@@ -35,6 +36,8 @@ struct Submission {
 contract ExecutionBroker is Transferable {
 
     uint public ACCEPTANCE_GRACE_PERIOD;  // = 300 seconds = 5 minutes 
+    uint8 public CONFIRMERS_FEE_PERCENTAGE;
+    uint8 public AMOUNT_OF_CONFIRMERS;
 
     Request[] public requests;
 
@@ -45,20 +48,24 @@ contract ExecutionBroker is Transferable {
     event acceptanceCancelled(uint requestID, address acceptor, bool refundSuccess);
     
     event resultSubmitted(uint requestID, bytes result, address submitter);
+    event resultConfirmed(uint requestID);
     event requestSolidified(uint requestID);
     
     event challengeProcessed(uint requestID, bytes result);
     event challengePayment(uint requestID, address payee, bool success);
     
-    constructor(uint acceptanceGracePeriod) {
+    constructor(uint acceptanceGracePeriod, uint8 confirmersFeePercentage, uint8 amountOfConfirmers) {
         ACCEPTANCE_GRACE_PERIOD = acceptanceGracePeriod;
+        CONFIRMERS_FEE_PERCENTAGE = confirmersFeePercentage;
+        AMOUNT_OF_CONFIRMERS = amountOfConfirmers;
     }
 
     // Restricted interaction functions
 
-    function submitRequest(BaseClient.ClientInput calldata input, uint postProcessingGas, uint requestedInsurance, uint claimDelay) public payable returns (uint) {
+    function submitRequest(BaseClient.ClientInput calldata input, uint payment, uint postProcessingGas, uint requestedInsurance, uint claimDelay) public payable returns (uint) {
         // check msg.sender is an actual client - creo que no se puede, me parece que lo voy a tener que dejar asi, creo que no es una vulnerabilidad, onda, si no es del tipo, va a fallar eventualmente, y problema del boludo que lo registro mal
-        require(msg.value > postProcessingGas * tx.gasprice, "The post processing gas cannot takeup all of the supplied ether");  //TODO en el bot de python, ver que efectivamente el net payment, valga la pena
+        require(msg.value == payment + (payment * AMOUNT_OF_CONFIRMERS * CONFIRMERS_FEE_PERCENTAGE) / 100, "The supplied ether must cover the payment and the confirmers fees");
+        require((payment / 4) > postProcessingGas * tx.gasprice, "The post processing gas has to be lower than 1/4th of the payment");
         Acceptance memory acceptance = Acceptance({
             acceptor: address(0x0),
             timestamp: 0
@@ -72,16 +79,17 @@ contract ExecutionBroker is Transferable {
         Request memory request = Request({
             id: requests.length,
             input: input,
-            payment: msg.value,  // aca esta incluido el post processing gas, para evitar tener que devolver aparte, ALSO el gasprice puede no ser el mismo entre el submit y el resolve, el payment tiene que ser generoso para el postprocessing
+            payment: payment,  // aca esta incluido el post processing gas, para evitar tener que devolver aparte, ALSO el gasprice puede no ser el mismo entre el submit y el resolve, el payment tiene que ser generoso para el postprocessing
+            confirmers: new address[](AMOUNT_OF_CONFIRMERS),
             postProcessingGas: postProcessingGas,
             challengeInsurance: requestedInsurance,
             claimDelay: claimDelay,
-            client: BaseClient(msg.sender),
+            client: BaseClient(payable(msg.sender)),
             acceptance: acceptance,
             submission: submission,
             cancelled: false
         });
-        emit requestCreated(request.id, msg.value, postProcessingGas, requestedInsurance, claimDelay);
+        emit requestCreated(request.id, payment, postProcessingGas, requestedInsurance, claimDelay);
         requests.push(request);
         return request.id;
     }
@@ -93,7 +101,7 @@ contract ExecutionBroker is Transferable {
         require(requests[requestID].acceptance.acceptor == address(0x0), "You cant cancel an accepted request");
         //delete requests[requestID], no puedo hacer esto, this fucks up the ids
         requests[requestID].cancelled = true;
-        bool transferSuccess = _internalTransferFunds(requests[requestID].payment, address(requests[requestID].client));
+        bool transferSuccess = _internalTransferFunds(requests[requestID].payment + (requests[requestID].payment * AMOUNT_OF_CONFIRMERS * CONFIRMERS_FEE_PERCENTAGE) / 100, address(requests[requestID].client));
         emit requestCancelled(requestID, transferSuccess);
     }
 
@@ -117,7 +125,6 @@ contract ExecutionBroker is Transferable {
         requests[requestID].acceptance.acceptor = msg.sender;
         requests[requestID].acceptance.timestamp = block.timestamp;
         emit requestAccepted(requestID, msg.sender);
-        //TODO Vale la pena el cancel acceptance?
     }
 
     function cancelAcceptance(uint requestID) public {
@@ -144,6 +151,22 @@ contract ExecutionBroker is Transferable {
         emit resultSubmitted(requestID, result, msg.sender);
     }
 
+    function confirmResult(uint requestID) public payable {
+        require(requests[requestID].submission.issuer != address(0x0), "There are no submissions for this request");
+        require(!requests[requestID].submission.solidified, "This request has already been solidified");
+        require(requests[requestID].submission.issuer != msg.sender, "You cant confirm your own result");
+        require(requests[requestID].confirmers[AMOUNT_OF_CONFIRMERS - 1] == address(0x0), "This request has reached max confirmation");
+        require(msg.value == (requests[requestID].challengeInsurance * CONFIRMERS_FEE_PERCENTAGE) / 100, "You need to deposit a percentage of the insurance fee to confirm");
+        for (uint8 i = 0; i < AMOUNT_OF_CONFIRMERS; i++) {
+            require(requests[requestID].confirmers[i] != msg.sender, "You have already confirmed this result");
+            if (requests[requestID].confirmers[i] == address(0x0)) {
+                requests[requestID].confirmers[i] = msg.sender;
+                emit resultConfirmed(requestID);
+                break;
+            }
+        }
+    }
+
     function challengeSubmission(uint requestID, address challenger) public returns (bool) {
 		require(msg.sender == address(requests[requestID].client), "You can only challenge a submission through the client");
         bytes memory submittedResult = requests[requestID].submission.result;
@@ -159,6 +182,17 @@ contract ExecutionBroker is Transferable {
                 solidified: false
             });
             requests[requestID].submission = submission;  // notar que en las requests que se resolvieron por challenge el acceptor es diferente al issuer (a menos que alguien se autochallengee)
+            uint feePayment = 0;
+            for (uint8 i = 0; i < AMOUNT_OF_CONFIRMERS; i++) {
+                if (requests[requestID].confirmers[i] == address(0x0)) {
+                    if (feePayment > 0) {
+                        _internalTransferFunds(feePayment, challenger);
+                    }
+                    break;
+                }
+                requests[requestID].confirmers[i] = address(0x0);
+                feePayment += (requests[requestID].challengeInsurance * CONFIRMERS_FEE_PERCENTAGE) / 100;  // El challenger se queda con el fee de los confirmers
+            }
             bool transferSuccess = _solidify(requestID);
             emit challengePayment(requestID, challenger, transferSuccess);
             return true;  // result was corrected
@@ -174,8 +208,6 @@ contract ExecutionBroker is Transferable {
         bool transferSuccess = _solidify(requestID);
         return transferSuccess;
     }
-
-    //TODO test onlyClient here and within client
 
     // Public views
 
@@ -202,6 +234,15 @@ contract ExecutionBroker is Transferable {
         emit requestSolidified(requestID);
         uint payAmount = requests[requestID].payment + requests[requestID].challengeInsurance;
         bool transferSuccess = _internalTransferFunds(payAmount, requests[requestID].submission.issuer);
+        for (uint8 i = 0; i < AMOUNT_OF_CONFIRMERS; i++) {
+            if (requests[requestID].confirmers[i] != address(0x0)) {
+                payAmount = ((requests[requestID].payment + requests[requestID].challengeInsurance) * CONFIRMERS_FEE_PERCENTAGE) / 100;
+                _internalTransferFunds(payAmount, requests[requestID].confirmers[i]);   
+            } else {
+                uint refundAmount = (AMOUNT_OF_CONFIRMERS - i) * ((requests[requestID].payment * CONFIRMERS_FEE_PERCENTAGE) / 100);
+                _internalTransferFunds(refundAmount, address(requests[requestID].client));
+            }
+        }
         return transferSuccess;
     }
 

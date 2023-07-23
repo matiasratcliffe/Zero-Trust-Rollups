@@ -8,9 +8,13 @@ import "./BaseClient.sol";
 contract PrimeFinder is BaseClient {
 
     uint[] public PRIMES;
+    bool public postProcessingEnabled;
+
+    event automaticRequestCreationFailed();
 
     constructor(address brokerAddress) BaseClient(brokerAddress) {
         PRIMES.push(2);
+        postProcessingEnabled = true;
     }
 
     function getPrimes() public view returns (uint[] memory) {
@@ -68,9 +72,16 @@ contract PrimeFinder is BaseClient {
             functionToRun: 1,
             data: abi.encode(OneInput({startPoint: number + 1}))
         });
-        _submitRequest(10000 gwei, input, 1000 gwei, 200000 gwei, 0 seconds);  //TODO si no tengo fondos, que no falle
+        if (postProcessingEnabled) {
+            _submitRequest(10000 gwei, input, 1000 gwei, 200000 gwei, 0 seconds);
+        }
         if (abi.decode(_isPrime(abi.encode(TwoInput({number: number}))), (bool))) {
             PRIMES.push(number);
         }
+    }
+
+    function togglePostProcessing() external onlyOwner returns (bool) {
+        postProcessingEnabled = postProcessingEnabled ? false : true;
+        return postProcessingEnabled;
     }
 }

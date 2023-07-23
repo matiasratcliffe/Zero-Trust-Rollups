@@ -6,6 +6,8 @@ from scripts.classes.utils.logger import Logger
 @Logger.LogClassMethods()
 class BrokerFactory:
     ACCEPTANCE_GRACE_PERIOD = 5
+    CONFIRMERS_FEE_PERCENTAGE = 10
+    AMOUNT_OF_CONFIRMERS = 2
 
     def getInstance():
         if "brokerContractAddress" in config["networks"][network.show_active()]:
@@ -20,6 +22,8 @@ class BrokerFactory:
             account = Accounts.getAccount()
         ExecutionBroker.deploy(
             BrokerFactory.ACCEPTANCE_GRACE_PERIOD,
+            BrokerFactory.CONFIRMERS_FEE_PERCENTAGE,
+            BrokerFactory.AMOUNT_OF_CONFIRMERS,
             {"from": account},
             publish_source=config["networks"][network.show_active()]["verify"]
         )

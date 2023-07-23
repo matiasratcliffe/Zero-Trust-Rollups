@@ -126,7 +126,7 @@ class TestRequestor:
 
     def test_create_request_with_excess_post_processing_gas(self):
         requestor = Requestor(ClientFactory.getInstance())
-        with pytest.raises(Exception, match="The post processing gas cannot takeup all of the supplied ether"):
+        with pytest.raises(Exception, match="The post processing gas has to be lower than 1/4th of the payment"):
             requestor.createRequest(
                 functionToRun=1,
                 dataArray=[10],
@@ -254,3 +254,33 @@ class TestRequestor:
                 0,  # This would yield an error but the call should never make it past the modifiers
                 {'from': account}
             )
+    
+    def test_challenge_submission_only_client(self):
+        requestor = Requestor(ClientFactory.getInstance())
+        requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        with pytest.raises(Exception, match="You can only challenge a submission through the client"):
+            broker.challengeSubmission(0, Accounts.getAccount(), {"from": Accounts.getAccount()}) 
+       
+    def test_claim_payment_only_client(self):
+        requestor = Requestor(ClientFactory.getInstance())
+        requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        broker = BrokerFactory.at(address=requestor.client.brokerContract())
+        with pytest.raises(Exception, match="You can only claim a payment through the client"):
+            broker.claimPayment(0, {"from": Accounts.getAccount()})
+
+    def test_claim_payment_through_foreign_client(self):
+        broker = BrokerFactory.getInstance()
+        requestor1 = Requestor(ClientFactory.create(broker))
+        requestor2 = Requestor(ClientFactory.create(broker))
+        requestor1.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        with pytest.raises(Exception, match="This ID does not belong to an active request within this client"):
+            requestor2.client.claimPayment(0, {"from": Accounts.getAccount()})
+
+    def test_challenge_submission_through_foreign_client(self):
+        broker = BrokerFactory.getInstance()
+        requestor1 = Requestor(ClientFactory.create(broker))
+        requestor2 = Requestor(ClientFactory.create(broker))
+        requestor1.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
+        with pytest.raises(Exception, match="This ID does not belong to an active request within this client"):
+            requestor2.client.challengeSubmission(0, {"from": Accounts.getAccount()})

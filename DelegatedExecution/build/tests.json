@@ -1,17 +1,17 @@
 {
   "contracts": {
     "DelegatedExecution": "73df0a6f5d0123eb2b2db0faf62b602aa77c123a",
-    "ExecutionBroker": "393f337b9a63835cecc3d12a4b2d46db1f3167da",
+    "ExecutionBroker": "7e9190a87f4070fbace9af2ed39e1d9a4ac0eec2",
     "Ownable": "672f70f06f11b1d7dfeb0f73ad0bb11d0c9972ad",
-    "PrimeFinder": "3548a8b47662ff3080dfbb7c0b67e0a86b0c0e4f",
+    "PrimeFinder": "2caab4b8968605a4da811b7955358b953246fa5f",
     "Transferable": "46d8302b7b373057f7bb873d07b598531307e853"
   },
   "tests": {
     "tests/test_executor.py": {
       "coverage": false,
       "isolated": false,
-      "results": "ssssssssssssssssssssssssssssssss.",
-      "sha1": "9f03a371d5c19dd4a53f2096a9fa8273f9d02266",
+      "results": "ssssssssssssssssssssssssssssssssssssssss.",
+      "sha1": "abae9da8807c279103baa1df23623e04df5fbbf6",
       "txhash": []
     }
   },
