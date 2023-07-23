@@ -17,10 +17,12 @@ contract TS3000 is BaseClient {
         uint fragmentIndex;
         bytes32 globalHash;
         bytes32 localHash;
+        uint minTimestamp;
     }
 
     struct Result {
         uint fragmentIndex;
+        uint timestampRestriction;
         uint passcode;
     }
 
@@ -32,13 +34,15 @@ contract TS3000 is BaseClient {
 
     uint public rewardPerFragment;
     uint public postProcessingGas;
+    uint public minTimeFramePerFragment;
     bool public postProcessingEnabled;
     
-    constructor(address brokerAddress, string memory _encryptedDataRefference, bytes32 firstLocalHash, bytes32[] memory globalHashes) BaseClient(brokerAddress) payable {
+    constructor(address brokerAddress, string memory _encryptedDataRefference, bytes32 firstLocalHash, bytes32[] memory globalHashes, uint _minTimeFramePerFragment) BaseClient(brokerAddress) payable {
         postProcessingGas = 400000;  // calculate postprocgas //// con 300000 funciona, con 200000 no
         postProcessingEnabled = true;
         rewardPerFragment = msg.value / globalHashes.length; //aca tener en cuenta el postprocgas
         encryptedDataRefference = _encryptedDataRefference;
+        minTimeFramePerFragment = _minTimeFramePerFragment;
         for (uint i = 0; i < globalHashes.length; i++) {
             KeyFragment memory fragment; 
             fragment.globalHash = globalHashes[i];
@@ -50,15 +54,16 @@ contract TS3000 is BaseClient {
         Input memory input = Input({
             fragmentIndex: 0,
             globalHash: globalHashes[0],
-            localHash: firstLocalHash
+            localHash: firstLocalHash,
+            minTimestamp: block.timestamp
         });
         _submitRequest(rewardPerFragment, abi.encode(input), postProcessingGas);
     }
 
-    function checkResult(bytes calldata inputData, bytes calldata resultData) external override pure returns (bool) {
+    function checkResult(bytes calldata inputData, bytes calldata resultData) external override view returns (bool) {
         Input memory input = abi.decode(inputData, (Input));
         Result memory result = abi.decode(resultData, (Result));
-        return (input.fragmentIndex == result.fragmentIndex) && (keccak256(abi.encode(result.passcode, input.localHash)) == input.globalHash);
+        return (input.minTimestamp == result.timestampRestriction) && (block.timestamp >= result.timestampRestriction) && (input.fragmentIndex == result.fragmentIndex) && (keccak256(abi.encode(result.passcode, input.localHash)) == input.globalHash);
     }
 
     function processResult(bytes calldata resultData) public override onlyClient { // decidir si quiero mantener el parametro de post processing gas, o si lo dejo limitless a criterio del ejecutor. LO MANTENGO POR QUE ESTA SETEADO EL LIMITE DESDE BASE CLIENT FUERA DEL CONTROL DE CLIENTES MALICIOSOS
@@ -74,7 +79,8 @@ contract TS3000 is BaseClient {
                 Input memory input = Input({
                     fragmentIndex: result.fragmentIndex + 1,
                     globalHash: keyFragments[result.fragmentIndex + 1].globalHash,
-                    localHash: keyFragments[result.fragmentIndex + 1].localHash
+                    localHash: keyFragments[result.fragmentIndex + 1].localHash,
+                    minTimestamp: result.timestampRestriction + minTimeFramePerFragment
                 });
                 _submitRequest(rewardPerFragment, abi.encode(input), postProcessingGas);
             }
@@ -87,11 +93,11 @@ contract TS3000 is BaseClient {
     }
 
     function getInputDataStructure() external override pure returns (string memory) {
-        return "{uint fragmentIndex; bytes32 globalHash; bytes32 localHash;}";
+        return "{uint fragmentIndex; bytes32 globalHash; bytes32 localHash; uint minTimestamp;}";
     }
     
     function getResultDataStructure() external override pure returns (string memory) {
-        return "{uint fragmentIndex; uint passcode;}";
+        return "{uint fragmentIndex; uint timestampRestriction; uint passcode;}";
     }
 
 }

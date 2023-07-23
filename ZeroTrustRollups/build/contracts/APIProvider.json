@@ -96,18 +96,18 @@
     "absolutePath": "contracts/APIProvider.sol",
     "exportedSymbols": {
       "APIProvider": [
-        1717
+        1751
       ],
       "Ownable": [
-        1760
+        1794
       ]
     },
-    "id": 1718,
+    "id": 1752,
     "license": "GPL-3.0",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1663,
+        "id": 1697,
         "literals": [
           "solidity",
           ">=",
@@ -123,11 +123,11 @@
       {
         "absolutePath": "contracts/Ownable.sol",
         "file": "./Ownable.sol",
-        "id": 1664,
+        "id": 1698,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 1718,
-        "sourceUnit": 1761,
+        "scope": 1752,
+        "sourceUnit": 1795,
         "src": "70:23:4",
         "symbolAliases": [],
         "unitAlias": ""
@@ -137,16 +137,16 @@
         "baseContracts": [
           {
             "baseName": {
-              "id": 1665,
+              "id": 1699,
               "name": "Ownable",
               "nameLocations": [
                 "120:7:4"
               ],
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 1760,
+              "referencedDeclaration": 1794,
               "src": "120:7:4"
             },
-            "id": 1666,
+            "id": 1700,
             "nodeType": "InheritanceSpecifier",
             "src": "120:7:4"
           }
@@ -155,10 +155,10 @@
         "contractDependencies": [],
         "contractKind": "contract",
         "fullyImplemented": true,
-        "id": 1717,
+        "id": 1751,
         "linearizedBaseContracts": [
-          1717,
-          1760
+          1751,
+          1794
         ],
         "name": "APIProvider",
         "nameLocation": "105:11:4",
@@ -167,12 +167,12 @@
           {
             "constant": false,
             "functionSelector": "5346eb83",
-            "id": 1670,
+            "id": 1704,
             "mutability": "mutable",
             "name": "RegisteredAPIs",
             "nameLocation": "169:14:4",
             "nodeType": "VariableDeclaration",
-            "scope": 1717,
+            "scope": 1751,
             "src": "135:48:4",
             "stateVariable": true,
             "storageLocation": "default",
@@ -181,11 +181,11 @@
               "typeString": "mapping(string => address)"
             },
             "typeName": {
-              "id": 1669,
+              "id": 1703,
               "keyName": "",
               "keyNameLocation": "-1:-1:-1",
               "keyType": {
-                "id": 1667,
+                "id": 1701,
                 "name": "string",
                 "nodeType": "ElementaryTypeName",
                 "src": "143:6:4",
@@ -203,7 +203,7 @@
               "valueName": "",
               "valueNameLocation": "-1:-1:-1",
               "valueType": {
-                "id": 1668,
+                "id": 1702,
                 "name": "address",
                 "nodeType": "ElementaryTypeName",
                 "src": "153:7:4",
@@ -218,27 +218,27 @@
           },
           {
             "body": {
-              "id": 1675,
+              "id": 1709,
               "nodeType": "Block",
               "src": "215:2:4",
               "statements": []
             },
-            "id": 1676,
+            "id": 1710,
             "implemented": true,
             "kind": "constructor",
             "modifiers": [
               {
                 "arguments": [],
-                "id": 1673,
+                "id": 1707,
                 "kind": "baseConstructorSpecifier",
                 "modifierName": {
-                  "id": 1672,
+                  "id": 1706,
                   "name": "Ownable",
                   "nameLocations": [
                     "205:7:4"
                   ],
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 1760,
+                  "referencedDeclaration": 1794,
                   "src": "205:7:4"
                 },
                 "nodeType": "ModifierInvocation",
@@ -249,18 +249,18 @@
             "nameLocation": "-1:-1:-1",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1671,
+              "id": 1705,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "202:2:4"
             },
             "returnParameters": {
-              "id": 1674,
+              "id": 1708,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "215:0:4"
             },
-            "scope": 1717,
+            "scope": 1751,
             "src": "190:27:4",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -268,37 +268,37 @@
           },
           {
             "body": {
-              "id": 1691,
+              "id": 1725,
               "nodeType": "Block",
               "src": "314:59:4",
               "statements": [
                 {
                   "expression": {
-                    "id": 1689,
+                    "id": 1723,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "baseExpression": {
-                        "id": 1685,
+                        "id": 1719,
                         "name": "RegisteredAPIs",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1670,
+                        "referencedDeclaration": 1704,
                         "src": "324:14:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_mapping$_t_string_memory_ptr_$_t_address_$",
                           "typeString": "mapping(string memory => address)"
                         }
                       },
-                      "id": 1687,
+                      "id": 1721,
                       "indexExpression": {
-                        "id": 1686,
+                        "id": 1720,
                         "name": "apiIdentifier",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1678,
+                        "referencedDeclaration": 1712,
                         "src": "339:13:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_calldata_ptr",
@@ -319,11 +319,11 @@
                     "nodeType": "Assignment",
                     "operator": "=",
                     "rightHandSide": {
-                      "id": 1688,
+                      "id": 1722,
                       "name": "apiAddress",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1680,
+                      "referencedDeclaration": 1714,
                       "src": "356:10:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
@@ -336,28 +336,28 @@
                       "typeString": "address"
                     }
                   },
-                  "id": 1690,
+                  "id": 1724,
                   "nodeType": "ExpressionStatement",
                   "src": "324:42:4"
                 }
               ]
             },
             "functionSelector": "a226039c",
-            "id": 1692,
+            "id": 1726,
             "implemented": true,
             "kind": "function",
             "modifiers": [
               {
-                "id": 1683,
+                "id": 1717,
                 "kind": "modifierInvocation",
                 "modifierName": {
-                  "id": 1682,
+                  "id": 1716,
                   "name": "onlyOwner",
                   "nameLocations": [
                     "304:9:4"
                   ],
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 1729,
+                  "referencedDeclaration": 1763,
                   "src": "304:9:4"
                 },
                 "nodeType": "ModifierInvocation",
@@ -368,17 +368,17 @@
             "nameLocation": "232:13:4",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1681,
+              "id": 1715,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1678,
+                  "id": 1712,
                   "mutability": "mutable",
                   "name": "apiIdentifier",
                   "nameLocation": "262:13:4",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1692,
+                  "scope": 1726,
                   "src": "246:29:4",
                   "stateVariable": false,
                   "storageLocation": "calldata",
@@ -387,7 +387,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 1677,
+                    "id": 1711,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "246:6:4",
@@ -400,12 +400,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 1680,
+                  "id": 1714,
                   "mutability": "mutable",
                   "name": "apiAddress",
                   "nameLocation": "285:10:4",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1692,
+                  "scope": 1726,
                   "src": "277:18:4",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -414,7 +414,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1679,
+                    "id": 1713,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "277:7:4",
@@ -430,12 +430,12 @@
               "src": "245:51:4"
             },
             "returnParameters": {
-              "id": 1684,
+              "id": 1718,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "314:0:4"
             },
-            "scope": 1717,
+            "scope": 1751,
             "src": "223:150:4",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -443,7 +443,7 @@
           },
           {
             "body": {
-              "id": 1715,
+              "id": 1749,
               "nodeType": "Block",
               "src": "460:160:4",
               "statements": [
@@ -455,31 +455,31 @@
                           "typeIdentifier": "t_address",
                           "typeString": "address"
                         },
-                        "id": 1707,
+                        "id": 1741,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
                         "lValueRequested": false,
                         "leftExpression": {
                           "baseExpression": {
-                            "id": 1700,
+                            "id": 1734,
                             "name": "RegisteredAPIs",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1670,
+                            "referencedDeclaration": 1704,
                             "src": "478:14:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_mapping$_t_string_memory_ptr_$_t_address_$",
                               "typeString": "mapping(string memory => address)"
                             }
                           },
-                          "id": 1702,
+                          "id": 1736,
                           "indexExpression": {
-                            "id": 1701,
+                            "id": 1735,
                             "name": "apiIdentifier",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1694,
+                            "referencedDeclaration": 1728,
                             "src": "493:13:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_string_calldata_ptr",
@@ -503,7 +503,7 @@
                           "arguments": [
                             {
                               "hexValue": "307830",
-                              "id": 1705,
+                              "id": 1739,
                               "isConstant": false,
                               "isLValue": false,
                               "isPure": true,
@@ -525,7 +525,7 @@
                                 "typeString": "int_const 0"
                               }
                             ],
-                            "id": 1704,
+                            "id": 1738,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
@@ -537,14 +537,14 @@
                               "typeString": "type(address)"
                             },
                             "typeName": {
-                              "id": 1703,
+                              "id": 1737,
                               "name": "address",
                               "nodeType": "ElementaryTypeName",
                               "src": "511:7:4",
                               "typeDescriptions": {}
                             }
                           },
-                          "id": 1706,
+                          "id": 1740,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -568,7 +568,7 @@
                       },
                       {
                         "hexValue": "54686973206964656e74696669657220686173206e6f74206265656e2072656769737465726564",
-                        "id": 1708,
+                        "id": 1742,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -594,7 +594,7 @@
                           "typeString": "literal_string \"This identifier has not been registered\""
                         }
                       ],
-                      "id": 1699,
+                      "id": 1733,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -608,7 +608,7 @@
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 1709,
+                    "id": 1743,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -624,31 +624,31 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1710,
+                  "id": 1744,
                   "nodeType": "ExpressionStatement",
                   "src": "470:97:4"
                 },
                 {
                   "expression": {
                     "baseExpression": {
-                      "id": 1711,
+                      "id": 1745,
                       "name": "RegisteredAPIs",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1670,
+                      "referencedDeclaration": 1704,
                       "src": "584:14:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_mapping$_t_string_memory_ptr_$_t_address_$",
                         "typeString": "mapping(string memory => address)"
                       }
                     },
-                    "id": 1713,
+                    "id": 1747,
                     "indexExpression": {
-                      "id": 1712,
+                      "id": 1746,
                       "name": "apiIdentifier",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 1694,
+                      "referencedDeclaration": 1728,
                       "src": "599:13:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_string_calldata_ptr",
@@ -666,15 +666,15 @@
                       "typeString": "address"
                     }
                   },
-                  "functionReturnParameters": 1698,
-                  "id": 1714,
+                  "functionReturnParameters": 1732,
+                  "id": 1748,
                   "nodeType": "Return",
                   "src": "577:36:4"
                 }
               ]
             },
             "functionSelector": "bf40fac1",
-            "id": 1716,
+            "id": 1750,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -682,17 +682,17 @@
             "nameLocation": "388:10:4",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1695,
+              "id": 1729,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1694,
+                  "id": 1728,
                   "mutability": "mutable",
                   "name": "apiIdentifier",
                   "nameLocation": "415:13:4",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1716,
+                  "scope": 1750,
                   "src": "399:29:4",
                   "stateVariable": false,
                   "storageLocation": "calldata",
@@ -701,7 +701,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 1693,
+                    "id": 1727,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "399:6:4",
@@ -716,17 +716,17 @@
               "src": "398:31:4"
             },
             "returnParameters": {
-              "id": 1698,
+              "id": 1732,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1697,
+                  "id": 1731,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1716,
+                  "scope": 1750,
                   "src": "451:7:4",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -735,7 +735,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1696,
+                    "id": 1730,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "451:7:4",
@@ -750,14 +750,14 @@
               ],
               "src": "450:9:4"
             },
-            "scope": 1717,
+            "scope": 1751,
             "src": "379:241:4",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "public"
           }
         ],
-        "scope": 1718,
+        "scope": 1752,
         "src": "96:527:4",
         "usedErrors": []
       }

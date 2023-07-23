@@ -50,20 +50,20 @@ class AESCipher(object):
 @Logger.LogClassMethods()
 class TS3000Requestor:
 
-    def __init__(self, broker, account, textFileToEncrypt, paymentPerFragment: int = 1e12, numberOfKeyFragments: int = 50, difficulty: int = 10):
+    def __init__(self, broker, account, textFileToEncrypt, paymentPerFragment: int = 1e12, numberOfKeyFragments: int = 50, difficulty: int = 10, timeFramePerFragment = 0):
         self.broker = broker
         self.owner = account
         firstLocalHash, globalHashes, passcode = self._generateKeyFragments(numberOfKeyFragments, difficulty)
         self.cipher = AESCipher(passcode)
         with open(textFileToEncrypt + ".encrypted", "w") as f:
             f.write(str(self.cipher.encryptFile(textFileToEncrypt))[2:-1])
-        self.client = TS3000.deploy(broker.address, textFileToEncrypt + ".encrypted", firstLocalHash, globalHashes, {'from': account, 'value': paymentPerFragment})
+        self.client = TS3000.deploy(broker.address, textFileToEncrypt + ".encrypted", firstLocalHash, globalHashes, timeFramePerFragment, {'from': account, 'value': paymentPerFragment})
 
     def _generateKeyFragments(self, size: int, difficulty: int):
         globalHashes = []
         localHashes = [keccak(encode(['uint'], [randint(0, int('9' * difficulty))]))]
         for i in range(size):
-            passcode = randint(int('9' * (difficulty - 2)), int('9' * difficulty))
+            passcode = randint(0, int('9' * difficulty))
             globalHashes.append(keccak(encode(['uint', 'bytes32'], [passcode, localHashes[i]])))
             if i < size - 1:
                 localHashes.append(keccak(encode(['uint'], [passcode])))

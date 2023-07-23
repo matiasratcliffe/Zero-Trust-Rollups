@@ -112,7 +112,7 @@ class Executor:
         else:
             Logger.log("Unaccepted requests buffer empty")
 
-    def challengerLoopRound(self): #TODO que se pueda convalidar ejecucion, y que los primeros N (a determinar por el cliente) en convalidar se lleven una pequeña paga. Pero para convalidar tenes que dejar una prima que se va a devolver junto con la paga cuando se solidifique la request
+    def challengerLoopRound(self):
         if len(self.unsolidifiedSubmissions) > 0:
             requestID = self.unsolidifiedSubmissions.pop(0)
             request = self.broker.requests(requestID)

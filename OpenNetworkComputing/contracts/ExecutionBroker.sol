@@ -92,6 +92,7 @@ contract ExecutionBroker is Transferable {
     event resultSubmitted(uint requestID, address submitter);
     event requestSubmissionsLocked(uint requestID);
     event requestClosed(uint requestID, uint coincidences);
+    event requestRecycled(uint requestID);
 
     event executorLocked(address executorAddress);
     event executorUnlocked(address executorAddress);
@@ -488,6 +489,7 @@ contract ExecutionBroker is Transferable {
         uint refundAmount = 0;
         requests[requestID].closed = true;
         emit requestClosed(requestID, 0);
+        emit requestRecycled(requestID);
         if (getAmountOfActiveExecutorsWithCriteria(CategoryIdentifiers.LOWEST) >= taskAssignmentsMap[requestID].length) {
             _submitRequest(requests[requestID].clientAddress, requests[requestID].executionPowerPrice, requests[requestID].executionPowerPaidFor, requests[requestID].inputState, requests[requestID].codeReference, taskAssignmentsMap[requestID].length, uint256(blockhash(block.number-1)), CategoryIdentifiers.LOWEST);
         } else {
