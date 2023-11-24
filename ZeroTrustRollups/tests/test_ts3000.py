@@ -21,14 +21,23 @@ class TestTS3000:
     def test_ts3000(self):
         fileName = "text_file"
         broker = BrokerFactory.getInstance()
-        requestor = TS3000Requestor(broker, Accounts.getFromIndex(0), fileName, numberOfKeyFragments=5, difficulty=5)
+        requestorAccount = Accounts.getFromIndex(0)
+        initialRequestorBalance = requestorAccount.balance()
+        requestor = TS3000Requestor(broker, requestorAccount, fileName, numberOfKeyFragments=5, difficulty=3, paymentPerFragment=0, gas_price=1)
+        requestDeploymentCost = initialRequestorBalance - requestorAccount.balance()
         reqID = requestor.getInitialRequestID()
         miner = TS3000Miner(broker, Accounts.getFromIndex(1))
+        #executorAccount = Accounts.getFromIndex(4)
+        #initialExecutorBalance = executorAccount.balance()
+        #tx = broker.resolveRequestOnChain(0, {"from": executorAccount, "gas_price": 1})
 
+        accTXs = []
+        submitTXs = []
         while True:
-            broker.acceptRequest(reqID, {"from": miner.account, "value": BrokerFactory.ACCEPTANCE_STAKE})
+            accTXs.append(broker.acceptRequest(reqID, {"from": miner.account, "value": BrokerFactory.ACCEPTANCE_STAKE}))
             fragment = miner.mineFragment(reqID, 5)
             tx = miner.submitFragmentResult(reqID, fragment)
+            submitTXs.append(tx)
             if int(requestor.client.finalKey().hex(), 16) != 0:
                 break
             reqID = tx.events["requestCreated"]["requestID"]

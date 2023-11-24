@@ -50,14 +50,14 @@ class AESCipher(object):
 @Logger.LogClassMethods()
 class TS3000Requestor:
 
-    def __init__(self, broker, account, textFileToEncrypt, paymentPerFragment: int = 1e12, numberOfKeyFragments: int = 50, difficulty: int = 10, timeFramePerFragment = 0):
+    def __init__(self, broker, account, textFileToEncrypt, paymentPerFragment: int = 1e12, numberOfKeyFragments: int = 50, difficulty: int = 10, timeFramePerFragment = 0, gas_price=0):
         self.broker = broker
         self.owner = account
         firstLocalHash, globalHashes, passcode = self._generateKeyFragments(numberOfKeyFragments, difficulty)
         self.cipher = AESCipher(passcode)
         with open(textFileToEncrypt + ".encrypted", "w") as f:
             f.write(str(self.cipher.encryptFile(textFileToEncrypt))[2:-1])
-        self.client = TS3000.deploy(broker.address, textFileToEncrypt + ".encrypted", firstLocalHash, globalHashes, timeFramePerFragment, {'from': account, 'value': paymentPerFragment})
+        self.client = TS3000.deploy(broker.address, textFileToEncrypt + ".encrypted", firstLocalHash, globalHashes, timeFramePerFragment, difficulty, {'from': account, 'value': paymentPerFragment, "gas_price": gas_price})
 
     def _generateKeyFragments(self, size: int, difficulty: int):
         globalHashes = []

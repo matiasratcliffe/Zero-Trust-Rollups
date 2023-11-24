@@ -5,7 +5,7 @@ from scripts.classes.utils.logger import Logger
 
 @Logger.LogClassMethods()
 class BrokerFactory:
-    ACCEPTANCE_STAKE = 1e15  # 2 dollar aprox
+    ACCEPTANCE_STAKE = 0#1e15  # 2 dollar aprox
     ACCEPTANCE_GRACE_PERIOD = 5
 
     def getInstance():

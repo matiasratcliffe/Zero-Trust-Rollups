@@ -57,7 +57,7 @@ contract ExecutionBroker is Transferable {
     // Restricted interaction functions
 
     function submitRequest(bytes calldata input, uint postProcessingGas) public payable returns (uint) {
-        require(msg.value > postProcessingGas * tx.gasprice, "The post processing gas cannot takeup all of the supplied ether");
+        //require(msg.value > postProcessingGas * tx.gasprice, "The post processing gas cannot takeup all of the supplied ether");
         Request memory request = Request({
             id: requests.length,
             input: input,
@@ -125,15 +125,25 @@ contract ExecutionBroker is Transferable {
             requests[requestID].result = result;
             requests[requestID].closed = true;
             uint payAmount = requests[requestID].payment + ACCEPTANCE_STAKE;
-            bool transferSuccess = _internalTransferFunds(payAmount, msg.sender);
+            bool transferSuccess = _internalTransferFunds(payAmount, requests[requestID].executor);
             emit requestCompleted(requestID, transferSuccess);
             return true;
         } else {
             requests[requestID].executor = address(0x0);
-            bool transferSuccess = _internalTransferFunds((ACCEPTANCE_STAKE*95)/100, msg.sender);
+            bool transferSuccess = _internalTransferFunds((ACCEPTANCE_STAKE*95)/100, requests[requestID].executor);
             emit requestReOpened(requestID, requests[requestID].payment, transferSuccess);
             _internalTransferFunds((ACCEPTANCE_STAKE*5)/100, address(requests[requestID].client));
             return false;
         }
+    }
+
+    function resolveRequestOnChain(uint requestID) external payable returns (bool) {
+        require(msg.value == ACCEPTANCE_STAKE, "Incorrect amount of stake provided");
+        requests[requestID].executor = address(this);//msg.sender;
+        requests[requestID].acceptedTimestamp = block.timestamp;
+        bytes memory result = requests[requestID].client.resolveOnChain(requests[requestID].input);
+        //bytes memory data = abi.encodeWithSelector(requests[requestID].client.submitResult.selector, requestID, result);
+        //(bool callSuccess, ) = address(requests[requestID].client).delegatecall(data);
+        return requests[requestID].client.submitResult(requestID, result);
     }
 }

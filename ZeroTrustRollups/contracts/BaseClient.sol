@@ -27,6 +27,7 @@ abstract contract BaseClient is Ownable {
     function getInputDataStructure() external virtual pure returns (string memory);
     function getResultDataStructure() external virtual returns (string memory);
     function processResult(bytes calldata resultData) public virtual onlyClient {}
+    function resolveOnChain(bytes calldata inputData) public virtual view returns (bytes memory) { /* This is not necessary, and is only used for comparison */ return inputData; }
 
     function submitRequest(uint payment, bytes memory input, uint postProcessingGas) public onlyOwner payable returns (uint) {
         return _submitRequest(payment, input, postProcessingGas);

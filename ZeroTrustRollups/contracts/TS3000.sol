@@ -32,14 +32,16 @@ contract TS3000 is BaseClient {
     KeyFragment[] public keyFragments;
     bytes32 public finalKey;
 
+    uint public fragmentDifficulty;
     uint public rewardPerFragment;
     uint public postProcessingGas;
     uint public minTimeFramePerFragment;
     bool public postProcessingEnabled;
     
-    constructor(address brokerAddress, string memory _encryptedDataRefference, bytes32 firstLocalHash, bytes32[] memory globalHashes, uint _minTimeFramePerFragment) BaseClient(brokerAddress) payable {
+    constructor(address brokerAddress, string memory _encryptedDataRefference, bytes32 firstLocalHash, bytes32[] memory globalHashes, uint _minTimeFramePerFragment, uint _fragmentDifficulty) BaseClient(brokerAddress) payable {
         postProcessingGas = 400000;  // calculate postprocgas //// con 300000 funciona, con 200000 no
         postProcessingEnabled = true;
+        fragmentDifficulty = _fragmentDifficulty;
         rewardPerFragment = msg.value / globalHashes.length; //aca tener en cuenta el postprocgas
         encryptedDataRefference = _encryptedDataRefference;
         minTimeFramePerFragment = _minTimeFramePerFragment;
@@ -100,4 +102,17 @@ contract TS3000 is BaseClient {
         return "{uint fragmentIndex; uint timestampRestriction; uint passcode;}";
     }
 
+    function resolveOnChain(bytes calldata inputData) public override view returns (bytes memory) { 
+        Result memory result;
+        Input memory input = abi.decode(inputData, (Input));
+        result.fragmentIndex = input.fragmentIndex;
+        result.timestampRestriction = input.minTimestamp;
+        for (uint passcode = 0; passcode < 10**fragmentDifficulty; passcode++) {
+            if (keccak256(abi.encode(passcode, input.localHash)) == input.globalHash) {
+                result.passcode = passcode;
+                break;
+            }
+        }
+        return abi.encode(result);
+    }
 }

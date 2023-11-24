@@ -5,7 +5,7 @@ pragma solidity >=0.7.0 <0.9.0;
 import "./APIProvider.sol";
 import "./BaseClient.sol";
 
-import "@openzeppelin/contracts/utils/Strings.sol";
+import "./utils/Strings.sol";
 
 
 struct Input {
