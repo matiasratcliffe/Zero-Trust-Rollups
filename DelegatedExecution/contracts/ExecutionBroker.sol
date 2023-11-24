@@ -65,7 +65,7 @@ contract ExecutionBroker is Transferable {
     function submitRequest(BaseClient.ClientInput calldata input, uint payment, uint postProcessingGas, uint requestedInsurance, uint claimDelay) public payable returns (uint) {
         // check msg.sender is an actual client - creo que no se puede, me parece que lo voy a tener que dejar asi, creo que no es una vulnerabilidad, onda, si no es del tipo, va a fallar eventualmente, y problema del boludo que lo registro mal
         require(msg.value == payment + (payment * AMOUNT_OF_CONFIRMERS * CONFIRMERS_FEE_PERCENTAGE) / 100, "The supplied ether must cover the payment and the confirmers fees");
-        require((payment / 4) > postProcessingGas * tx.gasprice, "The post processing gas has to be lower than 1/4th of the payment");
+        //require((payment / 4) >= postProcessingGas * tx.gasprice, "The post processing gas has to be lower than or equal to 1/4th of the payment");
         Acceptance memory acceptance = Acceptance({
             acceptor: address(0x0),
             timestamp: 0

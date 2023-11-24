@@ -8,13 +8,13 @@ import "./BaseClient.sol";
 contract PrimeFinder is BaseClient {
 
     uint[] public PRIMES;
-    bool public postProcessingEnabled;
+    bool public postProcessingEnabled = false;
+    uint public batchSize = 1000;
 
     event automaticRequestCreationFailed();
 
     constructor(address brokerAddress) BaseClient(brokerAddress) {
         PRIMES.push(2);
-        postProcessingEnabled = true;
     }
 
     function getPrimes() public view returns (uint[] memory) {
@@ -27,56 +27,69 @@ contract PrimeFinder is BaseClient {
 
     function clientLogic(ClientInput calldata input) external override pure returns (bytes memory) {
         bytes memory output = "";
-        if (input.functionToRun == 1) { output = _getPrime(input.data); }
-        else if (input.functionToRun == 2) {output = _isPrime(input.data); }
+        if (input.functionToRun == 1) { output = getPrime(input.data); }
+        else if (input.functionToRun == 2) {output = isPrime(input.data); }
         return output;
     }
 
-    struct OneInput {uint startPoint;}
-    function _getPrime(bytes memory data) private pure returns (bytes memory) {
-        uint i;
-        uint batchSize = 10;
+    struct OneInput {uint256 startPoint; uint256 batchSize;}
+    function getPrime(bytes memory data) private pure returns (bytes memory) {
         OneInput memory input = abi.decode(data, (OneInput));
-        for (i = input.startPoint | 1; i < input.startPoint + batchSize; i += 2) {
-            if (abi.decode(_isPrime(abi.encode(TwoInput({number: i}))), (bool))) {
-                return abi.encode(i);
+        return _getPrime(input.startPoint, input.batchSize);
+    }
+    function _getPrime(uint256 _startPoint, uint256 _batchSize) private pure returns (bytes memory) {
+        uint256 i;
+        bytes memory result;
+        for (i = _startPoint | 1; i < _startPoint + _batchSize; i += 2) {
+            if (_isPrime(i)) {
+                result = abi.encodePacked(result, i);
             }
         }
-        return abi.encode(i);
+        result = abi.encodePacked(result, i);  // Always add the last one so that post processing can know where to continue if there are no other numbers
+        return result;
     }
 
-    struct TwoInput {uint number;}
-    function _isPrime(bytes memory data) private pure returns (bytes memory) {
+    struct TwoInput {uint256 number;}
+    function isPrime(bytes memory data) private pure returns (bytes memory) {
         TwoInput memory input = abi.decode(data, (TwoInput));
-        if (input.number < 2 || (input.number % 2 == 0 && input.number > 2)) {
-            return abi.encode(false);
+        return abi.encode(_isPrime(input.number));
+    }
+    function _isPrime(uint256 _number) private pure returns (bool) {
+        if (_number < 2 || (_number % 2 == 0 && _number > 2)) {
+            return false;
         }
-        for (uint i = 3; i < input.number/2; i += 2) {
-            if (input.number % i == 0) {
-                return abi.encode(false);
+        for (uint i = 3; i < _number/2; i += 2) {
+            if (_number % i == 0) {
+                return false;
             }
         }
-        return abi.encode(true);
+        return true;
     }
 
     function getInputStructure(uint functionID) external override pure returns (string memory) {
-        if (functionID == 1) { return "{uint startPoint;}"; }
-        else if (functionID == 2) { return "{uint number;}"; }
+        if (functionID == 1) { return "{uint256 startPoint; uint256 batchSize;}"; }
+        else if (functionID == 2) { return "{uint256 number;}"; }
         else { revert("Invalid function ID"); }
     }
 
-    function processResult(bytes calldata result) public override onlyClient {
+    function processResult(bytes memory result) public override onlyClient {
         require(address(this).balance >= 10000 gwei, "Insufficient funds");
-        uint number = abi.decode(result, (uint));
-        ClientInput memory input = ClientInput({
-            functionToRun: 1,
-            data: abi.encode(OneInput({startPoint: number + 1}))
-        });
-        if (postProcessingEnabled) {
-            _submitRequest(10000 gwei, input, 1000 gwei, 200000 gwei, 0 seconds);
+        uint256 value;
+        uint length = result.length / 32;
+        for (uint i = 0; i < length; i++) {
+            assembly {
+                value := mload(add(result, add(32, mul(i, 32))))
+            }
+            if (i < length - 1 || _isPrime(value)) {
+                PRIMES.push(value);
+            }
         }
-        if (abi.decode(_isPrime(abi.encode(TwoInput({number: number}))), (bool))) {
-            PRIMES.push(number);
+        if (postProcessingEnabled) {
+            ClientInput memory input = ClientInput({
+                functionToRun: 1,
+                data: abi.encode(OneInput({startPoint: value + 1, batchSize: batchSize}))
+            });
+            _submitRequest(10000 gwei, input, 1000 gwei, 200000 gwei, 0 seconds);
         }
     }
 

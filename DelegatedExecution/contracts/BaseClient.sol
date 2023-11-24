@@ -30,7 +30,7 @@ abstract contract BaseClient is Ownable {
     }
 
     function clientLogic(ClientInput calldata input) external virtual pure returns (bytes memory);
-    function processResult(bytes calldata result) public virtual onlyClient {}
+    function processResult(bytes memory result) public virtual onlyClient {}
     function getInputStructure(uint functionID) external virtual pure returns (string memory);
 
     function submitRequest(uint payment, ClientInput calldata input, uint postProcessingGas, uint requestedInsurance, uint claimDelay) external payable onlyOwner returns (uint) {

@@ -61,9 +61,9 @@ class Executor:
     def __str__(self):
         return f"Executor ({str(self.account)[:6]}..{str(self.account)[-3:]})"
 
-    def _acceptRequest(self, requestID):
+    def _acceptRequest(self, requestID, gas_price=0):
         request = self.broker.requests(requestID).dict()
-        transaction = self.broker.acceptRequest(requestID, {'from': self.account, 'value': request['challengeInsurance']})
+        transaction = self.broker.acceptRequest(requestID, {'from': self.account, 'value': request['challengeInsurance'], 'gas_price': gas_price})
         transaction.wait(1)
         if requestID in self.unacceptedRequests:
             self.unacceptedRequests.pop(self.unacceptedRequests.index(requestID))
@@ -78,8 +78,8 @@ class Executor:
         client = ClientFactory.at(address=self.broker.requests(requestID).dict()['client'])
         return client.clientLogic(self.broker.requests(requestID).dict()['input'])
 
-    def _submitResult(self, requestID, result):
-        transaction = self.broker.submitResult(requestID, result, {'from': self.account})
+    def _submitResult(self, requestID, result, gas_price=0):
+        transaction = self.broker.submitResult(requestID, result, {'from': self.account, 'gas_price': gas_price})
         transaction.wait(1)
         return transaction
 
@@ -97,9 +97,9 @@ class Executor:
             self.unsolidifiedSubmissions.pop(self.unsolidifiedSubmissions.index(requestID))
         return transaction
 
-    def _claimPayment(self, requestID):
+    def _claimPayment(self, requestID, gas_price=0):
         client = ClientFactory.at(address=self.broker.requests(requestID).dict()['client'])
-        return client.claimPayment(requestID, {'from': self.account})
+        return client.claimPayment(requestID, {'from': self.account, 'gas_price': gas_price})
 
     def solverLoopRound(self):
         if len(self.unacceptedRequests) > 0:

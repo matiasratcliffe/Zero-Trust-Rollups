@@ -11,7 +11,7 @@ import time
 
 class TestExecutor:
     def setup(self):
-        pass
+        self.reference_gas_price = 58160642908  # 58 GWei
 
     def teardown(self):
         pass
@@ -417,6 +417,27 @@ class TestExecutor:
         assert executor.account.balance() > initialFunds
         assert list(requestor.client.getPrimes()) == [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73]
 
+    def test_find_first_primes_with_gas_offchain(self):
+        broker = BrokerFactory.create(account=Accounts.getFromIndex(0))
+        requestorAccount = Accounts.getFromIndex(1)
+        initialFunds = requestorAccount.balance()
+        clientContract = ClientFactory.create(broker, owner=requestorAccount, gas_price=self.reference_gas_price)
+        requestor = Requestor(clientContract)
+        deploymentCost = initialFunds - requestorAccount.balance()
+        request = requestor.createRequest(functionToRun=1, dataArray=[3, 1000], payment=0, postProcessingGas=0, requestedInsurance=2e14, gas_price=self.reference_gas_price, getTransaction=True)
+        reqID = request.return_value
+        executorAccount = Accounts.getFromIndex(0)
+        executor = Executor(executorAccount, broker, populateBuffers=True)
+        initialExecutorFunds = executor.account.balance()
+        acceptanceTransaction = executor._acceptRequest(reqID, gas_price=self.reference_gas_price)
+        result = executor._computeResult(reqID)
+        submissionTransaction = executor._submitResult(reqID, result, gas_price=self.reference_gas_price)
+        paymentTransaction = executor._claimPayment(reqID, gas_price=self.reference_gas_price)
+        executionCost = initialExecutorFunds - executorAccount.balance()
+        #raise "activate interactive console"
+        #assert executor.account.balance() > initialFunds
+        #assert list(requestor.client.getPrimes()) == [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73]
+
     def test_confirm_result_no_submissions(self):
         requestor = Requestor(ClientFactory.getInstance())
         reqID = requestor.createRequest(functionToRun=1, dataArray=[10], funds=1e18)
@@ -501,7 +522,8 @@ class TestExecutor:
         assert requestor.client.balance() == requestorOriginalBalance + (request["payment"] * broker.CONFIRMERS_FEE_PERCENTAGE()) / 100
         assert executor1.account.balance() == executor1OriginalBalance + (request["payment"] + request["challengeInsurance"]) - (tx.gas_used * tx.gas_price)
         assert executor2.account.balance() == executor2OriginalBalance + ((request["payment"] + request["challengeInsurance"]) * broker.CONFIRMERS_FEE_PERCENTAGE()) / 100
-    
+        assert False
+
     def test_confirm_erroneous_result(self):
         requestor = Requestor(ClientFactory.getInstance())
         requestor.togglePostProcessing()

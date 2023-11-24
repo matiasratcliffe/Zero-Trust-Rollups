@@ -20,15 +20,14 @@ class BrokerFactory:
     def create(account=None):
         if account == None:
             account = Accounts.getAccount()
-        ExecutionBroker.deploy(
+        return ExecutionBroker.deploy(
             BrokerFactory.ACCEPTANCE_GRACE_PERIOD,
             BrokerFactory.CONFIRMERS_FEE_PERCENTAGE,
             BrokerFactory.AMOUNT_OF_CONFIRMERS,
             {"from": account},
             publish_source=config["networks"][network.show_active()]["verify"]
         )
-        return BrokerFactory.at(index=-1)
-    
+
     def at(index=None, address=None):
         if address and not index:
             return ExecutionBroker.at(address)
@@ -49,15 +48,17 @@ class ClientFactory:
         else:
             return ClientFactory.create(broker=BrokerFactory.getInstance(), owner=Accounts.getAccount())
 
-    def create(broker, owner=None):
+    def create(broker, owner=None, gas_price=None):
+        transactionMetadata = {"from": owner}
+        if gas_price != None:
+            transactionMetadata["gas_price"] = gas_price
         if owner == None:
             owner = Accounts.getAccount()
-        PrimeFinder.deploy(
+        return PrimeFinder.deploy(
             broker.address,
-            {"from": owner},
+            transactionMetadata,
             publish_source=config["networks"][network.show_active()]["verify"]
         )
-        return ClientFactory.at(index=-1)
     
     def at(index=None, address=None):
         if address and not index:

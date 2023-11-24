@@ -670,5 +670,4 @@ contract ExecutionBroker is Transferable {
         executorsCollection.executorCategories[uint8(category)].amountOfActiveExecutors++;
         executorsCollection.amountOfActiveExecutors++;
     }
-
 }

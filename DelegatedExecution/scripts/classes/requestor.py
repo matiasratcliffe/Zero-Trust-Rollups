@@ -20,10 +20,10 @@ class Requestor:
     def _encodeInput(self, functionToRun, data):
         return (functionToRun, HexString(encode(self._getFunctionTypes(functionToRun), [tuple(data)]), "bytes"))
 
-    def createRequest(self, functionToRun, dataArray, payment=1e+10, postProcessingGas=2e13, requestedInsurance=1e+15, claimDelay=0, funds=0, gasPrice=None):
+    def createRequest(self, functionToRun, dataArray, payment=1e+10, postProcessingGas=2e13, requestedInsurance=1e+15, claimDelay=0, funds=0, gas_price=None, getTransaction=False):
         transactionData = { "from": self.owner, "value": funds }
-        if (gasPrice != None):
-            transactionData["gas_price"] = gasPrice
+        if (gas_price != None):
+            transactionData["gas_price"] = gas_price
         request = self.client.submitRequest(
             payment,
             self._encodeInput(functionToRun, dataArray),
@@ -33,7 +33,10 @@ class Requestor:
             transactionData
         )
         request.wait(1)
-        return request.return_value
+        if (getTransaction):
+            return request
+        else:
+            return request.return_value
 
     def cancelRequest(self, requestID):
         transaction = self.client.cancelRequest(requestID, {"from": self.owner})
