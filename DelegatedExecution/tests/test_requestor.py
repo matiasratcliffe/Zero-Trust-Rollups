@@ -6,7 +6,7 @@ from scripts.classes.executor import Executor
 from brownie.exceptions import VirtualMachineError
 from eth_abi.exceptions import ValueOutOfBounds
 from eth_abi import decode
-from brownie import network
+from brownie import network, DummyClient
 import pytest
 import time
 
@@ -37,6 +37,11 @@ class TestRequestor:
         assert requestor.owner.address == account.address
         assert requestor.client.address == client.address
         assert BrokerFactory.at(address=requestor.client.brokerContract()) == broker
+
+    def test_deploy_dummy_client(self):
+        initialBalance = Accounts.getFromIndex(0).balance()
+        DummyClient.deploy(BrokerFactory.getInstance(), {"from": Accounts.getFromIndex(0), "gas_price": 1})
+        print(f"Deployment gas: {initialBalance - Accounts.getFromIndex(0).balance()}")
 
     def test_send_funds(self):
         requestor = Requestor(ClientFactory.getInstance())

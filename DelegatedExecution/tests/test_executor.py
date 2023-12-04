@@ -445,8 +445,6 @@ class TestExecutor:
         print(f"Payment gas: {paymentTransaction.gas_used}")
         print("-------------------------------")
         print(clientContract.getPrimes())
-
-
         #raise "activate interactive console"
         #assert executor.account.balance() > initialFunds
         #assert list(requestor.client.getPrimes()) == [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73]
