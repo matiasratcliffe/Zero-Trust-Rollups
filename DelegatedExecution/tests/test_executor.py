@@ -423,8 +423,9 @@ class TestExecutor:
         initialFunds = requestorAccount.balance()
         clientContract = ClientFactory.create(broker, owner=requestorAccount, gas_price=self.reference_gas_price)
         requestor = Requestor(clientContract)
-        deploymentCost = initialFunds - requestorAccount.balance()
-        request = requestor.createRequest(functionToRun=1, dataArray=[3, 1000], payment=0, postProcessingGas=0, requestedInsurance=2e14, gas_price=self.reference_gas_price, getTransaction=True)
+        deploymentGas = initialFunds - requestorAccount.balance()
+        request = requestor.createRequest(functionToRun=1, dataArray=[3, 1000], payment=0, postProcessingGas=0,
+                                        requestedInsurance=2e14, gas_price=self.reference_gas_price, getTransaction=True)
         reqID = request.return_value
         executorAccount = Accounts.getFromIndex(0)
         executor = Executor(executorAccount, broker, populateBuffers=True)
@@ -434,6 +435,18 @@ class TestExecutor:
         submissionTransaction = executor._submitResult(reqID, result, gas_price=self.reference_gas_price)
         paymentTransaction = executor._claimPayment(reqID, gas_price=self.reference_gas_price)
         executionCost = initialExecutorFunds - executorAccount.balance()
+        print(f"Deployment gas: {deploymentGas}")
+        print(f"Request creation gas: {request.gas_used}")
+        print(f"Deployment cost: {deploymentGas * self.reference_gas_price}")
+        print(f"Request creation cost: {request.gas_used * self.reference_gas_price}")
+        print("-------------------------------")
+        print(f"Acceptance gas: {acceptanceTransaction.gas_used}")
+        print(f"Submission gas: {submissionTransaction.gas_used}")
+        print(f"Payment gas: {paymentTransaction.gas_used}")
+        print("-------------------------------")
+        print(clientContract.getPrimes())
+
+
         #raise "activate interactive console"
         #assert executor.account.balance() > initialFunds
         #assert list(requestor.client.getPrimes()) == [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73]
