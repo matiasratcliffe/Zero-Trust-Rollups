@@ -265,9 +265,9 @@ class TestExecutor:
         executor1 = Executor(broker, Accounts.getFromIndex(1), True, gas_price=1)
         executor2 = Executor(broker, Accounts.getFromIndex(2), True, gas_price=1)
         executor3 = Executor(broker, Accounts.getFromIndex(3), True, gas_price=1)
-        registrationCost1 = baseBalance - Accounts.getFromIndex(1).balance() + broker.BASE_STAKE_AMOUNT()
-        registrationCost2 = baseBalance - Accounts.getFromIndex(2).balance() + broker.BASE_STAKE_AMOUNT()
-        registrationCost3 = baseBalance - Accounts.getFromIndex(3).balance() + broker.BASE_STAKE_AMOUNT()
+        registrationCost1 = baseBalance - Accounts.getFromIndex(1).balance() - broker.BASE_STAKE_AMOUNT()
+        registrationCost2 = baseBalance - Accounts.getFromIndex(2).balance() - broker.BASE_STAKE_AMOUNT()
+        registrationCost3 = baseBalance - Accounts.getFromIndex(3).balance() - broker.BASE_STAKE_AMOUNT()
         requestor = Requestor(broker, Accounts.getFromIndex(4))
         request = requestor.createRequest("input state", "code reference", amountOfExecutors=3, executionPower=1000)
         requestCreationCost = request.gas_used
