@@ -137,6 +137,7 @@ contract ExecutionBroker is Transferable {
 
     function getExecutorCategory(Executor memory executor) public pure returns (CategoryIdentifiers) {
         uint divider = (executor.timesPunished + executor.inaccurateSolvings) * 50; // * 100 / 2
+        divider = divider == 0 ? 1 : divider;
         uint score = (executor.accurateSolvings * 10000) / divider;
         if (score <= 50) {
             return CategoryIdentifiers.LOWEST;
@@ -243,12 +244,14 @@ contract ExecutionBroker is Transferable {
 
     function getActiveExecutorByRelativePosition(uint position, CategoryIdentifiers category) public view returns (Executor memory executor) {
         uint24 j = 0;
-        for (uint24 i = 0; i < executorsCollection.executorCategories[uint8(category)].amountOfActiveExecutors; i++) {
+        for (uint24 i = 0; i < executorsCollection.executorCategories[uint8(category)].activeExecutors.length; i++) {  // i < executorsCollection.executorCategories[uint8(category)].amountOfActiveExecutors.amountOfActiveExecutors
             if (executorsCollection.executorCategories[uint8(category)].activeExecutors[i].executorAddress == address(0x0)) {
                 continue;
             }
             if (j == position) {
                 return executorsCollection.executorCategories[uint8(category)].activeExecutors[i];
+            } else {
+                j++;
             }
         }
         revert("Position exceeded number of available executors for category");
@@ -344,10 +347,8 @@ contract ExecutionBroker is Transferable {
         for (uint8 i = 0; i < effectiveAmountOfPunishedExecutors; i++) {  // Si la cantidad efectiva es menor a la cantidad total, solo roto los primeros
             uint taskIndex = punishedExecutorsTaskIDs[i];
             punishedExecutorsAddresses[i] = taskAssignmentsMap[requestID][taskIndex].executorAddress;
-            address newExecutorAddress = getActiveExecutorByAbsolutePosition(randomSeed % ceiling).executorAddress;
-            taskAssignmentsMap[requestID][taskIndex].executorAddress = newExecutorAddress;
+            taskAssignmentsMap[requestID][taskIndex].executorAddress = _getAndReserveActiveExecutorByAbsolutePosition(randomSeed % ceiling, requestID, i);
             taskAssignmentsMap[requestID][taskIndex].timestamp = block.timestamp;
-            _lockExecutor(newExecutorAddress, requestID, i);
             effectiveAmountOfPunishedExecutors++;
             randomSeed /= ceiling;
             ceiling--;
@@ -485,6 +486,12 @@ contract ExecutionBroker is Transferable {
     //TODO puedo hacer que el precio del executionpower sea inversamente proporsional a la cantidad de ejecutores activos, uso tx.gasprice? YA CONFIRME QUE SI EXISTE
     // Private Functions
 
+    function _getAndReserveActiveExecutorByAbsolutePosition(uint position, uint requestID, uint8 taskAssignmentIndex) private returns (address) {
+        address executorAddress = getActiveExecutorByAbsolutePosition(position).executorAddress;
+        _lockExecutor(executorAddress, requestID, taskAssignmentIndex);
+        return executorAddress;
+    }
+
     function _recycleRequest(uint requestID, uint initialGas, uint markedCount, address[] memory executorsMarked) private {
         uint refundAmount = 0;
         requests[requestID].closed = true;
@@ -516,10 +523,9 @@ contract ExecutionBroker is Transferable {
         requests.push(request);
         TaskAssignment[] storage taskAssignments = taskAssignmentsMap[request.id];
         uint24 ceiling = getAmountOfActiveExecutorsWithCriteria(executorCategory);
-        for (uint24 i = 0; i < amountOfExecutors; i++) {
-            address executorAddress = getActiveExecutorByAbsolutePosition(randomSeed % ceiling).executorAddress;
+        for (uint8 i = 0; i < amountOfExecutors; i++) {
             taskAssignments.push(TaskAssignment({
-                executorAddress: executorAddress,
+                executorAddress: _getAndReserveActiveExecutorByAbsolutePosition(randomSeed % ceiling, request.id, i),
                 timestamp: block.timestamp,
                 signedResultHash: bytes32(abi.encode(0)),
                 unsignedResultHash: bytes32(abi.encode(0)),
@@ -530,7 +536,6 @@ contract ExecutionBroker is Transferable {
                 submitted: false,
                 liberated: false
             }));
-            _lockExecutor(executorAddress, request.id, i);
             randomSeed /= ceiling;
             ceiling--;
         }

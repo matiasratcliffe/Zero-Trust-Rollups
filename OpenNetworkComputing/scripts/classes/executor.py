@@ -5,14 +5,14 @@ from scripts.classes.utils.logger import Logger
 @Logger.LogClassMethods()
 class Executor:
 
-    def __init__(self, broker, account, register=False, stake=None):
+    def __init__(self, broker, account, register=False, stake=None, gas_price=0):
         self.resultsBuffer = {}
         self.broker = broker
         self.account = account
         if register:
             if stake == None:
                 stake = broker.BASE_STAKE_AMOUNT()
-            self.broker.registerExecutor({"from": self.account, "value": stake})
+            self.broker.registerExecutor({"from": self.account, "value": stake, "gas_price": gas_price})
     
     def getData(self):
         return dict(self.broker.getExecutorByAddress(self.account))
@@ -38,7 +38,7 @@ class Executor:
             #TODO deberia chequear que la request no este closed? si ese es el caso explota todo
             #TODO una vez ejecuto, deberia chequear hasta que se lockeen todas las sub?
 
-    def _calculateFinalState(self, requestID): #TODO
+    def _calculateFinalState(self, requestID, state_value=0): #TODO
         assert self.getData()["assignedRequestID"] == requestID, "You are not assigned to this request"
         if requestID in self.resultsBuffer:
             return self.resultsBuffer[requestID]
@@ -46,7 +46,7 @@ class Executor:
         inputState = request["inputState"]
         codeReference = request["codeReference"]
         executionPower = request["executionPowerPaidFor"]
-        self.resultsBuffer[requestID] = ExecutionState(123, self.account.address) #TODO
+        self.resultsBuffer[requestID] = ExecutionState(state_value, self.account.address) #TODO
         return self.resultsBuffer[requestID]
 
     def _submitSignedHash(self, requestID, resultState=None):
