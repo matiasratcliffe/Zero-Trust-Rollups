@@ -303,7 +303,6 @@ class TestExecutor:
         #raise "interactive console"
         #TODO ver tema GAS y STAKES
 
-
     def test_liberate_result_from_unregistered_executor(self):
         broker = BrokerFactory.create()
         executor1 = Executor(broker, Accounts.getFromIndex(0), True)

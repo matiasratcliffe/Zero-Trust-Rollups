@@ -423,7 +423,7 @@ class TestExecutor:
         initialFunds = requestorAccount.balance()
         clientContract = ClientFactory.create(broker, owner=requestorAccount, gas_price=self.reference_gas_price)
         requestor = Requestor(clientContract)
-        deploymentGas = initialFunds - requestorAccount.balance()
+        deploymentGas = (initialFunds - requestorAccount.balance()) // self.reference_gas_price 
         request = requestor.createRequest(functionToRun=1, dataArray=[3, 1000], payment=0, postProcessingGas=0,
                                         requestedInsurance=2e14, gas_price=self.reference_gas_price, getTransaction=True)
         reqID = request.return_value
@@ -437,8 +437,6 @@ class TestExecutor:
         executionCost = initialExecutorFunds - executorAccount.balance()
         print(f"Deployment gas: {deploymentGas}")
         print(f"Request creation gas: {request.gas_used}")
-        print(f"Deployment cost: {deploymentGas * self.reference_gas_price}")
-        print(f"Request creation cost: {request.gas_used * self.reference_gas_price}")
         print("-------------------------------")
         print(f"Acceptance gas: {acceptanceTransaction.gas_used}")
         print(f"Submission gas: {submissionTransaction.gas_used}")
