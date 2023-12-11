@@ -1,4 +1,4 @@
-from scripts.classes.utils.contractProvider import ClientFactory, BrokerFactory
+from scripts.classes.utils.contractProvider import ClientFactory, BrokerFactory, DummyFactory
 from scripts.classes.utils.accountsManager import Accounts
 from scripts.classes.utils.logger import Logger
 from brownie.convert.datatypes import HexString
@@ -9,7 +9,10 @@ import re
 @Logger.LogClassMethods()
 class Requestor:
     def __init__(self, clientContract):
-        self.client = ClientFactory.at(address=clientContract.address)
+        try:
+            self.client = ClientFactory.at(address=clientContract.address)
+        except:
+            self.client = DummyFactory.at(address=clientContract.address)
         self.owner = Accounts.getFromKey(self.client.owner())
 
     def _getFunctionTypes(self, function):

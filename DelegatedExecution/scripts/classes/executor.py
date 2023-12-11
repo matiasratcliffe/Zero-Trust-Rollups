@@ -75,7 +75,10 @@ class Executor:
         return transaction
 
     def _computeResult(self, requestID):
-        client = ClientFactory.at(address=self.broker.requests(requestID).dict()['client'])
+        try:
+            client = ClientFactory.at(address=self.broker.requests(requestID).dict()['client'])
+        except:
+            client = ClientFactory.at(address=self.broker.requests(requestID).dict()['client'])
         return client.clientLogic(self.broker.requests(requestID).dict()['input'])
 
     def _submitResult(self, requestID, result, gas_price=0):

@@ -446,11 +446,41 @@ class TestExecutor:
         print(f"Second confirmation gas: {confirmationTransaction2.gas_used}")
         print(f"Payment gas: {paymentTransaction.gas_used}")
         print("-------------------------------")
-        #print(clientContract.getPrimes())
+        print(clientContract.getPrimes())
+        
+        #raise "activate interactive console"
+
+    def test_trivial_request(self):
+        broker = BrokerFactory.create(account=Accounts.getFromIndex(0))
+        requestorAccount = Accounts.getFromIndex(1)
+        initialFunds = requestorAccount.balance()
+        clientContract = DummyFactory.create(broker, owner=requestorAccount, gas_price=self.reference_gas_price)
+        requestor = Requestor(clientContract)
+        deploymentGas = (initialFunds - requestorAccount.balance()) // self.reference_gas_price 
+        request = requestor.createRequest(functionToRun=1, dataArray=[0], payment=0, postProcessingGas=0,
+                                        requestedInsurance=2e14, gas_price=self.reference_gas_price, getTransaction=True)
+        reqID = request.return_value
+        executorAccount = Accounts.getFromIndex(0)
+        executor = Executor(executorAccount, broker, populateBuffers=True)
+        initialExecutorFunds = executor.account.balance()
+        acceptanceTransaction = executor._acceptRequest(reqID, gas_price=self.reference_gas_price)
+        result = executor._computeResult(reqID)
+        submissionTransaction = executor._submitResult(reqID, result, gas_price=self.reference_gas_price)
+        confirmationInsurance = broker.requests(reqID).dict()["challengeInsurance"] // broker.CONFIRMERS_FEE_PERCENTAGE()
+        confirmationTransaction1 = broker.confirmResult(reqID, {"from": Accounts.getFromIndex(2), "value": confirmationInsurance})
+        confirmationTransaction2 = broker.confirmResult(reqID, {"from": Accounts.getFromIndex(3), "value": confirmationInsurance})
+        paymentTransaction = executor._claimPayment(reqID, gas_price=self.reference_gas_price)
+        print(f"Deployment gas: {deploymentGas}")
+        print(f"Request creation gas: {request.gas_used}")
+        print("-------------------------------")
+        print(f"Acceptance gas: {acceptanceTransaction.gas_used}")
+        print(f"Submission gas: {submissionTransaction.gas_used}")
+        print(f"First confirmation gas: {confirmationTransaction1.gas_used}")
+        print(f"Second confirmation gas: {confirmationTransaction2.gas_used}")
+        print(f"Payment gas: {paymentTransaction.gas_used}")
+        print("-------------------------------")
         
         raise "activate interactive console"
-        #assert executor.account.balance() > initialFunds
-        #assert list(requestor.client.getPrimes()) == [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73]
 
     def test_confirm_result_no_submissions(self):
         requestor = Requestor(ClientFactory.getInstance())
