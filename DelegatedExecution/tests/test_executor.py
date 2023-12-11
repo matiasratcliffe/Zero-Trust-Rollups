@@ -421,7 +421,7 @@ class TestExecutor:
         broker = BrokerFactory.create(account=Accounts.getFromIndex(0))
         requestorAccount = Accounts.getFromIndex(1)
         initialFunds = requestorAccount.balance()
-        clientContract = DummyFactory.create(broker, owner=requestorAccount, gas_price=self.reference_gas_price)
+        clientContract = ClientFactory.create(broker, owner=requestorAccount, gas_price=self.reference_gas_price)
         requestor = Requestor(clientContract)
         deploymentGas = (initialFunds - requestorAccount.balance()) // self.reference_gas_price 
         request = requestor.createRequest(functionToRun=1, dataArray=[0], payment=0, postProcessingGas=0,
@@ -446,9 +446,9 @@ class TestExecutor:
         print(f"Second confirmation gas: {confirmationTransaction2.gas_used}")
         print(f"Payment gas: {paymentTransaction.gas_used}")
         print("-------------------------------")
-        print(clientContract.getPrimes())
+        #print(clientContract.getPrimes())
         
-        #raise "activate interactive console"
+        raise "activate interactive console"
         #assert executor.account.balance() > initialFunds
         #assert list(requestor.client.getPrimes()) == [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73]
 
