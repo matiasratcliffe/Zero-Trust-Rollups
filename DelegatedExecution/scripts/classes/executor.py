@@ -1,4 +1,4 @@
-from scripts.classes.utils.contractProvider import ClientFactory
+from scripts.classes.utils.contractProvider import ClientFactory, DummyFactory
 from scripts.classes.utils.logger import Logger
 import time
 
@@ -78,7 +78,7 @@ class Executor:
         try:
             client = ClientFactory.at(address=self.broker.requests(requestID).dict()['client'])
         except:
-            client = ClientFactory.at(address=self.broker.requests(requestID).dict()['client'])
+            client = DummyFactory.at(address=self.broker.requests(requestID).dict()['client'])
         return client.clientLogic(self.broker.requests(requestID).dict()['input'])
 
     def _submitResult(self, requestID, result, gas_price=0):
@@ -93,7 +93,10 @@ class Executor:
         return transaction
 
     def _challengeSubmission(self, requestID):
-        client = ClientFactory.at(address=self.broker.requests(requestID).dict()['client'])
+        try:
+            client = ClientFactory.at(address=self.broker.requests(requestID).dict()['client'])
+        except:
+            client = DummyFactory.at(address=self.broker.requests(requestID).dict()['client'])
         transaction = client.challengeSubmission(requestID, {'from': self.account})
         transaction.wait(1)
         if requestID in self.unsolidifiedSubmissions:
@@ -101,7 +104,10 @@ class Executor:
         return transaction
 
     def _claimPayment(self, requestID, gas_price=0):
-        client = ClientFactory.at(address=self.broker.requests(requestID).dict()['client'])
+        try:
+            client = ClientFactory.at(address=self.broker.requests(requestID).dict()['client'])
+        except:
+            client = DummyFactory.at(address=self.broker.requests(requestID).dict()['client'])
         return client.claimPayment(requestID, {'from': self.account, 'gas_price': gas_price})
 
     def solverLoopRound(self):

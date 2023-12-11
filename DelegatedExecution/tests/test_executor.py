@@ -424,12 +424,11 @@ class TestExecutor:
         clientContract = ClientFactory.create(broker, owner=requestorAccount, gas_price=self.reference_gas_price)
         requestor = Requestor(clientContract)
         deploymentGas = (initialFunds - requestorAccount.balance()) // self.reference_gas_price 
-        request = requestor.createRequest(functionToRun=1, dataArray=[0], payment=0, postProcessingGas=0,
+        request = requestor.createRequest(functionToRun=1, dataArray=[3, 1000], payment=0, postProcessingGas=0,
                                         requestedInsurance=2e14, gas_price=self.reference_gas_price, getTransaction=True)
         reqID = request.return_value
         executorAccount = Accounts.getFromIndex(0)
         executor = Executor(executorAccount, broker, populateBuffers=True)
-        initialExecutorFunds = executor.account.balance()
         acceptanceTransaction = executor._acceptRequest(reqID, gas_price=self.reference_gas_price)
         result = executor._computeResult(reqID)
         submissionTransaction = executor._submitResult(reqID, result, gas_price=self.reference_gas_price)
@@ -448,7 +447,7 @@ class TestExecutor:
         print("-------------------------------")
         print(clientContract.getPrimes())
         
-        #raise "activate interactive console"
+        raise "activate interactive console"
 
     def test_trivial_request(self):
         broker = BrokerFactory.create(account=Accounts.getFromIndex(0))
@@ -462,7 +461,6 @@ class TestExecutor:
         reqID = request.return_value
         executorAccount = Accounts.getFromIndex(0)
         executor = Executor(executorAccount, broker, populateBuffers=True)
-        initialExecutorFunds = executor.account.balance()
         acceptanceTransaction = executor._acceptRequest(reqID, gas_price=self.reference_gas_price)
         result = executor._computeResult(reqID)
         submissionTransaction = executor._submitResult(reqID, result, gas_price=self.reference_gas_price)

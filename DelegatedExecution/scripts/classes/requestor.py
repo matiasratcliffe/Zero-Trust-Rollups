@@ -11,7 +11,7 @@ class Requestor:
     def __init__(self, clientContract):
         try:
             self.client = ClientFactory.at(address=clientContract.address)
-        except:
+        except: 
             self.client = DummyFactory.at(address=clientContract.address)
         self.owner = Accounts.getFromKey(self.client.owner())
 
