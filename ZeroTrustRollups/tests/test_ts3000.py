@@ -43,6 +43,24 @@ class TestTS3000:
             reqID = tx.events["requestCreated"]["requestID"]
         finalKey = bytes(requestor.client.finalKey())
 
+        print(f"Request deployment cost: {requestDeploymentCost}")
+        print("---------------------------------------------------------------------------------------")
+        totalMiningCost = 0
+        for i in range(len(accTXs)):
+            fragment = requestor.client.keyFragments(i).dict()
+            miningCost = accTXs[i].gas_used + submitTXs[i].gas_used
+            totalMiningCost += miningCost
+            print(f"Fragment {i} Acceptance Gas: {accTXs[i].gas_used} Submission Gas: {submitTXs[i].gas_used}")
+            print(f"\tglobalHash: {fragment['globalHash']}")
+            print(f"\tlocalHash: {fragment['localHash']}")
+            print(f"\tpasscode: {fragment['passcode']}")
+        print("---------------------------------------------------------------------------------------")
+        print(f"totalMiningCost: {totalMiningCost}")
+        print(f"finalKey: {requestor.client.finalKey()}")
+        print("============================== short test summary info ================================")
+
+        raise "Interactive Console"
+
         with open(f"{fileName}.decrypted", "w") as f1:
             decryptedText = AESCipher(finalKey).decryptFile("text_file.encrypted")
             f1.write(decryptedText)

@@ -1,4 +1,4 @@
-from brownie import ExecutionBroker, PrimeFinder, config, network
+from brownie import ExecutionBroker, PrimeFinder, DummyClient, config, network
 from scripts.classes.utils.accountsManager import Accounts
 from scripts.classes.utils.logger import Logger
 
@@ -69,3 +69,34 @@ class ClientFactory:
 
     def count():
         return len(PrimeFinder)
+
+class DummyFactory:
+    def getInstance():
+        if "clientContractAddress" in config["networks"][network.show_active()]:
+            return ClientFactory.at(address=config["networks"][network.show_active()]["clientContractAddress"])
+        elif (ClientFactory.count() > 0):
+            return ClientFactory.at(index=-1)
+        else:
+            return ClientFactory.create(broker=BrokerFactory.getInstance(), owner=Accounts.getAccount())
+
+    def create(broker, owner=None, gas_price=None):
+        transactionMetadata = {"from": owner}
+        if gas_price != None:
+            transactionMetadata["gas_price"] = gas_price
+        if owner == None:
+            owner = Accounts.getAccount()
+        return DummyClient.deploy(
+            broker.address,
+            transactionMetadata,
+            publish_source=config["networks"][network.show_active()]["verify"]
+        )
+    
+    def at(index=None, address=None):
+        if address and not index:
+            return DummyClient.at(address)
+        if index and not address:
+            return DummyClient[index]
+        raise "This method requires 1 keyValue parameter (address XOR index)"
+
+    def count():
+        return len(DummyClient)

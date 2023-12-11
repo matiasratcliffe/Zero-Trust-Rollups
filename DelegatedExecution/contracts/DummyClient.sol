@@ -10,11 +10,10 @@ contract DummyClient is BaseClient {
     constructor(address brokerAddress) BaseClient(brokerAddress) {}
 
     function clientLogic(ClientInput calldata input) external override pure returns (bytes memory) {
-        bytes memory output = "";
-        return output;
+        return abi.encode(0);
     }
 
     function getInputStructure(uint functionID) external override pure returns (string memory) {
-        return "";
+        return "{uint256 number;}";
     }
 }
