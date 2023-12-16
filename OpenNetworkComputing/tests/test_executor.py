@@ -290,16 +290,18 @@ class TestExecutor:
         assert dict(broker.requests(reqID))["closed"] == True
         assert dict(broker.requests(reqID))["result"] == results[0].toTuple()
         for i in range(amountOfExecutors):
-            print(f"Executor 1 registration cost: {registrationCosts[i]}")
+            print(f"Executor {i + 1} registration cost: {registrationCosts[i]}")
         print("--------------------------------------------------")
         print(f"Request creation cost: {requestCreationCost}")
         print("--------------------------------------------------")
         for i in range(amountOfExecutors):
-            print(f"Hash submission cost 1: {submissionTXs[i].gas_used}")
+            print(f"Hash submission cost {i + 1}: {submissionTXs[i].gas_used}")
         print("--------------------------------------------------")
         for i in range(amountOfExecutors):
-            print(f"Result liberation cost 1: {liberationTXs[i].gas_used}")
-        #raise "interactive console"
+            print(f"Result liberation cost {i + 1}: {liberationTXs[i].gas_used}")
+
+        
+        raise "interactive console"
         #TODO ver tema GAS y STAKES
 
     def test_liberate_result_from_unregistered_executor(self):

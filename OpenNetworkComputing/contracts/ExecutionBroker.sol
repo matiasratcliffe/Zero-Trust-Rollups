@@ -325,7 +325,7 @@ contract ExecutionBroker is Transferable {
         return _submitRequest(msg.sender, referenceExecutionPowerPriceCache, executionPowerPaidFor, inputState, codeReference, amountOfExecutors, randomSeed, executorCategory);
     }
 
-    function rotateExecutors(uint requestID, uint256 randomSeed, CategoryIdentifiers category) public returns (bool transferSuccess) {
+    /*function rotateExecutors(uint requestID, uint256 randomSeed, CategoryIdentifiers category) public returns (bool transferSuccess) {
         uint initialGas = gasleft();
         require(requests[requestID].clientAddress == msg.sender, "You cant rotate a request that was not made by you");
         require(requests[requestID].submissionsLocked == false, "All executors for this request have already delivered");
@@ -386,7 +386,7 @@ contract ExecutionBroker is Transferable {
         
         uint refundAmount = requests[requestID].executionPowerPrice * requests[requestID].executionPowerPaidFor * amountOfPunishedExecutors; // porque en close request solo hago refund por los marcados pero no los truncados
         return _punishmentRound(requestID, PunishmentCase.REGULAR, initialGas, amountOfPunishedExecutors, punishedExecutorsAddresses, refundAmount);
-    }
+    }*/
 
     //TODO fijarse que capaz un ejecutor truncado o un ejecutor marcado capaz todavia puede submitear o liberar????? mirar que onda las banderas y los index cacheados en el executor en si
     function submitSignedResultHash(uint requestID, bytes32 signedResultHash) public {
@@ -463,7 +463,7 @@ contract ExecutionBroker is Transferable {
         return hashMatched;
     }
 
-    function forceResultLiberation(uint requestID) public {
+    /*function forceResultLiberation(uint requestID) public {
         uint initialGas = gasleft();
         require(requests[requestID].closed == false, "This request has already been closed"); //TODO test in python
         require(requests[requestID].clientAddress == msg.sender, "You cant force the liberation of a request that was not made by you"); //TODO test in python
@@ -481,7 +481,7 @@ contract ExecutionBroker is Transferable {
         }
         require(amountOfValidSubmissions < taskAssignmentsMap[requestID].length, "There must be at least one valid liberated result");
         _closeRequest(requestID, initialGas);
-    }
+    }*/
 
     //TODO puedo hacer que el precio del executionpower sea inversamente proporsional a la cantidad de ejecutores activos, uso tx.gasprice? YA CONFIRME QUE SI EXISTE
     // Private Functions
@@ -598,8 +598,10 @@ contract ExecutionBroker is Transferable {
             _unlockExecutor(executorsToBeRewarded[i]);
         }
 
-        uint refundAmount = requests[requestID].executionPowerPaidFor * requests[requestID].executionPowerPrice * punishedCount;
-        _punishmentRound(requestID, PunishmentCase.INACCURATE_SOLVING, initialGas, punishedCount, executorsToBePunished, refundAmount);
+        if (punishedCount > 0) {
+            uint refundAmount = requests[requestID].executionPowerPaidFor * requests[requestID].executionPowerPrice * punishedCount;
+            _punishmentRound(requestID, PunishmentCase.INACCURATE_SOLVING, initialGas, punishedCount, executorsToBePunished, refundAmount);
+        }
     }
 
     function _punishmentRound(uint requestID, PunishmentCase punishmentCase, uint initialGas, uint punishedCount, address[] memory executorsToBePunished, uint refundAmount) private returns (bool transferSuccess) {
