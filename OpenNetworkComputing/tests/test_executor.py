@@ -260,46 +260,45 @@ class TestExecutor:
         assert dict(broker.requests(reqID))["closed"] == False
 
     def test_liberate_last_result_all_correct(self):
+        resultSize = "9" * 512
+        amountOfExecutors = 3
+        baseBalance = Accounts.getFromIndex(0).balance()
         broker = BrokerFactory.create(account=Accounts.getFromIndex(0))
-        baseBalance = Accounts.getFromIndex(1).balance()
-        executor1 = Executor(broker, Accounts.getFromIndex(1), True, gas_price=1)
-        executor2 = Executor(broker, Accounts.getFromIndex(2), True, gas_price=1)
-        executor3 = Executor(broker, Accounts.getFromIndex(3), True, gas_price=1)
-        registrationCost1 = baseBalance - Accounts.getFromIndex(1).balance() - broker.BASE_STAKE_AMOUNT()
-        registrationCost2 = baseBalance - Accounts.getFromIndex(2).balance() - broker.BASE_STAKE_AMOUNT()
-        registrationCost3 = baseBalance - Accounts.getFromIndex(3).balance() - broker.BASE_STAKE_AMOUNT()
-        requestor = Requestor(broker, Accounts.getFromIndex(4))
-        request = requestor.createRequest("input state", "code reference", amountOfExecutors=3, executionPower=1000)
+        executors = []
+        for i in range(amountOfExecutors):
+            executors.append(Executor(broker, Accounts.getFromIndex(i + 2), True, gas_price=1))
+        registrationCosts = []
+        for i in range(amountOfExecutors):
+            registrationCosts.append(baseBalance - Accounts.getFromIndex(i + 2).balance() - broker.BASE_STAKE_AMOUNT())
+        requestor = Requestor(broker, Accounts.getFromIndex(1))
+        request = requestor.createRequest("input state", "code reference", amountOfExecutors=amountOfExecutors, executionPower=1000)
         requestCreationCost = request.gas_used
         reqID = request.return_value
-        result1 = executor1._calculateFinalState(reqID, state_value=0)  # Hardcoded trivial result
-        submissionTX1 = executor1._submitSignedHash(reqID, result1)
-        result2 = executor2._calculateFinalState(reqID, state_value=0)  # Hardcoded trivial result
-        submissionTX2 = executor2._submitSignedHash(reqID, result2)
-        result3 = executor3._calculateFinalState(reqID, state_value=0)  # Hardcoded trivial result
-        submissionTX3 = executor3._submitSignedHash(reqID, result3)
+        results = []
+        submissionTXs = []
+        for i in range(amountOfExecutors):
+            results.append(executors[i]._calculateFinalState(reqID, state_value=resultSize))  # Hardcoded trivial result
+            submissionTXs.append(executors[i]._submitSignedHash(reqID, results[i]))
         assert dict(broker.requests(reqID))["submissionsLocked"] == True
-        liberationTX1 = executor1._liberateResult(reqID)
-        liberationTX2 = executor2._liberateResult(reqID)
+        liberationTXs = []
+        for i in range(amountOfExecutors - 1):
+            liberationTXs.append(executors[i]._liberateResult(reqID))
         assert dict(broker.requests(reqID))["closed"] == False
         assert dict(broker.requests(reqID))["result"] == ('', '0x0000000000000000000000000000000000000000')
-        liberationTX3 = executor3._liberateResult(reqID)
-        result1.signingAddress = broker.address
+        liberationTXs.append(executors[amountOfExecutors - 1]._liberateResult(reqID))
+        results[0].signingAddress = broker.address
         assert dict(broker.requests(reqID))["closed"] == True
-        assert dict(broker.requests(reqID))["result"] == result1.toTuple()
-        print(f"Executor 1 registration cost: {registrationCost1}")
-        print(f"Executor 2 registration cost: {registrationCost2}")
-        print(f"Executor 3 registration cost: {registrationCost3}")
+        assert dict(broker.requests(reqID))["result"] == results[0].toTuple()
+        for i in range(amountOfExecutors):
+            print(f"Executor 1 registration cost: {registrationCosts[i]}")
         print("--------------------------------------------------")
         print(f"Request creation cost: {requestCreationCost}")
         print("--------------------------------------------------")
-        print(f"Hash submission cost 1: {submissionTX1.gas_used}")
-        print(f"Hash submission cost 2: {submissionTX2.gas_used}")
-        print(f"Hash submission cost 3: {submissionTX3.gas_used}")
+        for i in range(amountOfExecutors):
+            print(f"Hash submission cost 1: {submissionTXs[i].gas_used}")
         print("--------------------------------------------------")
-        print(f"Result liberation cost 1: {liberationTX1.gas_used}")
-        print(f"Result liberation cost 2: {liberationTX2.gas_used}")
-        print(f"Result liberation cost 3: {liberationTX3.gas_used}")
+        for i in range(amountOfExecutors):
+            print(f"Result liberation cost 1: {liberationTXs[i].gas_used}")
         #raise "interactive console"
         #TODO ver tema GAS y STAKES
 
