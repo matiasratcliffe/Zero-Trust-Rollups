@@ -18,6 +18,56 @@ class TestExecutor:
     def teardown_method(self, method):
         pass
 
+    def run_full_test(self, amountOfExecutors, resultSize, printInfo):
+        resultValue = "9" * resultSize
+        baseBalance = Accounts.getFromIndex(0).balance()
+        broker = BrokerFactory.create(account=Accounts.getFromIndex(0))
+        executors = []
+        for i in range(amountOfExecutors):
+            executors.append(Executor(broker, Accounts.getFromIndex(i + 2), True, gas_price=1))
+        registrationCosts = []
+        for i in range(amountOfExecutors):
+            registrationCosts.append(baseBalance - Accounts.getFromIndex(i + 2).balance() - broker.BASE_STAKE_AMOUNT())
+        requestor = Requestor(broker, Accounts.getFromIndex(1))
+        request = requestor.createRequest("input state", "code reference", amountOfExecutors=amountOfExecutors, executionPower=1000)
+        requestCreationCost = request.gas_used
+        reqID = request.return_value
+        results = []
+        submissionTXs = []
+        firstSubmissionsAvgCost = 0
+        for i in range(amountOfExecutors - 1):
+            results.append(executors[i]._calculateFinalState(reqID, state_value=resultValue))  # Hardcoded trivial result
+            submissionTXs.append(executors[i]._submitSignedHash(reqID, results[i]))
+            firstSubmissionsAvgCost += submissionTXs[-1].gas_used
+        firstSubmissionsAvgCost /= len(submissionTXs)
+        results.append(executors[-1]._calculateFinalState(reqID, state_value=resultValue))  # Hardcoded trivial result
+        submissionTXs.append(executors[-1]._submitSignedHash(reqID, results[-1]))
+        assert dict(broker.requests(reqID))["submissionsLocked"] == True
+        liberationTXs = []
+        firstLiberationsAvgCost = 0
+        for i in range(amountOfExecutors - 1):
+            liberationTXs.append(executors[i]._liberateResult(reqID))
+            firstLiberationsAvgCost += liberationTXs[-1].gas_used
+        firstLiberationsAvgCost /= len(liberationTXs)
+        assert dict(broker.requests(reqID))["closed"] == False
+        assert dict(broker.requests(reqID))["result"] == ('', '0x0000000000000000000000000000000000000000')
+        liberationTXs.append(executors[-1]._liberateResult(reqID))
+        results[0].signingAddress = broker.address
+        assert dict(broker.requests(reqID))["closed"] == True
+        assert dict(broker.requests(reqID))["result"] == results[0].toTuple()
+        if printInfo:
+            for i in range(amountOfExecutors):
+                print(f"Executor {i + 1} registration cost: {registrationCosts[i]}")
+            print("--------------------------------------------------")
+            print(f"Request creation cost: {requestCreationCost}")
+            print("--------------------------------------------------")
+            for i in range(amountOfExecutors):
+                print(f"Hash submission cost {i + 1}: {submissionTXs[i].gas_used}")
+            print("--------------------------------------------------")
+            for i in range(amountOfExecutors):
+                print(f"Result liberation cost {i + 1}: {liberationTXs[i].gas_used}")
+        return requestCreationCost, firstSubmissionsAvgCost, submissionTXs[-1].gas_used, firstLiberationsAvgCost, liberationTXs[-1].gas_used
+
     def test_creation(self):
         account = Accounts.getAccount()
         broker = BrokerFactory.create()
@@ -260,47 +310,12 @@ class TestExecutor:
         assert dict(broker.requests(reqID))["closed"] == False
 
     def test_liberate_last_result_all_correct(self):
-        resultSize = "9" * 512
-        amountOfExecutors = 3
-        baseBalance = Accounts.getFromIndex(0).balance()
-        broker = BrokerFactory.create(account=Accounts.getFromIndex(0))
-        executors = []
-        for i in range(amountOfExecutors):
-            executors.append(Executor(broker, Accounts.getFromIndex(i + 2), True, gas_price=1))
-        registrationCosts = []
-        for i in range(amountOfExecutors):
-            registrationCosts.append(baseBalance - Accounts.getFromIndex(i + 2).balance() - broker.BASE_STAKE_AMOUNT())
-        requestor = Requestor(broker, Accounts.getFromIndex(1))
-        request = requestor.createRequest("input state", "code reference", amountOfExecutors=amountOfExecutors, executionPower=1000)
-        requestCreationCost = request.gas_used
-        reqID = request.return_value
-        results = []
-        submissionTXs = []
-        for i in range(amountOfExecutors):
-            results.append(executors[i]._calculateFinalState(reqID, state_value=resultSize))  # Hardcoded trivial result
-            submissionTXs.append(executors[i]._submitSignedHash(reqID, results[i]))
-        assert dict(broker.requests(reqID))["submissionsLocked"] == True
-        liberationTXs = []
-        for i in range(amountOfExecutors - 1):
-            liberationTXs.append(executors[i]._liberateResult(reqID))
-        assert dict(broker.requests(reqID))["closed"] == False
-        assert dict(broker.requests(reqID))["result"] == ('', '0x0000000000000000000000000000000000000000')
-        liberationTXs.append(executors[amountOfExecutors - 1]._liberateResult(reqID))
-        results[0].signingAddress = broker.address
-        assert dict(broker.requests(reqID))["closed"] == True
-        assert dict(broker.requests(reqID))["result"] == results[0].toTuple()
-        for i in range(amountOfExecutors):
-            print(f"Executor {i + 1} registration cost: {registrationCosts[i]}")
-        print("--------------------------------------------------")
-        print(f"Request creation cost: {requestCreationCost}")
-        print("--------------------------------------------------")
-        for i in range(amountOfExecutors):
-            print(f"Hash submission cost {i + 1}: {submissionTXs[i].gas_used}")
-        print("--------------------------------------------------")
-        for i in range(amountOfExecutors):
-            print(f"Result liberation cost {i + 1}: {liberationTXs[i].gas_used}")
+        amountsOfExecutors = [1, 3, 5, 7]
+        resultStateSizes = [256, 512, 1024, 2048]
+        for resultStateSize in resultStateSizes:
+            for amountOfExecutors in amountsOfExecutors:
+                print(self.run_full_test(amountOfExecutors, resultStateSize, printInfo=False))
 
-        
         raise "interactive console"
         #TODO ver tema GAS y STAKES
 
