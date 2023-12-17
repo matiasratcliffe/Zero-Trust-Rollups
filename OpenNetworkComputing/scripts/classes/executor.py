@@ -12,7 +12,7 @@ class Executor:
         if register:
             if stake == None:
                 stake = broker.BASE_STAKE_AMOUNT()
-            self.broker.registerExecutor({"from": self.account, "value": stake, "gas_price": gas_price})
+            self.registrationCost = self.broker.registerExecutor({"from": self.account, "value": stake, "gas_price": gas_price}).gas_used
     
     def getData(self):
         return dict(self.broker.getExecutorByAddress(self.account))

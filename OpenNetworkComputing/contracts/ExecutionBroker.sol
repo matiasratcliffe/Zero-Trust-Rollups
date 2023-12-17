@@ -158,11 +158,12 @@ contract ExecutionBroker is Transferable {
         return requests;
     }
 
-    function getActiveExecutorsList() public view returns (address[3][] memory) {
-        address[3][] memory addresses = new address[3][](executorsCollection.amountOfActiveExecutors);
+    function getActiveExecutorsList() public view returns (address[][] memory) {
+        address[][] memory addresses = new address[][](3);
         uint24 j = 0;
         for (uint8 category = 0; category < 3; category++) {
-            for (uint24 i = 0; i < executorsCollection.executorCategories[uint8(category)].activeExecutors.length; i++) {
+            addresses[category] = new address[](executorsCollection.executorCategories[uint8(category)].amountOfActiveExecutors);
+            for (uint24 i = 0; i < executorsCollection.executorCategories[uint8(category)].activeExecutors.length; i++) {  // La categoria arranca con un executor nulo, y puede o no tener huecos por ejecutores blockeados o removidos, por eso uso length para recorrer, y no amount que es el numero de efectivos
                 if (executorsCollection.executorCategories[uint8(category)].activeExecutors[i].executorAddress != address(0x0)) {
                     addresses[uint8(category)][j] = executorsCollection.executorCategories[uint8(category)].activeExecutors[i].executorAddress;
                     j++;

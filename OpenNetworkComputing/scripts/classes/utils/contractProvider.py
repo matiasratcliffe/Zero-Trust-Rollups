@@ -8,7 +8,7 @@ class BrokerFactory:
     DEFAULT_EXECUTION_TIME_FRAME = 5
     BASE_STAKE_AMOUNT = 1e9
     MAXIMUM_EXECUTION_POWER_ALLOWED = 10000
-    MAXIMUM_NUMBER_OF_EXECUTORS_ALLOWED = 5
+    MAXIMUM_NUMBER_OF_EXECUTORS_ALLOWED = 7
 
     def getInstance():
         if "brokerContractAddress" in config["networks"][network.show_active()]:

@@ -1,6 +1,6 @@
 {
   "contracts": {
-    "ExecutionBroker": "9f5f98a0fe13d1f2310b039e75f8dbb60b95331e",
+    "ExecutionBroker": "8ae9ac732d983a861a645d9db3e848d9c333a129",
     "Transferable": "46d8302b7b373057f7bb873d07b598531307e853"
   },
   "tests": {},

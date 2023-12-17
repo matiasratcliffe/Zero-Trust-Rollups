@@ -20,16 +20,14 @@ class TestExecutor:
 
     def run_full_test(self, amountOfExecutors, resultSize, printInfo):
         resultValue = "9" * resultSize
-        baseBalance = Accounts.getFromIndex(0).balance()
         broker = BrokerFactory.create(account=Accounts.getFromIndex(0))
         executors = []
-        for i in range(amountOfExecutors):
-            executors.append(Executor(broker, Accounts.getFromIndex(i + 2), True, gas_price=1))
         registrationCosts = []
         for i in range(amountOfExecutors):
-            registrationCosts.append(baseBalance - Accounts.getFromIndex(i + 2).balance() - broker.BASE_STAKE_AMOUNT())
+            executors.append(Executor(broker, Accounts.getFromIndex(i + 2), True, gas_price=1))
+            registrationCosts.append(executors[-1].registrationCost)
         requestor = Requestor(broker, Accounts.getFromIndex(1))
-        request = requestor.createRequest("input state", "code reference", amountOfExecutors=amountOfExecutors, executionPower=1000)
+        request = requestor.createRequest(f"{registrationCosts} - {executors}", f"{amountOfExecutors} {resultSize}", amountOfExecutors=i+1, executionPower=1000)
         requestCreationCost = request.gas_used
         reqID = request.return_value
         results = []
@@ -38,8 +36,7 @@ class TestExecutor:
         for i in range(amountOfExecutors - 1):
             results.append(executors[i]._calculateFinalState(reqID, state_value=resultValue))  # Hardcoded trivial result
             submissionTXs.append(executors[i]._submitSignedHash(reqID, results[i]))
-            firstSubmissionsAvgCost += submissionTXs[-1].gas_used
-        firstSubmissionsAvgCost /= len(submissionTXs)
+            firstSubmissionsAvgCost += submissionTXs[-1].gas_used / (amountOfExecutors - 1)
         results.append(executors[-1]._calculateFinalState(reqID, state_value=resultValue))  # Hardcoded trivial result
         submissionTXs.append(executors[-1]._submitSignedHash(reqID, results[-1]))
         assert dict(broker.requests(reqID))["submissionsLocked"] == True
@@ -47,8 +44,7 @@ class TestExecutor:
         firstLiberationsAvgCost = 0
         for i in range(amountOfExecutors - 1):
             liberationTXs.append(executors[i]._liberateResult(reqID))
-            firstLiberationsAvgCost += liberationTXs[-1].gas_used
-        firstLiberationsAvgCost /= len(liberationTXs)
+            firstLiberationsAvgCost += liberationTXs[-1].gas_used / (amountOfExecutors - 1)
         assert dict(broker.requests(reqID))["closed"] == False
         assert dict(broker.requests(reqID))["result"] == ('', '0x0000000000000000000000000000000000000000')
         liberationTXs.append(executors[-1]._liberateResult(reqID))
@@ -310,11 +306,46 @@ class TestExecutor:
         assert dict(broker.requests(reqID))["closed"] == False
 
     def test_liberate_last_result_all_correct(self):
+        registrationCosts = []
+        firstSubmissionCosts = []
+        lastSubmissionCosts = []
+        fisrtLiberationCosts = []
+        lastLiberationCosts = []
         amountsOfExecutors = [1, 3, 5, 7]
         resultStateSizes = [256, 512, 1024, 2048]
         for resultStateSize in resultStateSizes:
+            _registrationCosts = []
+            _firstSubmissionCosts = []
+            _lastSubmissionCosts = []
+            _fisrtLiberationCosts = []
+            _lastLiberationCosts = []
             for amountOfExecutors in amountsOfExecutors:
-                print(self.run_full_test(amountOfExecutors, resultStateSize, printInfo=False))
+                rC, fSC, lSC, fLC, lLC = self.run_full_test(amountOfExecutors, resultStateSize, printInfo=False)
+                _registrationCosts.append(rC)
+                _firstSubmissionCosts.append(fSC)
+                _lastSubmissionCosts.append(lSC)
+                _fisrtLiberationCosts.append(fLC)
+                _lastLiberationCosts.append(lLC)
+            registrationCosts.append(_registrationCosts)
+            firstSubmissionCosts.append(_firstSubmissionCosts)
+            lastSubmissionCosts.append(_lastSubmissionCosts)
+            fisrtLiberationCosts.append(_fisrtLiberationCosts)
+            lastLiberationCosts.append(_lastLiberationCosts)
+        print("Registration")
+        for line in registrationCosts:
+            print(line)
+        print("\nFirst Submission")
+        for line in firstSubmissionCosts:
+            print(line)
+        print("\nLast Submission")
+        for line in lastSubmissionCosts:
+            print(line)
+        print("\nFirst Liberation")
+        for line in fisrtLiberationCosts:
+            print(line)
+        print("\nLast Liberation")
+        for line in lastLiberationCosts:
+            print(line)
 
         raise "interactive console"
         #TODO ver tema GAS y STAKES
