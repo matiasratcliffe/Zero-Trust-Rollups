@@ -102,7 +102,7 @@ contract TS3000 is BaseClient {
         return "{uint fragmentIndex; uint timestampRestriction; uint passcode;}";
     }
 
-    function resolveOnChain(bytes calldata inputData) public override view returns (bytes memory) { 
+    /*function resolveOnChain(bytes calldata inputData) public override view returns (bytes memory) { 
         Result memory result;
         Input memory input = abi.decode(inputData, (Input));
         result.fragmentIndex = input.fragmentIndex;
@@ -114,5 +114,5 @@ contract TS3000 is BaseClient {
             }
         }
         return abi.encode(result);
-    }
+    }*/
 }

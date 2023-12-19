@@ -22,12 +22,10 @@ class TestExecutor:
         resultValue = "9" * resultSize
         broker = BrokerFactory.create(account=Accounts.getFromIndex(0))
         executors = []
-        registrationCosts = []
         for i in range(amountOfExecutors):
             executors.append(Executor(broker, Accounts.getFromIndex(i + 2), True, gas_price=1))
-            registrationCosts.append(executors[-1].registrationCost)
         requestor = Requestor(broker, Accounts.getFromIndex(1))
-        request = requestor.createRequest(f"{registrationCosts} - {executors}", f"{amountOfExecutors} {resultSize}", amountOfExecutors=i+1, executionPower=1000)
+        request = requestor.createRequest("input state reference", "code reference", amountOfExecutors=i+1, executionPower=1000)
         requestCreationCost = request.gas_used
         reqID = request.return_value
         results = []
@@ -349,6 +347,15 @@ class TestExecutor:
 
         raise "interactive console"
         #TODO ver tema GAS y STAKES
+
+    def test_executor_registration_costs(self):
+        broker = BrokerFactory.create()
+        executors = []
+        for i in range(30):
+            executors.append(Executor(broker, Accounts.getFromIndex(i), True))
+        for i, executor in enumerate(executors):
+            print(f"Executor {(i+1):02d} registration cost: {executor.registrationCost}")
+        raise "print results"
 
     def test_liberate_result_from_unregistered_executor(self):
         broker = BrokerFactory.create()
