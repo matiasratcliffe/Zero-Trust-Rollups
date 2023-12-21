@@ -18,12 +18,12 @@ class TestTS3000:
     def teardown_method(self, method):
         pass
 
-    def test_ts3000(self):
+    def test_ts3000_ztr(self):
         fileName = "text_file"
         broker = BrokerFactory.getInstance()
         requestorAccount = Accounts.getFromIndex(0)
         initialRequestorBalance = requestorAccount.balance()
-        requestor = TS3000Requestor(broker, requestorAccount, fileName, numberOfKeyFragments=5, difficulty=3, paymentPerFragment=0, gas_price=1)
+        requestor = TS3000Requestor(broker, requestorAccount, fileName, numberOfKeyFragments=30, difficulty=4, paymentPerFragment=0, gas_price=1)
         requestDeploymentCost = initialRequestorBalance - requestorAccount.balance()
         reqID = requestor.getInitialRequestID()
         miner = TS3000Miner(broker, Accounts.getFromIndex(1))
@@ -43,19 +43,19 @@ class TestTS3000:
             reqID = tx.events["requestCreated"]["requestID"]
         finalKey = bytes(requestor.client.finalKey())
 
-        print(f"Request deployment cost: {requestDeploymentCost}")
+        print(f"Request deployment cost: {requestDeploymentCost:,}")
         print("---------------------------------------------------------------------------------------")
         totalMiningCost = 0
         for i in range(len(accTXs)):
             fragment = requestor.client.keyFragments(i).dict()
             miningCost = accTXs[i].gas_used + submitTXs[i].gas_used
             totalMiningCost += miningCost
-            print(f"Fragment {i} Acceptance Gas: {accTXs[i].gas_used} Submission Gas: {submitTXs[i].gas_used}")
-            print(f"\tglobalHash: {fragment['globalHash']}")
-            print(f"\tlocalHash: {fragment['localHash']}")
-            print(f"\tpasscode: {fragment['passcode']}")
+            print(f"Fragment {i} Acceptance Gas: {accTXs[i].gas_used:,} Submission Gas: {submitTXs[i].gas_used:,}")
+            #print(f"\tglobalHash: {fragment['globalHash']}")
+            #print(f"\tlocalHash: {fragment['localHash']}")
+            #print(f"\tpasscode: {fragment['passcode']}")
         print("---------------------------------------------------------------------------------------")
-        print(f"totalMiningCost: {totalMiningCost}")
+        print(f"totalMiningCost: {totalMiningCost:,}")
         print(f"finalKey: {requestor.client.finalKey()}")
         print("============================== short test summary info ================================")
 

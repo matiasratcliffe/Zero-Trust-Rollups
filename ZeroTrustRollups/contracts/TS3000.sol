@@ -101,18 +101,4 @@ contract TS3000 is BaseClient {
     function getResultDataStructure() external override pure returns (string memory) {
         return "{uint fragmentIndex; uint timestampRestriction; uint passcode;}";
     }
-
-    /*function resolveOnChain(bytes calldata inputData) public override view returns (bytes memory) { 
-        Result memory result;
-        Input memory input = abi.decode(inputData, (Input));
-        result.fragmentIndex = input.fragmentIndex;
-        result.timestampRestriction = input.minTimestamp;
-        for (uint passcode = 0; passcode < 10**fragmentDifficulty; passcode++) {
-            if (keccak256(abi.encode(passcode, input.localHash)) == input.globalHash) {
-                result.passcode = passcode;
-                break;
-            }
-        }
-        return abi.encode(result);
-    }*/
 }

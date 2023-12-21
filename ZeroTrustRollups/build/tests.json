@@ -4,18 +4,26 @@
     "APIProvider": "9b08f00b064623d04f2c099f68afc2d5ba0361e5",
     "ExecutionBroker": "b15317e6323f1e5405d18ebb93311918cf984a57",
     "Math": "1ce946f6a4eaa185320328620ccf999b9e86db7c",
+    "OnchainTS3000": "f0f2a1a6f984215bfea7af5757580d8972dcb823",
     "Ownable": "672f70f06f11b1d7dfeb0f73ad0bb11d0c9972ad",
     "SignedMath": "1ce946f6a4eaa185320328620ccf999b9e86db7c",
     "Strings": "1ce946f6a4eaa185320328620ccf999b9e86db7c",
-    "TS3000": "430b86a001319bb3ff3f1c1443851b754dc0ea70",
+    "TS3000": "1105f4c55c00e4eafbe14e4245b16fb357703546",
     "Transferable": "46d8302b7b373057f7bb873d07b598531307e853"
   },
   "tests": {
+    "tests/test_onchain_ts3000.py": {
+      "coverage": false,
+      "isolated": false,
+      "results": ".F",
+      "sha1": "32b2ae71879e5a1fa79667e1740b1c39650b03bb",
+      "txhash": []
+    },
     "tests/test_ts3000.py": {
       "coverage": false,
       "isolated": false,
       "results": "F",
-      "sha1": "f2d5307912d981a433d3686928d2bf71d219d60c",
+      "sha1": "98da99aa9f3e9c437a0db5c08a386be400c1f991",
       "txhash": []
     }
   },
