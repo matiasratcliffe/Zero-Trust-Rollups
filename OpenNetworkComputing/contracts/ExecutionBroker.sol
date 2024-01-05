@@ -94,7 +94,7 @@ contract ExecutionBroker is Transferable {
     event requestClosed(uint requestID, uint coincidences);
     event requestRecycled(uint requestID);
 
-    event executorLocked(address executorAddress);
+    event executorLocked(address executorAddress, uint requestID);
     event executorUnlocked(address executorAddress);
     event executorPunished(address executorAddress);
 
@@ -648,7 +648,7 @@ contract ExecutionBroker is Transferable {
         delete executorsCollection.executorCategories[uint8(category)].activeIndexOf[executorAddress];
         executorsCollection.executorCategories[uint8(category)].amountOfActiveExecutors--;
         executorsCollection.amountOfActiveExecutors--;
-        emit executorLocked(executorAddress);
+        emit executorLocked(executorAddress, requestID);
     }
 
     function _unlockExecutor(address executorAddress) private {
