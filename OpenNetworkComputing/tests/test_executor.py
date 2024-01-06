@@ -19,23 +19,28 @@ class TestExecutor:
         pass
 
     def run_full_test(self, amountOfExecutors, resultSize, printInfo):
-        resultValue = "9" * resultSize
+        executionStateSampleValue = "9" * resultSize
         broker = BrokerFactory.create(account=Accounts.getFromIndex(0))
+        registrationCosts = []
+        for i in range(amountOfExecutors):
+            registrationCosts.append(Accounts.getFromIndex(i + 2).balance())
         executors = []
         for i in range(amountOfExecutors):
             executors.append(Executor(broker, Accounts.getFromIndex(i + 2), True, gas_price=1))
+        for i in range(amountOfExecutors):
+            registrationCosts[i] = registrationCosts[i] - Accounts.getFromIndex(i + 2).balance()
         requestor = Requestor(broker, Accounts.getFromIndex(1))
-        request = requestor.createRequest("input state reference", "code reference", amountOfExecutors=i+1, executionPower=1000)
+        request = requestor.createRequest(executionStateSampleValue, "code reference", amountOfExecutors=i+1, executionPower=1000)
         requestCreationCost = request.gas_used
         reqID = request.return_value
         results = []
         submissionTXs = []
         firstSubmissionsAvgCost = 0
         for i in range(amountOfExecutors - 1):
-            results.append(executors[i]._calculateFinalState(reqID, state_value=resultValue))  # Hardcoded trivial result
+            results.append(executors[i]._calculateFinalState(reqID, state_value=executionStateSampleValue))  # Hardcoded trivial result
             submissionTXs.append(executors[i]._submitSignedHash(reqID, results[i]))
             firstSubmissionsAvgCost += submissionTXs[-1].gas_used / (amountOfExecutors - 1)
-        results.append(executors[-1]._calculateFinalState(reqID, state_value=resultValue))  # Hardcoded trivial result
+        results.append(executors[-1]._calculateFinalState(reqID, state_value=executionStateSampleValue))  # Hardcoded trivial result
         submissionTXs.append(executors[-1]._submitSignedHash(reqID, results[-1]))
         assert dict(broker.requests(reqID))["submissionsLocked"] == True
         liberationTXs = []
